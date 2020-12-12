@@ -1,0 +1,46 @@
+<ui:composition template="/template/common/commonLayout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<ui:define name="head"></ui:define>
+	<ui:define name="content">
+
+
+		<p:ajaxStatus onstart="PF('statusDialog').show()"
+			onsuccess="PF('statusDialog').hide()" />
+
+		<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:graphicImage value="../resources/img/ajax-loader.gif" />
+		</p:dialog>
+
+		<h:form>
+			<p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true" />
+
+			<p:fieldset legend="Create New Invoice" style="margin-bottom:20px">
+
+				<p:fieldset legend="Select Customer" toggleable="true"
+					toggleSpeed="500">
+
+					<h:panelGrid columns="2" cellpadding="5">
+						<p:outputLabel value="Pojo:" for="themePojo" />
+						<p:autoComplete id="themePojo" value="#{autoCompleteView.theme1}"
+							completeMethod="#{autoCompleteView.completeTheme}" var="theme"
+							itemLabel="#{theme.displayName}" itemValue="#{theme}"
+							forceSelection="true" />
+					</h:panelGrid>
+				</p:fieldset>
+
+
+
+			</p:fieldset>
+
+
+		</h:form>
+
+
+	</ui:define>
+</ui:composition>
+

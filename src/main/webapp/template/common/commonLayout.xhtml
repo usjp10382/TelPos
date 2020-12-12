@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<h:outputStylesheet name="common-style.css" library="css" />
+	<h:outputStylesheet name="primeicons/primeicons.css"
+		library="primefaces" />
+	<link href="#{request.contextPath}/resources/css/inputText.css"
+		rel="stylesheet" />
+	<link href="#{request.contextPath}/resources/css/primeflex.css"
+		rel="stylesheet" />
+	<link rel="shortcut icon" type="image/x-icon"
+		href="#{request.contextPath}/resources/img/fav.png" />
+
+</h:head>
+
+<h:body>
+	<f:view contentType="text/html" locale="#{locallController.local}">
+		<div class="p-grid header-footer" id="template-header" >
+			<div class="p-col-12" >
+				<ui:include src="/template/common/header.xhtml" />
+			</div>
+		</div>
+
+		<div class="p-grid ">
+
+			<div class="p-col-2" id="template-menu">
+				<ui:include src="/template/common/themeMenu.xhtml" />
+			</div>
+
+			<div class="p-col-10" id="template-content">
+				<ui:insert name="content"></ui:insert>
+			</div>
+		</div>
+
+	</f:view>
+</h:body>
+
+</html>

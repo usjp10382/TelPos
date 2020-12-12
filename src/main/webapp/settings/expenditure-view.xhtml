@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	
+</h:head>
+<h:body>
+
+	<ui:composition template="/template/common/commonLayout.xhtml">
+
+		<ui:define name="content">
+
+
+			<h:form id="expform">
+
+				<p:growl id="growl" sticky="false" life="2000" showDetail="true"
+					showSummary="true" />
+
+				<p:fieldset legend="Expendature Details" style="margin-bottom:20px"
+					toggleable="true" toggleSpeed="400">
+
+
+					<p:dataTable var="exp" value="#{expeControl.expenditures}"
+						widgetVar="expTable" id="expTble"
+						emptyMessage="No Expenditure found with given criteria"
+						filteredValue="#{expeControl.filExpenditures}"
+						globalFilterFunction="#{expeControl.globalFilterFunction}">
+
+						<f:facet name="header">
+							<p:outputPanel>
+								<h:outputText value="Search Expenditures  " />
+								<p:inputText id="globalFilter" onkeyup="PF('expTable').filter()"
+									style="width:250px" placeholder="Enter keyword" />
+							</p:outputPanel>
+						</f:facet>
+
+						<p:column headerText="Id" width="15">
+							<h:outputText value="#{exp.expId}" />
+						</p:column>
+
+						<p:column headerText="Description">
+							<h:outputText value="#{exp.dec}" />
+						</p:column>
+
+						<p:column headerText="Create By">
+							<h:outputText value="#{exp.createBy}" />
+						</p:column>
+
+						<p:column headerText="Create Date">
+							<h:outputText value="#{exp.createDate}">
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Status">
+							<h:outputText value="#{exp.expState=='1' ? 'Active': 'InActive'}" />
+						</p:column>
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="pi pi-refresh" title="Update"
+								process="expTble" update=":expform:expUpdates"
+								oncomplete="saveDisable()" style="width:20px;height:20px">
+								<f:setPropertyActionListener value="#{exp}"
+									target="#{expeControl.selectedExpenditure}" />
+							</p:commandButton>
+						</p:column>
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="pi pi-trash" title="Delete"
+								style="width:20px;height:20px" process="expTble"
+								update=":expform:growl,:expform:expTble" styleClass="red-button">
+								<f:setPropertyActionListener value="#{exp}"
+									target="#{expeControl.deleteExpenditure}" />
+								<p:confirm header="Warning!"
+									message="Do you need to delete this item permenently?"
+									icon="pi pi-trash" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+
+
+				</p:fieldset>
+
+
+
+				<p:fieldset legend="Expendature Controlls"
+					style="margin-bottom:20px" id="expUpdates">
+
+					<p:confirmDialog global="true" showEffect="expLode"
+						hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							styleClass="red-button ui-confirmdialog-yes" icon="pi pi-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="green-button ui-confirmdialog-no" icon="pi pi-times" />
+					</p:confirmDialog>
+
+					<p:panelGrid columns="4" layout="grid"
+						styleClass="showcase-text-align-center"
+						columnClasses="ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3"
+						contentStyleClass="p-align-baseline ui-fluid">
+
+						<p:outputLabel for="expId" value="ID" />
+						<p:inputText id="expId" readonly="true"
+							value="#{expeControl.selectedExpenditure.expId}"
+							style="font-weight:bold" />
+
+						<p:outputLabel for="expDes" value="Description" />
+						<p:inputText widgetVar="expDes" id="expDes" required="true"
+							requiredMessage="Expenditure Name Is Required!"
+							value="#{expeControl.selectedExpenditure.dec}"
+							style="font-weight:bold" />
+
+						<p:outputLabel for="expCreBy" value="Create By" />
+						<p:inputText id="expCreBy" readonly="true"
+							value="#{expeControl.selectedExpenditure.createBy}"
+							style="font-weight:bold" />
+
+						<p:outputLabel for="expCreDt" value="Create Date" />
+						<p:inputText id="expCreDt" readonly="true"
+							value="#{expeControl.selectedExpenditure.createDate}"
+							style="font-weight:bold">
+							<f:convertDateTime type="date" pattern="dd-MMM-yyyy" />
+						</p:inputText>
+					</p:panelGrid>
+
+
+
+					<div
+						style="display: flex; justify-content: flex-end; font-weight: bold">
+
+						<p:commandButton value="Reset" icon="fa fa-times-circle"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							styleClass="red-button" type="button"
+							onclick="saveEnable();clearAll()">
+						</p:commandButton>
+
+						<p:commandButton value="Save" icon="pi pi-check-circle"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							update=":expform:growl,:expform:expTble,:expform:expUpdates"
+							process="@form" ajax="true"
+							action="#{expeControl.creaeNewExpenditure}" widgetVar="btnSave">
+							<p:confirm header="Create New Expenditure"
+								message="Are you Sure Create New Expenditure?"
+								icon="fa fa-floppy-o" />
+						</p:commandButton>
+
+
+						<p:commandButton value="Update" icon="pi pi-refresh"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							styleClass="green-button" widgetVar="btnUpdate" disabled="false"
+							action="#{expeControl.updateExpenditure}"
+							update=":expform:growl,:expform:expTble,:expform:expUpdates"
+							process="@form" ajax="true">
+							<p:confirm header="Update Expenditure"
+								message="Are you Sure Update Expenditure?" icon="pi pi-refresh" />
+						</p:commandButton>
+
+					</div>
+
+
+				</p:fieldset>
+			</h:form>
+
+
+
+
+<div id="template-footer">
+<ui:include src="/template/common/commonFooter.xhtml" />
+</div>
+			<script>
+				function saveEnable() {
+					PF('btnUpdate').disable();
+					PF('btnSave').enable();
+				}
+
+				function saveDisable() {
+					PF('btnSave').disable();
+					PF('btnUpdate').enable();
+				}
+
+				function clearAll() {
+					console.log("ok")
+					PF('expDes').value = '';
+				}
+			</script>
+
+
+		</ui:define>
+
+	</ui:composition>
+
+</h:body>
+</html>
+
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+    http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
+	version="2.0">
+
+	<application>
+		<locale-config>
+			<default-locale>en</default-locale>
+			<supported-locale>si</supported-locale>
+		</locale-config>
+		<resource-bundle>
+			<base-name>bundle</base-name>
+			<var>msg</var>
+		</resource-bundle>
+		<!-- <el-resolver>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerELResolver</el-resolver> -->
+	</application>
+	<!-- <factory> <exception-handler-factory>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerFactory</exception-handler-factory> 
+		</factory> -->
+
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>SettingView</from-outcome>
+			<to-view-id>/settings/expenditure-view.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>BillingView</from-outcome>
+			<to-view-id>/pos/billing.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>UomView</from-outcome>
+			<to-view-id>/settings/uom-view.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+</faces-config>
