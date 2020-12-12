@@ -127,13 +127,13 @@
 					<div
 						style="display: flex; justify-content: flex-end; font-weight: bold">
 
-						<p:commandButton value="Reset" icon="fa fa-times-circle"
+						<p:commandButton value="#{msg['tel.pos.cwc.reset']}" icon="fa fa-times-circle"
 							style="margin-right:20px;margin-top:10px;width:200px"
 							styleClass="red-button" type="button"
 							onclick="saveEnable();clearAll()">
 						</p:commandButton>
 
-						<p:commandButton value="Save" icon="pi pi-check-circle"
+						<p:commandButton value="#{msg['tel.pos.cwc.save']}" icon="pi pi-check-circle"
 							style="margin-right:20px;margin-top:10px;width:200px"
 							update=":uomform:growl,:uomform:uomTble,:uomform:uomUpdates"
 							process="@form" ajax="true"
@@ -144,7 +144,7 @@
 						</p:commandButton>
 
 
-						<p:commandButton value="Update" icon="pi pi-refresh"
+						<p:commandButton value="#{msg['tel.pos.cwc.update']}" icon="pi pi-refresh"
 							style="margin-right:20px;margin-top:10px;width:200px"
 							styleClass="green-button" widgetVar="btnUpdate" disabled="false"
 							action="#{expeControl.updateExpenditure}"
