@@ -90,10 +90,10 @@
 #template-menu {
 	position: fixed;
 	top: 50px;
-	left:5px;
+	left: 5px;
 	/* background-image: linear-gradient(to right, #ffffff, #6a6cf1); */
 	height: 100%;
-border-radius: 10px;
+	border-radius: 10px;
 }
 
 #template-content {
@@ -111,7 +111,7 @@ border-radius: 10px;
 	border-radius: 5px;
 }
 
-#footer-link{
-	color: white;	
+#footer-link {
+	color: white;
 	font-size: 14px;
 }
