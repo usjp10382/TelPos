@@ -96,7 +96,7 @@ public class CategoryController implements Serializable {
 				LOGGER.info("<--------- Create New Category Success--------->");
 				addMessage("Create New Category", "Create New Category Success!");
 				loadAllCategories();
-				clearFiled(0);
+				clearFiled();
 			} else {
 				addErrorMessage("Create New Category", "Create New Category Falied");
 			}
@@ -122,7 +122,7 @@ public class CategoryController implements Serializable {
 				LOGGER.info("Update Category Success...");
 				addMessage("Update Category", "Update Category Successfull!");
 				loadAllCategories();
-				clearFiled(1);
+				clearFiled();
 			} else {
 
 				addErrorMessage("Update Category", "Update Category Faild!");
@@ -170,12 +170,8 @@ public class CategoryController implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
 	}
 
-	private void clearFiled(int flag) {
+	private void clearFiled() {
 		getSelectedCategory().setCategoryName(null);
-		if (flag == 1) {
-			getSelectedCategory().setCreateBy(null);
-			getSelectedCategory().setCreateDate(null);
-		}
 
 	}
 

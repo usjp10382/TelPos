@@ -91,7 +91,7 @@ public class UomController implements Serializable {
 				LOGGER.info("<--------- Create New UOM Success--------->");
 				addMessage("Create New UOM", "Create New UOM Success!");
 				loadAllUom();
-				clearFiled(0);
+				clearFiled();
 			} else {
 				addErrorMessage("Create New UOM", "Create New UOM Falied");
 			}
@@ -118,7 +118,7 @@ public class UomController implements Serializable {
 				LOGGER.info("Update Success...");
 				addMessage("Update UOM", "Update UOM Successfull");
 				loadAllUom();
-				clearFiled(1);
+				clearFiled();
 			} else {
 
 				addErrorMessage("Update UOM", "Update UOM Faild");
@@ -165,14 +165,10 @@ public class UomController implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
 	}
 
-	private void clearFiled(int flag) {
+	private void clearFiled() {
 		getSelectedUom().setUomName(null);
 		getSelectedUom().setUomChar(null);
-		if (flag == 1) {
-			selectedUom.setCreateBy(null);
-			selectedUom.setCreateDate(null);
-		}
-
+	
 	}
 
 	public Uom getSelectedUom() {
