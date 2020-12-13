@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="/template/common/commonLayout.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="categform">
+
+				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+					showSummary="false" />
+
+				<!-- Uom Details - Start -->
+				<p:fieldset legend="#{msg['tel.pos.uom.ct.det']}"
+					style="margin-bottom:20px" toggleable="true" toggleSpeed="400">
+
+					<p:dataTable var="categ" value="#{categController.categoryList}"
+						widgetVar="categTable" id="categTable"
+						emptyMessage="No Expenditure found with given criteria"
+						filteredValue="#{categController.filteredCategories}"
+						globalFilterFunction="#{categController.globalFilterFunction}">
+
+						<f:facet name="header">
+							<p:outputPanel>
+								<h:outputText value="#{msg['tel.pos.uom.ct.srh_uom']}" />
+								<p:inputText id="globalFilter"
+									onkeyup="PF('categTable').filter()" style="width:250px"
+									placeholder="#{msg['tel.pos.cwc.srh']}" />
+							</p:outputPanel>
+						</f:facet>
+
+						<p:column headerText="#{msg['tel.pos.cwc.des']}">
+							<h:outputText value="#{categ.categoryName}" />
+						</p:column>
+
+						<p:column headerText="#{msg['tel.pos.cwc.cby']}">
+							<h:outputText value="#{categ.createBy}" />
+						</p:column>
+
+						<p:column headerText="#{msg['tel.pos.cwc.cdt']}">
+							<h:outputText value="#{categ.createDate}">
+							</h:outputText>
+						</p:column>
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="pi pi-refresh" title="Update"
+								process="categTable" update=":categform:categUpdates"
+								oncomplete="saveDisable()" style="width:20px;height:20px">
+								<f:setPropertyActionListener value="#{categ}"
+									target="#{categController.selectedCategory}" />
+							</p:commandButton>
+						</p:column>
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="pi pi-trash" title="Delete"
+								style="width:20px;height:20px" process="categTable"
+								update=":categform:growl,:categform:categTable"
+								styleClass="red-button">
+								<f:setPropertyActionListener value="#{categ}"
+									target="#{categController.deleteCategory}" />
+								<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+									message="#{msg['tel.pos.cm.dlt']}" icon="pi pi-trash" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+				</p:fieldset>
+				<!-- Uom Details - End -->
+
+				<!-- UOM  Controlls - Start -->
+				<p:fieldset legend="#{msg['tel.pos.uom.ct.ctl']}"
+					style="margin-bottom:20px" id="categUpdates">
+
+					<p:confirmDialog global="true" showEffect="expLode"
+						hideEffect="fade">
+						<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+							type="button" styleClass="red-button ui-confirmdialog-yes"
+							icon="pi pi-check" />
+						<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
+							type="button" styleClass="green-button ui-confirmdialog-no"
+							icon="pi pi-times" />
+					</p:confirmDialog>
+
+					<div class="p-grid ">
+
+						<div class="p-col-2">
+							<p:outputLabel for="uomId" value="#{msg['tel.pos.cwc.des']}"
+								style="padding-right:50px" />
+						</div>
+
+						<div class="p-col-4">
+							<p:inputText id="uomId" required="true" maxlength="20"
+								requiredMessage="#{msg['tel.pos.tfvm.des']}"
+								value="#{categController.selectedCategory.categoryName}"
+								style="font-weight:bold; width:100%" />
+						</div>
+
+					</div>
+
+					<div class="p-grid ">
+
+						<div class="p-col-2">
+							<p:outputLabel for="uomCreBy" value="#{msg['tel.pos.cwc.cby']}"
+								style="padding-right:50px" />
+						</div>
+
+						<div class="p-col-4">
+							<p:inputText id="uomCreBy" readonly="true"
+								value="#{categController.selectedCategory.createBy}"
+								style="font-weight:bold; width:100%" />
+						</div>
+
+						<div class="p-col-2">
+							<p:outputLabel for="uomCreDt" value="#{msg['tel.pos.cwc.cdt']}"
+								style="padding-right:50px" />
+						</div>
+
+						<div class="p-col-4">
+							<p:inputText id="uomCreDt" readonly="true"
+								value="#{categController.selectedCategory.createDate}"
+								style="font-weight:bold;width:100%">
+								<f:convertDateTime type="date" pattern="dd-MMM-yyyy" />
+							</p:inputText>
+						</div>
+
+					</div>
+
+					<!-- Uom Controlls - End-->
+
+					<div
+						style="display: flex; justify-content: flex-end; font-weight: bold">
+
+						<p:commandButton value="#{msg['tel.pos.cwc.reset']}"
+							icon="fa fa-times-circle"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							styleClass="red-button" type="button"
+							onclick="saveEnable();clearAll()">
+						</p:commandButton>
+
+						<p:commandButton value="#{msg['tel.pos.cwc.save']}"
+							icon="pi pi-check-circle"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							update=":categform:growl,:categform:categTable,:categform:categUpdates"
+							process="@form" ajax="true"
+							action="#{categController.creaeNewCategory}" widgetVar="btnSave">
+							<p:confirm header="#{msg['tel.pos.cm.info']}"
+								message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
+						</p:commandButton>
+
+						<p:commandButton value="#{msg['tel.pos.cwc.update']}"
+							icon="pi pi-refresh"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							styleClass="green-button" widgetVar="btnUpdate" disabled="false"
+							action="#{categController.updateCategory}"
+							update=":categform:growl,:categform:categTable,:categform:categUpdates"
+							process="@form" ajax="true">
+							<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+								message="#{msg['tel.pos.cm.updte']}" />
+						</p:commandButton>
+
+					</div>
+
+				</p:fieldset>
+			</h:form>
+
+			<div id="template-footer">
+				<ui:include src="/template/common/commonFooter.xhtml" />
+			</div>
+			<script>
+				function saveEnable() {
+					PF('btnUpdate').disable();
+					PF('btnSave').enable();
+				}
+
+				function saveDisable() {
+					PF('btnSave').disable();
+					PF('btnUpdate').enable();
+				}
+
+				function clearAll() {
+					console.log("ok")
+					PF('uomDes').value = '';
+				}
+			</script>
+
+		</ui:define>
+
+	</ui:composition>
+
+</h:body>
+</html>
+
+

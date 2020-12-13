@@ -41,7 +41,7 @@ public class CategoryService {
 
 	public List<Category> getActiveCategories() throws EmptyResultDataAccessException, DataAccessException {
 		LOGGER.info("Execute Get Active Categories Service-----------> ");
-		return this.getActiveCategories();
+		return this.categoryDaoImpl.getActiveCategories();
 	}
 
 	public List<Category> getAllCategories() throws EmptyResultDataAccessException, DataAccessException {
