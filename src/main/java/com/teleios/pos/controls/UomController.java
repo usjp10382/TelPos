@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.Uom;
 import com.teleios.pos.service.UomService;
@@ -49,6 +50,8 @@ public class UomController implements Serializable {
 
 	private void loadAllUom() {
 		try {
+			getSelectedUom().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+			getSelectedUom().setCreateDate(new Date());
 			this.uomList = uomService.getActiveUoms();
 		} catch (EmptyResultDataAccessException empe) {
 			LOGGER.error("Loead All Uom Is Emplty", empe);
@@ -81,7 +84,7 @@ public class UomController implements Serializable {
 		LOGGER.info("Execute Create New Uom--------->");
 		int saveState = 0;
 		try {
-			getSelectedUom().setCreateBy("teleios");
+			getSelectedUom().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
 			getSelectedUom().setCreateDate(new Date());
 			saveState = this.uomService.createNewUom(getSelectedUom());
 			if (saveState > 0) {
@@ -108,6 +111,7 @@ public class UomController implements Serializable {
 		LOGGER.info("Call to UOM update meth....");
 		int updateState = 0;
 		try {
+			getSelectedUom().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
 			updateState = this.uomService.updateUom(getSelectedUom());
 
 			if (updateState > 0) {

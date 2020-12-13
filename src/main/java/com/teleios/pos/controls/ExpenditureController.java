@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.Expenditure;
 import com.teleios.pos.service.ExpenditureService;
@@ -56,6 +57,8 @@ public class ExpenditureController implements Serializable {
 
 	private void loadAllExp() {
 		try {
+			this.selectedExpenditure.setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+			getSelectedExpenditure().setCreateDate(new Date());
 			this.expenditures = expenditureService.getAllExpenditures();
 			this.selectedExpenditure.setExpId(this.expenditureService.getNextExpNumber());
 		} catch (EmptyResultDataAccessException empe) {
@@ -93,7 +96,7 @@ public class ExpenditureController implements Serializable {
 		LOGGER.info("Execute Create New Exp--------->");
 		int saveState = 0;
 		try {
-			getSelectedExpenditure().setCreateBy("Dilan");
+			getSelectedExpenditure().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
 			getSelectedExpenditure().setCreateDate(new Date());
 			saveState = this.expenditureService.createNewExpendiure(getSelectedExpenditure());
 			if (saveState > 0) {
@@ -115,6 +118,7 @@ public class ExpenditureController implements Serializable {
 		LOGGER.info("Call to update meth....");
 		int updateState = 0;
 		try {
+			getSelectedExpenditure().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
 			updateState = this.expenditureService.updateExpenditure(getSelectedExpenditure());
 
 			if (updateState > 0) {

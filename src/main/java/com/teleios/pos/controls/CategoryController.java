@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.Category;
 import com.teleios.pos.service.CategoryService;
@@ -54,6 +55,8 @@ public class CategoryController implements Serializable {
 
 	private void loadAllCategories() {
 		try {
+			getSelectedCategory().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+			getSelectedCategory().setCreateDate(new Date());
 			this.categoryList = categoryService.getActiveCategories();
 		} catch (EmptyResultDataAccessException empe) {
 			LOGGER.error("Loead All Categories Is Emplty", empe);
@@ -86,7 +89,7 @@ public class CategoryController implements Serializable {
 		LOGGER.info("Execute Create New Category--------->");
 		int saveState = 0;
 		try {
-			getSelectedCategory().setCreateBy("teleios");
+			getSelectedCategory().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
 			getSelectedCategory().setCreateDate(new Date());
 			saveState = this.categoryService.createNewCategory(getSelectedCategory());
 			if (saveState > 0) {
@@ -112,6 +115,7 @@ public class CategoryController implements Serializable {
 		LOGGER.info("Call to Category update meth....");
 		int updateState = 0;
 		try {
+			getSelectedCategory().setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
 			updateState = this.categoryService.updateCategory(getSelectedCategory());
 
 			if (updateState > 0) {

@@ -3,18 +3,27 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
 <h:body>
 	<ui:composition>
 		<div
 			style="display: flex; justify-content: flex-end; font-weight: bold;">
-			<h:form>
+			<h:outputText value="Welcome--> #{locallController.username}" />
+			<h:form onsubmit="this.action='#{request.contextPath}/logout';"
+				class="logout-form">
+				<p:commandButton icon="pi pi-sign-out" ajax="false"
+					style="margin-right:20px;" title="Logout" />
+			</h:form>
+			<h:form id="frmChangeLang">
 				<h:commandLink action="#{locallController.change('en-US')}"
-					value="English" style="color:#ffffff;" /> | <h:commandLink action="#{locallController.change('si-LK')}"
-					value="සිංහල"   style="color:#ffffff;" /> | <h:commandLink action="#{locallController.change('ta-IN')}"
-					value="தமிழ்" disabled="true" />
-					
-				</h:form>
+					value="English" style="color:#ffffff;" /> | <h:commandLink
+					action="#{locallController.change('si-LK')}" value="සිංහල"
+					style="color:#ffffff;" /> | <h:commandLink
+					action="#{locallController.change('ta-IN')}" value="தமிழ்"
+					disabled="true" />
+
+			</h:form>
 		</div>
 
 	</ui:composition>

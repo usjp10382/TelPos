@@ -9,13 +9,15 @@
 
 <h:body>
 
-	<ui:composition template="/template/common/commonLayout.xhtml">
+	<ui:composition xmlns:security="https://joinfaces.org/security"
+		template="/template/common/commonLayout.xhtml">
 
 		<ui:define name="content">
 
 			<h:form id="uomform">
 
-				<p:growl id="growl" sticky="false" life="5000" showDetail="true" showSummary="false" />
+				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+					showSummary="false" />
 
 				<!-- Uom Details - Start -->
 				<p:fieldset legend="#{msg['tel.pos.uom.ct.det']}"
@@ -61,17 +63,19 @@
 							</p:commandButton>
 						</p:column>
 
-						<p:column style="width:32px;text-align: center">
-							<p:commandButton icon="pi pi-trash" title="Delete"
-								style="width:20px;height:20px" process="uomTble"
-								update=":uomform:growl,:uomform:uomTble" styleClass="red-button">
-								<f:setPropertyActionListener value="#{uom}"
-									target="#{uomController.deleteUom}" />
-								<p:confirm header="#{msg['tel.pos.cm.wrn']}"
-									message="#{msg['tel.pos.cm.dlt']}"
-									icon="pi pi-trash" />
-							</p:commandButton>
-						</p:column>
+						<security:authorize access="hasRole('ROLE_ADMIN')">
+							<p:column style="width:32px;text-align: center">
+								<p:commandButton icon="pi pi-trash" title="Delete"
+									style="width:20px;height:20px" process="uomTble"
+									update=":uomform:growl,:uomform:uomTble"
+									styleClass="red-button">
+									<f:setPropertyActionListener value="#{uom}"
+										target="#{uomController.deleteUom}" />
+									<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+										message="#{msg['tel.pos.cm.dlt']}" icon="pi pi-trash" />
+								</p:commandButton>
+							</p:column>
+						</security:authorize>
 					</p:dataTable>
 
 				</p:fieldset>
@@ -84,10 +88,12 @@
 
 					<p:confirmDialog global="true" showEffect="expLode"
 						hideEffect="fade">
-						<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}" type="button"
-							styleClass="red-button ui-confirmdialog-yes" icon="pi pi-check" />
-						<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}" type="button"
-							styleClass="green-button ui-confirmdialog-no" icon="pi pi-times" />
+						<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+							type="button" styleClass="red-button ui-confirmdialog-yes"
+							icon="pi pi-check" />
+						<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
+							type="button" styleClass="green-button ui-confirmdialog-no"
+							icon="pi pi-times" />
 					</p:confirmDialog>
 
 					<p:panelGrid columns="4" layout="grid"
@@ -96,7 +102,8 @@
 						contentStyleClass="p-align-baseline ui-fluid">
 
 						<p:outputLabel for="uomId" value="#{msg['tel.pos.cwc.des']}" />
-						<p:inputText id="uomId" required="true" maxlength="20" requiredMessage="#{msg['tel.pos.tfvm.des']}"
+						<p:inputText id="uomId" required="true" maxlength="20"
+							requiredMessage="#{msg['tel.pos.tfvm.des']}"
 							value="#{uomController.selectedUom.uomName}"
 							style="font-weight:bold" />
 
@@ -140,8 +147,7 @@
 							process="@form" ajax="true" action="#{uomController.creaeNewUom}"
 							widgetVar="btnSave">
 							<p:confirm header="#{msg['tel.pos.cm.info']}"
-								message="#{msg['tel.pos.cm.save']}"
-								icon="fa fa-floppy-o" />
+								message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
 						</p:commandButton>
 
 
