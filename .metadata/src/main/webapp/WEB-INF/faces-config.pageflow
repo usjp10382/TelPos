@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf16069771639600" configfile="/TeleiosPos/src/main/webapp/WEB-INF/faces-config.xml">
   <nodes xsi:type="pageflow:PFPage" x="122" y="178" id="pf16071213663970" referenceLink="//@navigationRule.0/@fromViewId|"/>
-  <nodes xsi:type="pageflow:PFPage" name="*" x="122" y="562" id="pf16071221606017" outlinks="pf16071221606018 pf16078024104120 pf16077881151760 pf16077881151761" path="*"/>
+  <nodes xsi:type="pageflow:PFPage" name="*" x="122" y="562" id="pf16071221606017" outlinks="pf16071221606018 pf16078024104120 pf16077881151760 pf16077881151761 pf16078608133211" path="*"/>
   <nodes xsi:type="pageflow:PFPage" name="settings/expenditure-view.xhtml" x="338" y="178" id="pf16071221606019" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" inlinks="pf16071221606018" path="/settings/expenditure-view.xhtml"/>
   <nodes xsi:type="pageflow:PFPage" name="pos/billing-view.xhtml" x="122" y="946" id="pf16073193081451" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" path="/pos/billing-view.xhtml"/>
   <nodes xsi:type="pageflow:PFPage" name="pos/billing.xhtml" x="338" y="562" id="pf16078024104121" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" inlinks="pf16078024104120" path="/pos/billing.xhtml"/>
   <nodes xsi:type="pageflow:PFPage" name="settings/uom-view.xhtml" x="338" y="946" id="pf16077881151762" referenceLink="//@navigationRule.2/@navigationCase.0/@toViewId|" inlinks="pf16077881151760" path="/settings/uom-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="settings/category-view.xhtml" id="pf16077881151763" referenceLink="//@navigationRule.3/@navigationCase.0/@toViewId|" inlinks="pf16077881151761" path="/settings/category-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/category-view.xhtml" id="pf16077881151763" referenceLink="//@navigationRule.4/@navigationCase.0/@toViewId|" inlinks="pf16077881151761" path="/settings/category-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/brand-view.xhtml" id="pf16078608133222" referenceLink="//@navigationRule.4/@navigationCase.0/@toViewId|" inlinks="pf16078608133211" path="/settings/brand-view.xhtml"/>
   <links id="pf16071221606018" target="pf16071221606019" source="pf16071221606017" outcome="SettingView"/>
   <links id="pf16078024104120" target="pf16078024104121" source="pf16071221606017" outcome="BillingView"/>
   <links id="pf16077881151760" target="pf16077881151762" source="pf16071221606017" outcome="UomView"/>
   <links id="pf16077881151761" target="pf16077881151763" source="pf16071221606017" outcome="CatView"/>
+  <links id="pf16078608133211" target="pf16078608133222" source="pf16071221606017" outcome="BrdView"/>
 </pageflow:Pageflow>

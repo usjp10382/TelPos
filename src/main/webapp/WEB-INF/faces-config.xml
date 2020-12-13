@@ -46,5 +46,12 @@
 			<to-view-id>/settings/category-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
+	
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>BrdView</from-outcome>
+			<to-view-id>/settings/brand-view.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
 
 </faces-config>

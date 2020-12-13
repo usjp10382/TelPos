@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="/template/common/commonLayout.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="brandform">
+
+				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+					showSummary="false" />
+
+				<!-- Uom Details - Start -->
+				<p:fieldset legend="#{msg['tel.pos.uom.ct.det']}"
+					style="margin-bottom:20px" toggleable="true" toggleSpeed="400">
+
+					<p:dataTable var="brand" value="#{brandController.brandList}"
+						widgetVar="brandTable" id="brandTable"
+						emptyMessage="No Expenditure found with given criteria"
+						filteredValue="#{brandController.filteredBrands}"
+						globalFilterFunction="#{brandController.globalFilterFunction}">
+
+						<f:facet name="header">
+							<p:outputPanel>
+								<h:outputText value="#{msg['tel.pos.uom.ct.srh_uom']}" />
+								<p:inputText id="globalFilter"
+									onkeyup="PF('brandTable').filter()" style="width:250px"
+									placeholder="#{msg['tel.pos.cwc.srh']}" />
+							</p:outputPanel>
+						</f:facet>
+
+						<p:column headerText="#{msg['tel.pos.cwc.des']}">
+							<h:outputText value="#{brand.brandName}" />
+						</p:column>
+
+						<p:column headerText="#{msg['tel.pos.cwc.cby']}">
+							<h:outputText value="#{brand.createBy}" />
+						</p:column>
+
+						<p:column headerText="#{msg['tel.pos.cwc.cdt']}">
+							<h:outputText value="#{brand.createDate}">
+							</h:outputText>
+						</p:column>
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="pi pi-refresh" title="Update"
+								process="brandTable" update=":brandform:brandUpdates"
+								oncomplete="saveDisable()" style="width:20px;height:20px">
+								<f:setPropertyActionListener value="#{brand}"
+									target="#{brandController.selectedBrand}" />
+							</p:commandButton>
+						</p:column>
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="pi pi-trash" title="Delete"
+								style="width:20px;height:20px" process="brandTable"
+								update=":brandform:growl,:brandform:brandTable"
+								styleClass="red-button">
+								<f:setPropertyActionListener value="#{brand}"
+									target="#{brandController.deleteBrand}" />
+								<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+									message="#{msg['tel.pos.cm.dlt']}" icon="pi pi-trash" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+				</p:fieldset>
+				<!-- Uom Details - End -->
+
+				<!-- UOM  Controlls - Start -->
+				<p:fieldset legend="#{msg['tel.pos.uom.ct.ctl']}"
+					style="margin-bottom:20px" id="brandUpdates">
+
+					<p:confirmDialog global="true" showEffect="expLode"
+						hideEffect="fade">
+						<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+							type="button" styleClass="red-button ui-confirmdialog-yes"
+							icon="pi pi-check" />
+						<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
+							type="button" styleClass="green-button ui-confirmdialog-no"
+							icon="pi pi-times" />
+					</p:confirmDialog>
+
+					<div class="p-grid ">
+
+						<div class="p-col-2">
+							<p:outputLabel for="uomId" value="#{msg['tel.pos.cwc.des']}"
+								style="padding-right:50px" />
+						</div>
+
+						<div class="p-col-4">
+							<p:inputText id="uomId" required="true" maxlength="20"
+								requiredMessage="#{msg['tel.pos.tfvm.des']}"
+								value="#{brandController.selectedBrand.brandName}"
+								style="font-weight:bold; width:100%" />
+						</div>
+
+					</div>
+
+					<div class="p-grid ">
+
+						<div class="p-col-2">
+							<p:outputLabel for="uomCreBy" value="#{msg['tel.pos.cwc.cby']}"
+								style="padding-right:50px" />
+						</div>
+
+						<div class="p-col-4">
+							<p:inputText id="uomCreBy" readonly="true"
+								value="#{brandController.selectedBrand.createBy}"
+								style="font-weight:bold; width:100%" />
+						</div>
+
+						<div class="p-col-2">
+							<p:outputLabel for="uomCreDt" value="#{msg['tel.pos.cwc.cdt']}"
+								style="padding-right:50px" />
+						</div>
+
+						<div class="p-col-4">
+							<p:inputText id="uomCreDt" readonly="true"
+								value="#{brandController.selectedBrand.createDate}"
+								style="font-weight:bold;width:100%">
+								<f:convertDateTime type="date" pattern="dd-MMM-yyyy" />
+							</p:inputText>
+						</div>
+
+					</div>
+
+					<!-- Uom Controlls - End-->
+
+					<div
+						style="display: flex; justify-content: flex-end; font-weight: bold">
+
+						<p:commandButton value="#{msg['tel.pos.cwc.reset']}"
+							icon="fa fa-times-circle"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							styleClass="red-button" type="button"
+							onclick="saveEnable();clearAll()">
+						</p:commandButton>
+
+						<p:commandButton value="#{msg['tel.pos.cwc.save']}"
+							icon="pi pi-check-circle"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+							process="@form" ajax="true"
+							action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
+							<p:confirm header="#{msg['tel.pos.cm.info']}"
+								message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
+						</p:commandButton>
+
+						<p:commandButton value="#{msg['tel.pos.cwc.update']}"
+							icon="pi pi-refresh"
+							style="margin-right:20px;margin-top:10px;width:200px"
+							styleClass="green-button" widgetVar="btnUpdate" disabled="false"
+							action="#{brandController.updateBrand}"
+							update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+							process="@form" ajax="true">
+							<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+								message="#{msg['tel.pos.cm.updte']}" />
+						</p:commandButton>
+
+					</div>
+
+				</p:fieldset>
+			</h:form>
+
+			<div id="template-footer">
+				<ui:include src="/template/common/commonFooter.xhtml" />
+			</div>
+			<script>
+				function saveEnable() {
+					PF('btnUpdate').disable();
+					PF('btnSave').enable();
+				}
+
+				function saveDisable() {
+					PF('btnSave').disable();
+					PF('btnUpdate').enable();
+				}
+
+				function clearAll() {
+					console.log("ok")
+					PF('uomDes').value = '';
+				}
+			</script>
+
+		</ui:define>
+
+	</ui:composition>
+
+</h:body>
+</html>
+
+
