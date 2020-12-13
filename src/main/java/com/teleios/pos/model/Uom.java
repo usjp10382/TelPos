@@ -58,7 +58,7 @@ public class Uom implements Serializable {
 	}
 
 	public void setUomChar(String uomChar) {
-		this.uomChar = uomChar.toUpperCase();
+		this.uomChar = uomChar;
 	}
 
 	public String getCreateBy() {

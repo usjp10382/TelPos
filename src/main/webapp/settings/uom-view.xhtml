@@ -98,23 +98,23 @@
 
 						<p:outputLabel for="uomId" value="#{msg['tel.pos.cwc.des']}" />
 						<p:inputText id="uomId" required="true" maxlength="10"
-							value="#{expeControl.selectedExpenditure.expId}"
+							value="#{uomController.selectedUom.uomName}"
 							style="font-weight:bold" />
 
 						<p:outputLabel for="uomDes" value="#{msg['tel.pos.uom.ct.cha']}" />
 						<p:inputText widgetVar="uomDes" id="uomDes" required="true"
 							maxlength="5" requiredMessage="Expenditure Name Is Required!"
-							value="#{expeControl.selectedExpenditure.dec}"
+							value="#{uomController.selectedUom.uomChar}"
 							style="font-weight:bold" />
 
 						<p:outputLabel for="uomCreBy" value="#{msg['tel.pos.cwc.cby']}" />
 						<p:inputText id="uomCreBy" readonly="true"
-							value="#{uomeControl.selectedExpenditure.createBy}"
+							value="#{uomController.selectedUom.createBy}"
 							style="font-weight:bold" />
 
 						<p:outputLabel for="uomCreDt" value="#{msg['tel.pos.cwc.cdt']}" />
 						<p:inputText id="uomCreDt" readonly="true"
-							value="#{expeControl.selectedExpenditure.createDate}"
+							value="#{uomController.selectedUom.createDate}"
 							style="font-weight:bold">
 							<f:convertDateTime type="date" pattern="dd-MMM-yyyy" />
 						</p:inputText>
@@ -127,27 +127,30 @@
 					<div
 						style="display: flex; justify-content: flex-end; font-weight: bold">
 
-						<p:commandButton value="#{msg['tel.pos.cwc.reset']}" icon="fa fa-times-circle"
+						<p:commandButton value="#{msg['tel.pos.cwc.reset']}"
+							icon="fa fa-times-circle"
 							style="margin-right:20px;margin-top:10px;width:200px"
 							styleClass="red-button" type="button"
 							onclick="saveEnable();clearAll()">
 						</p:commandButton>
 
-						<p:commandButton value="#{msg['tel.pos.cwc.save']}" icon="pi pi-check-circle"
+						<p:commandButton value="#{msg['tel.pos.cwc.save']}"
+							icon="pi pi-check-circle"
 							style="margin-right:20px;margin-top:10px;width:200px"
 							update=":uomform:growl,:uomform:uomTble,:uomform:uomUpdates"
-							process="@form" ajax="true"
-							action="#{expeControl.creaeNewExpenditure}" widgetVar="btnSave">
+							process="@form" ajax="true" action="#{uomController.creaeNewUom}"
+							widgetVar="btnSave">
 							<p:confirm header="Create New Expenditure"
 								message="Are you Sure Create New Expenditure?"
 								icon="fa fa-floppy-o" />
 						</p:commandButton>
 
 
-						<p:commandButton value="#{msg['tel.pos.cwc.update']}" icon="pi pi-refresh"
+						<p:commandButton value="#{msg['tel.pos.cwc.update']}"
+							icon="pi pi-refresh"
 							style="margin-right:20px;margin-top:10px;width:200px"
 							styleClass="green-button" widgetVar="btnUpdate" disabled="false"
-							action="#{expeControl.updateExpenditure}"
+							action="#{uomController.updateUom}"
 							update=":uomform:growl,:uomform:uomTble,:uomform:uomUpdates"
 							process="@form" ajax="true">
 							<p:confirm header="Update Expenditure"

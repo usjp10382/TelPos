@@ -26,7 +26,7 @@ public class UomDaoImpl implements UomDao {
 
 	// Define Sql Query
 	static final String CREATE_UOM_SQL = "INSERT INTO inv_schema.uom(uom_name,char_prifix,create_by,create_date,uom_state) VALUES(:uom_name,:char_prifix,:create_by,:create_date,:uom_state)";
-	static final String UPDATE_UOM_SQL = "UPDATE inv_schema.uom SET uom_name=:uom_name,char_prifix=:char_prifix,create_by=:create_by,create_date=:create_date,uom_state=:uom_state) "
+	static final String UPDATE_UOM_SQL = "UPDATE inv_schema.uom SET uom_name=:uom_name,char_prifix=:char_prifix,create_by=:create_by,create_date=:create_date,uom_state=:uom_state "
 			+ "WHERE uom_id=:uom_id";
 	static final String DELETE_UOM_SQL = "UPDATE inv_schema.uom SET uom_state=:uom_state WHERE uom_id=:uom_id";
 	static final String UOM_BY_NUMBER_SQL = "SELECT uom_id,uom_name,char_prifix,create_by,create_date,uom_state FROM inv_schema.uom WHERE uom_id=?";
@@ -44,7 +44,7 @@ public class UomDaoImpl implements UomDao {
 		int createstate = 0;
 		Map<String, Object> paraMap = new HashMap<String, Object>();
 		paraMap.put("uom_name", uom.getUomName());
-		paraMap.put("char_prifix", uom.getUomChar());
+		paraMap.put("char_prifix", uom.getUomChar().toUpperCase());
 		paraMap.put("create_by", uom.getCreateBy());
 		paraMap.put("create_date", uom.getCreateDate());
 		paraMap.put("uom_state", (short) 1);

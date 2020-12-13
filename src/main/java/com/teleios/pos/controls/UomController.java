@@ -76,7 +76,7 @@ public class UomController implements Serializable {
 	}
 
 	// UOM Save Function
-	public void creaeNewExpenditure() {
+	public void creaeNewUom() {
 		LOGGER.info("Execute Create New Uom--------->");
 		int saveState = 0;
 		try {
@@ -99,7 +99,7 @@ public class UomController implements Serializable {
 	}
 
 	// UOM Update Function
-	public void updateExpenditure() {
+	public void updateUom() {
 		LOGGER.info("Call to UOM update meth....");
 		int updateState = 0;
 		try {
@@ -121,7 +121,7 @@ public class UomController implements Serializable {
 	}
 
 	// Delete Uom Function
-	public void deleteExpendature() {
+	public void deleteUom() {
 		LOGGER.info("Call to delete UOM method....");
 		int deleteState = 0;
 
@@ -157,10 +157,10 @@ public class UomController implements Serializable {
 	}
 
 	private void clearFiled() {
-		selectedUom.setUomName(null);
-		selectedUom.setUomChar(null);
-		selectedUom.setCreateBy(null);
-		selectedUom.setCreateDate(null);
+		getSelectedUom().setUomName(null);
+		getSelectedUom().setUomChar(null);
+		// selectedUom.setCreateBy(null);
+		// selectedUom.setCreateDate(null);
 	}
 
 	public UomService getUomService() {
@@ -185,6 +185,7 @@ public class UomController implements Serializable {
 
 	public void setDeleteUom(Uom deleteUom) {
 		this.deleteUom = deleteUom;
+		deleteUom();
 	}
 
 	public List<Uom> getUomList() {

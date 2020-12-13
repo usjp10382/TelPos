@@ -164,8 +164,8 @@ public class ExpenditureController implements Serializable {
 
 	private void clearFiled() {
 		getSelectedExpenditure().setDec(null);
-		getSelectedExpenditure().setCreateBy(null);
-		getSelectedExpenditure().setCreateDate(null);
+		//getSelectedExpenditure().setCreateBy(null);
+		//getSelectedExpenditure().setCreateDate(null);
 	}
 
 	public List<Expenditure> getExpenditures() {
