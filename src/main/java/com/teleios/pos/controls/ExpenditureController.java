@@ -100,7 +100,7 @@ public class ExpenditureController implements Serializable {
 				LOGGER.info("<--------- Create New Expenditure Success--------->");
 				addMessage("Create New Expenditure", "Create New Expenditure Success!");
 				loadAllExp();
-				clearFiled();
+				clearFiled(0);
 			} else {
 				addErrorMessage("Create New Expenditure", "Create New Expenditure Falied");
 			}
@@ -121,7 +121,7 @@ public class ExpenditureController implements Serializable {
 				LOGGER.info("Update Success...");
 				addMessage("Update Expenditure", "Update Expenditure Successfull");
 				loadAllExp();
-				clearFiled();
+				clearFiled(1);
 			} else {
 
 				addErrorMessage("Update Expenditure", "Update Expenditure Faild");
@@ -162,10 +162,12 @@ public class ExpenditureController implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
 	}
 
-	private void clearFiled() {
+	private void clearFiled(int flag) {
 		getSelectedExpenditure().setDec(null);
-		//getSelectedExpenditure().setCreateBy(null);
-		//getSelectedExpenditure().setCreateDate(null);
+		if (flag == 1) {
+			getSelectedExpenditure().setCreateBy(null);
+			getSelectedExpenditure().setCreateDate(null);
+		}
 	}
 
 	public List<Expenditure> getExpenditures() {

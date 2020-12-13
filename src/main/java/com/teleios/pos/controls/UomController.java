@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import com.teleios.pos.model.Uom;
@@ -87,11 +88,15 @@ public class UomController implements Serializable {
 				LOGGER.info("<--------- Create New UOM Success--------->");
 				addMessage("Create New UOM", "Create New UOM Success!");
 				loadAllUom();
-				clearFiled();
+				clearFiled(0);
 			} else {
 				addErrorMessage("Create New UOM", "Create New UOM Falied");
 			}
 
+		} catch (DuplicateKeyException de) {
+			LOGGER.error("Create New UOM Name/Charactor Duplicate Ocurr----------> ", de);
+			addErrorMessage("Create New UOM",
+					"Entered UOM Name Or Charactor Allredy Exit\n" + de.getLocalizedMessage());
 		} catch (Exception e) {
 			LOGGER.error("Create New UOM Error Ocurr----------> ", e);
 			addErrorMessage("Create New UOM", "Create New UOM Falied\n" + e.getLocalizedMessage());
@@ -109,7 +114,7 @@ public class UomController implements Serializable {
 				LOGGER.info("Update Success...");
 				addMessage("Update UOM", "Update UOM Successfull");
 				loadAllUom();
-				clearFiled();
+				clearFiled(1);
 			} else {
 
 				addErrorMessage("Update UOM", "Update UOM Faild");
@@ -156,19 +161,14 @@ public class UomController implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
 	}
 
-	private void clearFiled() {
+	private void clearFiled(int flag) {
 		getSelectedUom().setUomName(null);
 		getSelectedUom().setUomChar(null);
-		// selectedUom.setCreateBy(null);
-		// selectedUom.setCreateDate(null);
-	}
+		if (flag == 1) {
+			selectedUom.setCreateBy(null);
+			selectedUom.setCreateDate(null);
+		}
 
-	public UomService getUomService() {
-		return uomService;
-	}
-
-	public void setUomService(UomService uomService) {
-		this.uomService = uomService;
 	}
 
 	public Uom getSelectedUom() {
