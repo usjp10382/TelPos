@@ -36,6 +36,8 @@ public class ConvertorController implements Serializable{
 	//Define Uom Variables
 	private List<Uom> uoms;
 	
+	private Uom selBaseUom;
+	
 	@PostConstruct
 	public void init() {
 		LOGGER.info("<--------- Execute Convertor Bean Init ----------->");
@@ -48,6 +50,15 @@ public class ConvertorController implements Serializable{
 
 	public void setUoms(List<Uom> uoms) {
 		this.uoms = uoms;
+	}
+
+	public Uom getSelBaseUom() {
+		return selBaseUom;
+	}
+
+	public void setSelBaseUom(Uom selBaseUom) {
+		this.selBaseUom = selBaseUom;
+		LOGGER.info("Selected UOM Obj---> "+selBaseUom.getUomName()+" - "+selBaseUom.getUomId());
 	}
 	
 	
