@@ -1,0 +1,53 @@
+package com.teleios.pos.model;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import com.teleios.pos.dao.impl.ConvertorDaoImpl;
+
+@Service
+public class ConvertorService {
+	@Autowired
+	private ConvertorDaoImpl convertoDaoImpl;
+
+	public int createNewConvertor(Convertor convertor) throws DuplicateKeyException, Exception {
+		return this.convertoDaoImpl.createNewConvertor(convertor);
+	}
+
+	public int[][] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int updateConvertor(Convertor convertor) throws DuplicateKeyException, Exception {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int deleteConvertor(Convertor convertor) throws Exception {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public Convertor getConvertorByNumber(Convertor convertor)
+			throws EmptyResultDataAccessException, DataAccessException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Convertor> getActiveConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Convertor> getAllConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
