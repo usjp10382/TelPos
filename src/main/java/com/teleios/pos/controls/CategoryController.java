@@ -25,10 +25,6 @@ import com.teleios.pos.service.CategoryService;
 @Named("categController")
 @ViewScoped
 public class CategoryController implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5324689614403275797L;
 
 	/**
 	 * @author Harith Ahangama
@@ -37,6 +33,7 @@ public class CategoryController implements Serializable {
 	 * @since 1.0
 	 */
 
+	private static final long serialVersionUID = -5324689614403275797L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(CategoryController.class);
 
 	@Autowired
@@ -78,10 +75,10 @@ public class CategoryController implements Serializable {
 			return true;
 		}
 
-		Category uom = (Category) value;
+		Category category = (Category) value;
 
-		return uom.getCategoryName().toLowerCase().contains(filterText)
-				|| uom.getCreateBy().toLowerCase().contains(filterText);
+		return category.getCategoryName().toLowerCase().contains(filterText)
+				|| category.getCreateBy().toLowerCase().contains(filterText);
 	}
 
 	// Category Save Function
@@ -127,6 +124,9 @@ public class CategoryController implements Serializable {
 
 				addErrorMessage("Update Category", "Update Category Faild!");
 			}
+		} catch (DuplicateKeyException de) {
+			LOGGER.error("Update Category Name Duplicate Ocurr----------> ", de);
+			addErrorMessage("Update Category", "Entered Category Name Allredy Exit\n" + de.getLocalizedMessage());
 		} catch (Exception e) {
 			LOGGER.error("Update Category Fail", e);
 			addErrorMessage("Update Category", "Update Category Faild\n" + e.getLocalizedMessage());
