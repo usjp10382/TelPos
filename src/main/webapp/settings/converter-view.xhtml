@@ -149,13 +149,13 @@
 								style="display: flex; justify-content: flex-shrink; font-weight: bold">
 
 								<p:commandButton value="#{msg['tel.pos.cwc.reset']}"
-									icon="fa fa-times-circle" style="margin-top:10px; width:20%"
+									icon="fa fa-times-circle" style="margin-top:10px; width:25%"
 									styleClass="red-button" type="button"
 									onclick="saveEnable();clearAll()">
 								</p:commandButton>
 
-								<p:commandButton value="Direct Save" icon="pi pi-check-circle"
-									style="margin-top:10px; width:20%"
+								<p:commandButton value="#{msg['tel.pos.cwc.drt.save']}" icon="pi pi-check-circle"
+									style="margin-top:10px; width:25%"
 									update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
 									process="brandUpdates" ajax="true" partialSubmit="true"
 									action="#{convertorController.createNewConvertor}"
@@ -165,7 +165,7 @@
 								</p:commandButton>
 
 								<p:commandButton value="#{msg['tel.pos.cwc.update']}"
-									icon="pi pi-refresh" style="margin-top:10px; width:20%"
+									icon="pi pi-refresh" style="margin-top:10px; width:25%"
 									styleClass="green-button;" widgetVar="btnUpdate"
 									disabled="false" action="#{brandController.updateBrand}"
 									update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
@@ -210,7 +210,7 @@
 							</p:dataTable>
 
 							<p:commandButton value="#{msg['tel.pos.cwc.save']}"
-								icon="pi pi-check-circle" style="margin-top:10px; width:20%"
+								icon="pi pi-check-circle" style="margin-top:10px; width:40%; float:right; "
 								update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
 								process="@form" ajax="true"
 								action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
