@@ -19,48 +19,48 @@
 					showSummary="false" />
 
 				<!-- conversion Details - Start -->
-				<p:fieldset legend="Conversion Details" style="margin-bottom:20px"
+				<p:fieldset legend="#{msg['tel.pos.cc.det']}" style="margin-bottom:20px"
 					toggleable="true" toggleSpeed="400">
 
-					<p:dataTable var="brand" value="#{brandController.brandList}"
-						widgetVar="brandTable" id="brandTable"
-						emptyMessage="No Expenditure found with given criteria"
-						filteredValue="#{brandController.filteredBrands}"
-						globalFilterFunction="#{brandController.globalFilterFunction}">
+					<p:dataTable var="conv" value="#{convertorController.allActiveConvertors}"
+						widgetVar="convTable" id="convTable"
+						emptyMessage="#{msg['tel.pos.cm.tbl.content']}"
+						filteredValue="#{convertorController.filteredConvertor}"
+						globalFilterFunction="#{convertorController.globalFilterFunction}">
 
 						<f:facet name="header">
 							<p:outputPanel>
-								<h:outputText value="Search by unit" />
-								<p:inputText id="globalFilter"
-									onkeyup="PF('brandTable').filter()" style="width:250px"
+								<h:outputText value="#{msg['tel.pos.cc.srh']}" />
+								<p:inputText id="convFilter"
+									onkeyup="PF('convTable').filter()" style="width:250px"
 									placeholder="#{msg['tel.pos.cwc.srh']}" />
 							</p:outputPanel>
 						</f:facet>
 
-						<p:column headerText="Base unit">
-							<h:outputText value="#{brand.brandName}" />
+						<p:column headerText="#{msg['tel.pos.cc.bunit']}">
+							<h:outputText value="#{conv.baseUom.uomName}" />
 						</p:column>
 
-						<p:column headerText="derived unit">
-							<h:outputText value="#{brand.brandName}" />
+						<p:column headerText="#{msg['tel.pos.cc.dunit']}">
+							<h:outputText value="#{conv.ratUom.uomName}" />
 						</p:column>
 
-						<p:column headerText="Value">
-							<h:outputText value="#{brand.brandName}" />
+						<p:column headerText="#{msg['tel.pos.cc.value']}">
+							<h:outputText value="#{conv.value}" />
 						</p:column>
 
 						<p:column headerText="#{msg['tel.pos.cwc.cby']}">
-							<h:outputText value="#{brand.createBy}" />
+							<h:outputText value="#{conv.createby}" />
 						</p:column>
 
 						<p:column headerText="#{msg['tel.pos.cwc.cdt']}">
-							<h:outputText value="#{brand.createDate}">
+							<h:outputText value="#{conv.createDate}">
 							</h:outputText>
 						</p:column>
 
 						<p:column style="width:32px;text-align: center">
 							<p:commandButton icon="pi pi-refresh" title="Update"
-								process="brandTable" update=":converform:brandUpdates"
+								process="convTable" update=":converform:brandUpdates"
 								oncomplete="saveDisable()" style="width:20px;height:20px">
 								<f:setPropertyActionListener value="#{brand}"
 									target="#{brandController.selectedBrand}" />
@@ -69,8 +69,8 @@
 
 						<p:column style="width:32px;text-align: center">
 							<p:commandButton icon="pi pi-trash" title="Delete"
-								style="width:20px;height:20px" process="brandTable"
-								update=":converform:growl,:converform:brandTable"
+								style="width:20px;height:20px" process="convTable"
+								update=":converform:growl,:converform:convTable"
 								styleClass="red-button">
 								<f:setPropertyActionListener value="#{brand}"
 									target="#{brandController.deleteBrand}" />
@@ -84,7 +84,7 @@
 				<!-- conversion Details - End -->
 
 				<!-- conversion  Controls - Start -->
-				<p:fieldset legend="Conversion Controls" style="margin-bottom:20px"
+				<p:fieldset legend="#{msg['tel.pos.cc.ctl']}" style="margin-bottom:20px"
 					id="brandUpdates">
 
 					<p:confirmDialog global="true" showEffect="expLode"
@@ -104,7 +104,7 @@
 
 							<div class="cc-display-inline">
 								<div>
-									<p:outputLabel for="@next" value="Base Unit:" />
+									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.bunit']}" />
 								</div>
 								<p:selectOneMenu id="baseUnit" effect="fold" filter="true"
 									editable="true" value="#{convertorController.selBaseUomId}">
@@ -116,7 +116,7 @@
 
 							<div class="cc-display-inline">
 								<div>
-									<p:outputLabel for="@next" value="Value:" />
+									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.value']}" />
 								</div>
 								<p:inputText value="1" readonly="true" />
 							</div>
@@ -124,7 +124,7 @@
 
 							<div class="cc-display-inline">
 								<div>
-									<p:outputLabel for="@next" value="derived Unit: " />
+									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.dunit']}" />
 								</div>
 								<p:selectOneMenu id="cimty" effect="fold" filter="true"
 									editable="true" value="#{convertorController.selDerUomId}">
@@ -136,7 +136,7 @@
 
 							<div class="cc-display-inline">
 								<div>
-									<p:outputLabel for="@next" value="Value:" />
+									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.value']}" />
 								</div>
 								<p:inputText required="true"
 									requiredMessage="Convertor Ratio Is Required!"
@@ -156,7 +156,7 @@
 
 								<p:commandButton value="#{msg['tel.pos.cwc.drt.save']}" icon="pi pi-check-circle"
 									style="margin-top:10px; width:25%"
-									update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
+									update=":converform:growl,:converform:convTable,:converform:brandUpdates"
 									process="brandUpdates" ajax="true" partialSubmit="true"
 									action="#{convertorController.createNewConvertor}"
 									widgetVar="btnSave">
@@ -168,7 +168,7 @@
 									icon="pi pi-refresh" style="margin-top:10px; width:25%"
 									styleClass="green-button;" widgetVar="btnUpdate"
 									disabled="false" action="#{brandController.updateBrand}"
-									update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
+									update=":converform:growl,:converform:convTable,:converform:brandUpdates"
 									process="@form" ajax="true">
 									<p:confirm header="#{msg['tel.pos.cm.wrn']}"
 										message="#{msg['tel.pos.cm.updte']}" />
@@ -183,23 +183,23 @@
 
 						<!-- Table 2 - Start -->
 						<div class="p-col-6">
-							<p:dataTable>
-								<p:column headerText="Base Unit">
+							<p:dataTable emptyMessage="#{msg['tel.pos.cm.tbl.content']}">
+								<p:column headerText="#{msg['tel.pos.cc.bunit']}">
 									<h:outputText />
 								</p:column>
 
-								<p:column headerText="derived unit">
+								<p:column headerText="#{msg['tel.pos.cc.dunit']}">
 									<h:outputText />
 								</p:column>
 
-								<p:column headerText="Value">
+								<p:column headerText="#{msg['tel.pos.cc.value']}">
 									<h:outputText />
 								</p:column>
 
 								<p:column style="width:32px;text-align: center">
 									<p:commandButton icon="pi pi-trash" title="Delete"
-										style="width:20px;height:20px" process="brandTable"
-										update=":converform:growl,:converform:brandTable"
+										style="width:20px;height:20px" process="convTable"
+										update=":converform:growl,:converform:convTable"
 										styleClass="red-button">
 										<f:setPropertyActionListener value="#{brand}"
 											target="#{brandController.deleteBrand}" />
@@ -209,9 +209,9 @@
 								</p:column>
 							</p:dataTable>
 
-							<p:commandButton value="#{msg['tel.pos.cwc.save']}"
+							<p:commandButton value="#{msg['tel.pos.cwc.save.all']}"
 								icon="pi pi-check-circle" style="margin-top:10px; width:40%; float:right; "
-								update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
+								update=":converform:growl,:converform:convTable,:converform:brandUpdates"
 								process="@form" ajax="true"
 								action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
 								<p:confirm header="#{msg['tel.pos.cm.info']}"

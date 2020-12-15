@@ -92,7 +92,7 @@ public class ConvertorDaoImpl implements ConvertorDao {
 						if (convertor != null) {
 							convertor.setBaseUom(uomDaoImpl.getUomByNumber(
 									new Uom(rs.getInt("base_uom_id"), null, null, null, null, (short) 1)));
-							convertor.setRatUom(new Uom(rs.getInt("base_uom_id"), null, null, null, null, (short) 1));
+							convertor.setRatUom(uomDaoImpl.getUomByNumber(new Uom(rs.getInt("rat_uom_id"), null, null, null, null, (short) 1)));
 						}
 
 						return convertor;

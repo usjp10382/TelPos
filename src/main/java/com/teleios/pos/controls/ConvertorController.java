@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -45,6 +46,7 @@ public class ConvertorController implements Serializable {
 	private List<Uom> uoms;
 
 	private List<Convertor> allActiveConvertors;
+	private List<Convertor> filteredConvertor;
 
 	private Integer selBaseUomId;
 	private Integer selDerUomId;
@@ -86,6 +88,19 @@ public class ConvertorController implements Serializable {
 			LOGGER.error("Unexpected Error---", e);
 			addErrorMessage("Convertor Operation Init", "System Error Ocured-->" + e.getLocalizedMessage());
 		}
+	}
+	
+	
+	public boolean globalFilterFunction(Object value, Object filter, Locale locale) {
+		LOGGER.info("<----Global Filter Function Called----->");
+		String filterText = (filter == null) ? null : filter.toString().trim().toLowerCase();
+		if (filterText == null || filterText.equals("")) {
+			return true;
+		}
+		Convertor convertor = (Convertor) value;
+
+		return convertor.getBaseUom().getUomChar().toLowerCase().contains(filterText)
+				|| convertor.getBaseUom().getUomChar().toLowerCase().contains(filterText);
 	}
 
 	public void createNewConvertor() {
@@ -184,6 +199,16 @@ public class ConvertorController implements Serializable {
 
 	public void setAllActiveConvertors(List<Convertor> allActiveConvertors) {
 		this.allActiveConvertors = allActiveConvertors;
+	}
+	
+	
+
+	public List<Convertor> getFilteredConvertor() {
+		return filteredConvertor;
+	}
+
+	public void setFilteredConvertor(List<Convertor> filteredConvertor) {
+		this.filteredConvertor = filteredConvertor;
 	}
 
 	public Integer getSelBaseUomId() {
