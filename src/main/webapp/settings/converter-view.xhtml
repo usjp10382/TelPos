@@ -99,23 +99,84 @@
 
 					<div class="p-grid ">
 
-						<!-- DropDown - Start -->
+						<!-- Field 1 - Start -->
 						<div class="p-col-6">
-							
-							
-							
-							
-							 <p:outputLabel for="@next" value="Editable: " />
-        <p:selectOneMenu id="city" effect="fold" filter="true" editable="true"  value="#{convertorController.selBaseUom}">
-            <f:selectItem itemLabel="- select one -" itemValue="" />
-            <f:selectItems value="#{convertorController.uoms}" var="uom" itemValue="#{uom}" itemLabel="#{uom.uomChar}"  />
-        </p:selectOneMenu>
-							
-							
-							
-							
+
+							<div class="cc-display-inline">
+								<div>
+									<p:outputLabel for="@next" value="Base Unit:" />
+								</div>
+								<p:selectOneMenu id="city" effect="fold" filter="true"
+									editable="true" value="#{convertorController.selBaseUom}">
+									<f:selectItem itemLabel="- select one -" itemValue="" />
+									<f:selectItems value="#{convertorController.uoms}" var="uom"
+										itemValue="#{uom}" itemLabel="#{uom.uomChar}" />
+								</p:selectOneMenu>
+							</div>
+
+							<div class="cc-display-inline">
+								<div>
+									<p:outputLabel for="@next" value="Value:" />
+								</div>
+								<p:inputText value="1" readonly="true" />
+							</div>
+
+
+							<div class="cc-display-inline">
+								<div>
+									<p:outputLabel for="@next" value="derived Unit: " />
+								</div>
+								<p:selectOneMenu id="cimty" effect="fold" filter="true"
+									editable="true" value="#{convertorController.selBaseUom}">
+									<f:selectItem itemLabel="- select one -" itemValue="" />
+									<f:selectItems value="#{convertorController.uoms}" var="uom"
+										itemValue="#{uom}" itemLabel="#{uom.uomChar}" />
+								</p:selectOneMenu>
+							</div>
+
+							<div class="cc-display-inline">
+								<div>
+									<p:outputLabel for="@next" value="Value:" />
+								</div>
+								<p:inputText />
+							</div>
+
+
+
+							<div
+								style="display: flex; justify-content: flex-shrink; font-weight: bold">
+
+								<p:commandButton value="#{msg['tel.pos.cwc.reset']}"
+									icon="fa fa-times-circle" style="margin-top:10px; width:20%"
+									styleClass="red-button" type="button"
+									onclick="saveEnable();clearAll()">
+								</p:commandButton>
+
+								<p:commandButton value="#{msg['tel.pos.cwc.save']}"
+									icon="pi pi-check-circle" style="margin-top:10px; width:20%"
+									update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+									process="@form" ajax="true"
+									action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
+									<p:confirm header="#{msg['tel.pos.cm.info']}"
+										message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
+								</p:commandButton>
+
+								<p:commandButton value="#{msg['tel.pos.cwc.update']}"
+									icon="pi pi-refresh" style="margin-top:10px; width:20%"
+									styleClass="green-button;" widgetVar="btnUpdate"
+									disabled="false" action="#{brandController.updateBrand}"
+									update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+									process="@form" ajax="true">
+									<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+										message="#{msg['tel.pos.cm.updte']}" />
+								</p:commandButton>
+
+							</div>
+
+
+
 						</div>
-						<!-- DropDown - End -->
+						<!-- Field 1 - End -->
 
 						<!-- Table 2 - Start -->
 						<div class="p-col-6">
@@ -131,7 +192,29 @@
 								<p:column headerText="Value">
 									<h:outputText />
 								</p:column>
+
+								<p:column style="width:32px;text-align: center">
+									<p:commandButton icon="pi pi-trash" title="Delete"
+										style="width:20px;height:20px" process="brandTable"
+										update=":brandform:growl,:brandform:brandTable"
+										styleClass="red-button">
+										<f:setPropertyActionListener value="#{brand}"
+											target="#{brandController.deleteBrand}" />
+										<p:confirm header="#{msg['tel.pos.cm.wrn']}"
+											message="#{msg['tel.pos.cm.dlt']}" icon="pi pi-trash" />
+									</p:commandButton>
+								</p:column>
 							</p:dataTable>
+
+							<p:commandButton value="#{msg['tel.pos.cwc.save']}"
+								icon="pi pi-check-circle" style="margin-top:10px; width:20%"
+								update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+								process="@form" ajax="true"
+								action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
+								<p:confirm header="#{msg['tel.pos.cm.info']}"
+									message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
+							</p:commandButton>
+
 						</div>
 						<!-- Table 2 - End -->
 
@@ -141,40 +224,8 @@
 					</div>
 
 
-				
 
-					<div
-						style="display: flex; justify-content: flex-end; font-weight: bold">
 
-						<p:commandButton value="#{msg['tel.pos.cwc.reset']}"
-							icon="fa fa-times-circle"
-							style="margin-right:20px;margin-top:10px;width:200px"
-							styleClass="red-button" type="button"
-							onclick="saveEnable();clearAll()">
-						</p:commandButton>
-
-						<p:commandButton value="#{msg['tel.pos.cwc.save']}"
-							icon="pi pi-check-circle"
-							style="margin-right:20px;margin-top:10px;width:200px"
-							update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
-							process="@form" ajax="true"
-							action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
-							<p:confirm header="#{msg['tel.pos.cm.info']}"
-								message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
-						</p:commandButton>
-
-						<p:commandButton value="#{msg['tel.pos.cwc.update']}"
-							icon="pi pi-refresh"
-							style="margin-right:20px;margin-top:10px;width:200px"
-							styleClass="green-button" widgetVar="btnUpdate" disabled="false"
-							action="#{brandController.updateBrand}"
-							update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
-							process="@form" ajax="true">
-							<p:confirm header="#{msg['tel.pos.cm.wrn']}"
-								message="#{msg['tel.pos.cm.updte']}" />
-						</p:commandButton>
-
-					</div>
 
 				</p:fieldset>
 			</h:form>
