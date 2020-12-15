@@ -19,21 +19,25 @@
 					showSummary="false" />
 
 				<!-- conversion Details - Start -->
-				<p:fieldset legend="#{msg['tel.pos.cc.det']}" style="margin-bottom:20px"
-					toggleable="true" toggleSpeed="400">
+				<p:fieldset legend="#{msg['tel.pos.cc.det']}"
+					style="margin-bottom:20px" toggleable="true" toggleSpeed="400">
 
-					<p:dataTable var="conv" value="#{convertorController.allActiveConvertors}"
-						widgetVar="convTable" id="convTable"
+					<p:dataTable var="conv"
+						value="#{convertorController.allActiveConvertors}"
+						widgetVar="cconvTable" id="convTable"
 						emptyMessage="#{msg['tel.pos.cm.tbl.content']}"
 						filteredValue="#{convertorController.filteredConvertor}"
-						globalFilterFunction="#{convertorController.globalFilterFunction}">
+						globalFilterFunction="#{convertorController.globalFilterFunction}"
+						rows="10" paginator="true" paginatorPosition="bottom"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+						rowsPerPageTemplate="5,10,15">
 
 						<f:facet name="header">
 							<p:outputPanel>
 								<h:outputText value="#{msg['tel.pos.cc.srh']}" />
-								<p:inputText id="convFilter"
-									onkeyup="PF('convTable').filter()" style="width:250px"
-									placeholder="#{msg['tel.pos.cwc.srh']}" />
+								<p:inputText id="convFilter" onkeyup="PF('cconvTable').filter()"
+									style="width:250px" placeholder="#{msg['tel.pos.cwc.srh']}" />
 							</p:outputPanel>
 						</f:facet>
 
@@ -84,8 +88,8 @@
 				<!-- conversion Details - End -->
 
 				<!-- conversion  Controls - Start -->
-				<p:fieldset legend="#{msg['tel.pos.cc.ctl']}" style="margin-bottom:20px"
-					id="brandUpdates">
+				<p:fieldset legend="#{msg['tel.pos.cc.ctl']}"
+					style="margin-bottom:20px" id="brandUpdates">
 
 					<p:confirmDialog global="true" showEffect="expLode"
 						hideEffect="fade">
@@ -154,8 +158,8 @@
 									onclick="saveEnable();clearAll()">
 								</p:commandButton>
 
-								<p:commandButton value="#{msg['tel.pos.cwc.drt.save']}" icon="pi pi-check-circle"
-									style="margin-top:10px; width:25%"
+								<p:commandButton value="#{msg['tel.pos.cwc.drt.save']}"
+									icon="pi pi-check-circle" style="margin-top:10px; width:25%"
 									update=":converform:growl,:converform:convTable,:converform:brandUpdates"
 									process="brandUpdates" ajax="true" partialSubmit="true"
 									action="#{convertorController.createNewConvertor}"
@@ -210,7 +214,8 @@
 							</p:dataTable>
 
 							<p:commandButton value="#{msg['tel.pos.cwc.save.all']}"
-								icon="pi pi-check-circle" style="margin-top:10px; width:40%; float:right; "
+								icon="pi pi-check-circle"
+								style="margin-top:10px; width:40%; float:right; "
 								update=":converform:growl,:converform:convTable,:converform:brandUpdates"
 								process="@form" ajax="true"
 								action="#{brandController.creaeNewBrand}" widgetVar="btnSave">

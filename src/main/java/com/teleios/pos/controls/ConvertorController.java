@@ -89,8 +89,7 @@ public class ConvertorController implements Serializable {
 			addErrorMessage("Convertor Operation Init", "System Error Ocured-->" + e.getLocalizedMessage());
 		}
 	}
-	
-	
+
 	public boolean globalFilterFunction(Object value, Object filter, Locale locale) {
 		LOGGER.info("<----Global Filter Function Called----->");
 		String filterText = (filter == null) ? null : filter.toString().trim().toLowerCase();
@@ -200,8 +199,6 @@ public class ConvertorController implements Serializable {
 	public void setAllActiveConvertors(List<Convertor> allActiveConvertors) {
 		this.allActiveConvertors = allActiveConvertors;
 	}
-	
-	
 
 	public List<Convertor> getFilteredConvertor() {
 		return filteredConvertor;
