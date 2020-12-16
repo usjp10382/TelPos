@@ -27,6 +27,7 @@ public class LocallController implements Serializable {
 	private Locale local = new Locale("en", "US");
 	private String username;
 
+
 	@PostConstruct
 	public void init() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -122,5 +123,4 @@ public class LocallController implements Serializable {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
 }

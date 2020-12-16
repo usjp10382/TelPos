@@ -13,7 +13,7 @@
 
 		<ui:define name="content">
 
-			<h:form id="brandform">
+			<h:form id="converform">
 
 				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
 					showSummary="false" />
@@ -60,7 +60,7 @@
 
 						<p:column style="width:32px;text-align: center">
 							<p:commandButton icon="pi pi-refresh" title="Update"
-								process="brandTable" update=":brandform:brandUpdates"
+								process="brandTable" update=":converform:brandUpdates"
 								oncomplete="saveDisable()" style="width:20px;height:20px">
 								<f:setPropertyActionListener value="#{brand}"
 									target="#{brandController.selectedBrand}" />
@@ -70,7 +70,7 @@
 						<p:column style="width:32px;text-align: center">
 							<p:commandButton icon="pi pi-trash" title="Delete"
 								style="width:20px;height:20px" process="brandTable"
-								update=":brandform:growl,:brandform:brandTable"
+								update=":converform:growl,:converform:brandTable"
 								styleClass="red-button">
 								<f:setPropertyActionListener value="#{brand}"
 									target="#{brandController.deleteBrand}" />
@@ -100,17 +100,17 @@
 					<div class="p-grid ">
 
 						<!-- Field 1 - Start -->
-						<div class="p-col-6">
+						<div class="p-col-6" id="idInput">
 
 							<div class="cc-display-inline">
 								<div>
 									<p:outputLabel for="@next" value="Base Unit:" />
 								</div>
-								<p:selectOneMenu id="city" effect="fold" filter="true"
-									editable="true" value="#{convertorController.selBaseUom}">
+								<p:selectOneMenu id="baseUnit" effect="fold" filter="true"
+									editable="true" value="#{convertorController.selDerUomId}">
 									<f:selectItem itemLabel="- select one -" itemValue="" />
 									<f:selectItems value="#{convertorController.uoms}" var="uom"
-										itemValue="#{uom}" itemLabel="#{uom.uomChar}" />
+										itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
 								</p:selectOneMenu>
 							</div>
 
@@ -127,10 +127,10 @@
 									<p:outputLabel for="@next" value="derived Unit: " />
 								</div>
 								<p:selectOneMenu id="cimty" effect="fold" filter="true"
-									editable="true" value="#{convertorController.selBaseUom}">
+									editable="true" value="#{convertorController.selBaseUomId}">
 									<f:selectItem itemLabel="- select one -" itemValue="" />
 									<f:selectItems value="#{convertorController.uoms}" var="uom"
-										itemValue="#{uom}" itemLabel="#{uom.uomChar}" />
+										itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
 								</p:selectOneMenu>
 							</div>
 
@@ -138,7 +138,9 @@
 								<div>
 									<p:outputLabel for="@next" value="Value:" />
 								</div>
-								<p:inputText />
+								<p:inputText required="true"
+									requiredMessage="Convertor Ratio Is Required!"
+									value="#{convertorController.newConvertorObj.value}" />
 							</div>
 
 
@@ -152,11 +154,12 @@
 									onclick="saveEnable();clearAll()">
 								</p:commandButton>
 
-								<p:commandButton value="#{msg['tel.pos.cwc.save']}"
-									icon="pi pi-check-circle" style="margin-top:10px; width:20%"
-									update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
-									process="@form" ajax="true"
-									action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
+								<p:commandButton value="Direct Save" icon="pi pi-check-circle"
+									style="margin-top:10px; width:20%"
+									update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
+									process="brandUpdates" ajax="true" partialSubmit="true"
+									action="#{convertorController.createNewConvertor}"
+									widgetVar="btnSave">
 									<p:confirm header="#{msg['tel.pos.cm.info']}"
 										message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
 								</p:commandButton>
@@ -165,7 +168,7 @@
 									icon="pi pi-refresh" style="margin-top:10px; width:20%"
 									styleClass="green-button;" widgetVar="btnUpdate"
 									disabled="false" action="#{brandController.updateBrand}"
-									update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+									update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
 									process="@form" ajax="true">
 									<p:confirm header="#{msg['tel.pos.cm.wrn']}"
 										message="#{msg['tel.pos.cm.updte']}" />
@@ -196,7 +199,7 @@
 								<p:column style="width:32px;text-align: center">
 									<p:commandButton icon="pi pi-trash" title="Delete"
 										style="width:20px;height:20px" process="brandTable"
-										update=":brandform:growl,:brandform:brandTable"
+										update=":converform:growl,:converform:brandTable"
 										styleClass="red-button">
 										<f:setPropertyActionListener value="#{brand}"
 											target="#{brandController.deleteBrand}" />
@@ -208,7 +211,7 @@
 
 							<p:commandButton value="#{msg['tel.pos.cwc.save']}"
 								icon="pi pi-check-circle" style="margin-top:10px; width:20%"
-								update=":brandform:growl,:brandform:brandTable,:brandform:brandUpdates"
+								update=":converform:growl,:converform:brandTable,:converform:brandUpdates"
 								process="@form" ajax="true"
 								action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
 								<p:confirm header="#{msg['tel.pos.cm.info']}"
