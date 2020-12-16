@@ -7,6 +7,7 @@ package com.teleios.pos.controls;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -74,11 +75,41 @@ public class ConvertorController implements Serializable {
 	public void createNewConvertor() {
 		LOGGER.info("<----Execute Create New Convertor------>");
 		try {
-			LOGGER.info("Sel Base Obj--> " + getSelBaseUomId());
-			LOGGER.info("Sel Dir Obj--> " + getSelDerUomId());
+			if (getSelBaseUomId() == null) {
+				addErrorMessage("Create New Convertor Item", "Select Base Unit Is Required!");
+				return;
+			}
+			if (getSelDerUomId() == null) {
+				addErrorMessage("Create New Convertor Item", "Select Derived Unit Is Required!");
+				return;
+			}
+
 		} catch (Exception e) {
 			LOGGER.error("Create New Convertor Errorr Ocurr--> ", e);
 		}
+	}
+
+	private Uom getSelUomObj(final Uom checkUom) {
+		Uom selObj = null;
+		try {
+			if (uoms != null) {
+				if (uoms.size() > 0) {
+					Iterator<Uom> iterator = this.uoms.iterator();
+					while (iterator.hasNext()) {
+						Uom uom = iterator.next();
+						if (uom.getUomId().equals(checkUom.getUomId())) {
+							selObj = uom;
+							return selObj;
+						}
+
+					}
+				}
+			}
+		} catch (Exception e) {
+			addErrorMessage("Create New Convertor Item",
+					"Search Selected Uom Item ErrorOcurr\n" + e.getLocalizedMessage());
+		}
+		return selObj;
 	}
 
 	private void addMessage(String summery, String details) {

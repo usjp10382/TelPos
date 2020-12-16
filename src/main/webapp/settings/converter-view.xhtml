@@ -107,7 +107,7 @@
 									<p:outputLabel for="@next" value="Base Unit:" />
 								</div>
 								<p:selectOneMenu id="baseUnit" effect="fold" filter="true"
-									editable="true" value="#{convertorController.selDerUomId}">
+									editable="true" value="#{convertorController.selBaseUomId}">
 									<f:selectItem itemLabel="- select one -" itemValue="" />
 									<f:selectItems value="#{convertorController.uoms}" var="uom"
 										itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
@@ -127,7 +127,7 @@
 									<p:outputLabel for="@next" value="derived Unit: " />
 								</div>
 								<p:selectOneMenu id="cimty" effect="fold" filter="true"
-									editable="true" value="#{convertorController.selBaseUomId}">
+									editable="true" value="#{convertorController.selDerUomId}">
 									<f:selectItem itemLabel="- select one -" itemValue="" />
 									<f:selectItems value="#{convertorController.uoms}" var="uom"
 										itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
