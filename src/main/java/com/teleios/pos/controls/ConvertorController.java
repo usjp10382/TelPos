@@ -24,8 +24,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.Convertor;
-import com.teleios.pos.model.ConvertorService;
 import com.teleios.pos.model.Uom;
+import com.teleios.pos.service.ConvertorService;
 import com.teleios.pos.service.UomService;
 
 @Named("convertorController")
@@ -44,6 +44,8 @@ public class ConvertorController implements Serializable {
 	// Define Uom Variables
 	private List<Uom> uoms;
 
+	private List<Convertor> allActiveConvertors;
+
 	private Integer selBaseUomId;
 	private Integer selDerUomId;
 
@@ -52,18 +54,33 @@ public class ConvertorController implements Serializable {
 	@PostConstruct
 	public void init() {
 		LOGGER.info("<--------- Execute Convertor Bean Init ----------->");
-		loadAllUoms();
+		loadAllActiveUoms();
+		loadAllActiveConvertors();
 	}
 
-	private void loadAllUoms() {
+	private void loadAllActiveUoms() {
 		try {
-
 			this.uoms = this.uomService.getActiveUoms();
 		} catch (EmptyResultDataAccessException empe) {
 			LOGGER.error("Loead All UOMS Is Emplty", empe);
 			addWarMessage("Convertor Operation Init", "Doesnt Contains Any UOMS/s");
 		} catch (DataAccessException dae) {
 			LOGGER.error("Loead All UOMS Is Daa Acc Error", dae);
+			addErrorMessage("Convertor Operation Init", "Data AccesError Ocured-->" + dae.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Unexpected Error---", e);
+			addErrorMessage("Convertor Operation Init", "System Error Ocured-->" + e.getLocalizedMessage());
+		}
+	}
+
+	private void loadAllActiveConvertors() {
+		try {
+			this.allActiveConvertors = this.convertorService.getActiveConvertors();
+		} catch (EmptyResultDataAccessException empe) {
+			LOGGER.error("Loead All Active Convertors Is Emplty", empe);
+			addWarMessage("Convertor Operation Init", "Doesnt Contains Any Convertor/s");
+		} catch (DataAccessException dae) {
+			LOGGER.error("Loead All Active Convertors Is Daa Acc Error", dae);
 			addErrorMessage("Convertor Operation Init", "Data AccesError Ocured-->" + dae.getLocalizedMessage());
 		} catch (Exception e) {
 			LOGGER.error("Unexpected Error---", e);
@@ -87,6 +104,10 @@ public class ConvertorController implements Serializable {
 			}
 			if (getSelDerUomId() == null) {
 				addErrorMessage("Create New Convertor Item", "Select Derived Unit Is Required!");
+				return;
+			}
+			if (getSelBaseUomId().equals(getSelDerUomId())) {
+				addErrorMessage("Create New Convertor Item", "The Derived Unit Can't Be the Base Unti!");
 				return;
 			}
 
@@ -155,6 +176,14 @@ public class ConvertorController implements Serializable {
 
 	public void setUoms(List<Uom> uoms) {
 		this.uoms = uoms;
+	}
+
+	public List<Convertor> getAllActiveConvertors() {
+		return allActiveConvertors;
+	}
+
+	public void setAllActiveConvertors(List<Convertor> allActiveConvertors) {
+		this.allActiveConvertors = allActiveConvertors;
 	}
 
 	public Integer getSelBaseUomId() {

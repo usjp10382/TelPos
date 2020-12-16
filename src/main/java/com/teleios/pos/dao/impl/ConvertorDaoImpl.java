@@ -1,5 +1,7 @@
 package com.teleios.pos.dao.impl;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +13,13 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.teleios.pos.dao.ConvertorDao;
 import com.teleios.pos.model.Convertor;
+import com.teleios.pos.model.Uom;
 
 @Repository
 public class ConvertorDaoImpl implements ConvertorDao {
@@ -24,6 +28,10 @@ public class ConvertorDaoImpl implements ConvertorDao {
 	// Define Sql Query
 	static final String CREATE_CONVERTOR_SQL = "INSERT INTO settings.convertor(base_uom_id,rat_uom_id,val,create_by,create_date,con_state) "
 			+ "VALUES(:base_uom_id,:rat_uom_id,:val,:create_by,:create_date,:con_state)";
+	static final String ACTIVE_CONV_SQL = "SELECT con_id,base_uom_id,rat_uom_id,val,create_by,create_date,con_state FROM settings.convertor WHERE con_state=?";
+
+	@Autowired
+	private UomDaoImpl uomDaoImpl;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -72,8 +80,25 @@ public class ConvertorDaoImpl implements ConvertorDao {
 
 	@Override
 	public List<Convertor> getActiveConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("Execute Get Active Convertors Repositort-----------> ");
+		List<Convertor> activeConvertors = null;
+		activeConvertors = this.jdbcTemplate.query(ACTIVE_CONV_SQL, new Object[] { (short) 1 },
+				new RowMapper<Convertor>() {
+
+					@Override
+					public Convertor mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Convertor convertor = new Convertor(rs.getInt("con_id"), null, null, rs.getDouble("val"),
+								rs.getString("create_by"), rs.getDate("create_date"), rs.getShort("con_state"));
+						if (convertor != null) {
+							convertor.setBaseUom(uomDaoImpl.getUomByNumber(
+									new Uom(rs.getInt("base_uom_id"), null, null, null, null, (short) 1)));
+							convertor.setRatUom(new Uom(rs.getInt("base_uom_id"), null, null, null, null, (short) 1));
+						}
+
+						return convertor;
+					}
+				});
+		return activeConvertors;
 	}
 
 	@Override

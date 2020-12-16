@@ -1,4 +1,4 @@
-package com.teleios.pos.model;
+package com.teleios.pos.service;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.teleios.pos.dao.impl.ConvertorDaoImpl;
+import com.teleios.pos.model.Convertor;
 
 @Service
 public class ConvertorService {
@@ -41,8 +42,7 @@ public class ConvertorService {
 	}
 
 	public List<Convertor> getActiveConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return this.convertoDaoImpl.getAllConvertors();
 	}
 
 	public List<Convertor> getAllConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
