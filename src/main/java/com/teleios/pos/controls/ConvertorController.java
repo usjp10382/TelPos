@@ -57,8 +57,7 @@ public class ConvertorController implements Serializable {
 
 	private void loadAllUoms() {
 		try {
-			getNewConvertorObj().setCreateby(SecurityContextHolder.getContext().getAuthentication().getName());
-			getNewConvertorObj().setCreateDate(new Date());
+
 			this.uoms = this.uomService.getActiveUoms();
 		} catch (EmptyResultDataAccessException empe) {
 			LOGGER.error("Loead All UOMS Is Emplty", empe);
@@ -74,7 +73,14 @@ public class ConvertorController implements Serializable {
 
 	public void createNewConvertor() {
 		LOGGER.info("<----Execute Create New Convertor------>");
+		int createState = 0;
 		try {
+			if (this.uoms == null) {
+				return;
+			}
+			if (this.uoms.size() <= 0) {
+				return;
+			}
 			if (getSelBaseUomId() == null) {
 				addErrorMessage("Create New Convertor Item", "Select Base Unit Is Required!");
 				return;
@@ -84,12 +90,27 @@ public class ConvertorController implements Serializable {
 				return;
 			}
 
+			getNewConvertorObj().setBaseUom(getSelUomObj(getSelBaseUomId()));
+			getNewConvertorObj().setRatUom(getSelUomObj(getSelDerUomId()));
+			getNewConvertorObj().setCreateby(SecurityContextHolder.getContext().getAuthentication().getName());
+			getNewConvertorObj().setCreateDate(new Date());
+			getNewConvertorObj().setState((short) 1);
+
+			createState = this.convertorService.createNewConvertor(getNewConvertorObj());
+			if (createState > 0) {
+				addMessage("Create New Convertor Item", "Successfuly Create New Convertor Item !");
+			} else {
+				addErrorMessage("Create New Convertor Item", "Create New Convertor Item Is Failed !");
+			}
+
 		} catch (Exception e) {
 			LOGGER.error("Create New Convertor Errorr Ocurr--> ", e);
+			addErrorMessage("Create New Convertor Item",
+					"Create New Convertor Item Is Failed !\n" + e.getLocalizedMessage());
 		}
 	}
 
-	private Uom getSelUomObj(final Uom checkUom) {
+	private Uom getSelUomObj(final Integer checkUom) {
 		Uom selObj = null;
 		try {
 			if (uoms != null) {
@@ -97,15 +118,16 @@ public class ConvertorController implements Serializable {
 					Iterator<Uom> iterator = this.uoms.iterator();
 					while (iterator.hasNext()) {
 						Uom uom = iterator.next();
-						if (uom.getUomId().equals(checkUom.getUomId())) {
+						if (uom.getUomId().equals(checkUom)) {
 							selObj = uom;
-							return selObj;
+							break;
 						}
 
 					}
 				}
 			}
 		} catch (Exception e) {
+			LOGGER.error("Search Selected Uom Error--> ", e);
 			addErrorMessage("Create New Convertor Item",
 					"Search Selected Uom Item ErrorOcurr\n" + e.getLocalizedMessage());
 		}
