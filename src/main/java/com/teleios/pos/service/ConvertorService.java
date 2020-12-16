@@ -42,7 +42,7 @@ public class ConvertorService {
 	}
 
 	public List<Convertor> getActiveConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
-		return this.convertoDaoImpl.getAllConvertors();
+		return this.convertoDaoImpl.getActiveConvertors();
 	}
 
 	public List<Convertor> getAllConvertors() throws EmptyResultDataAccessException, DataAccessException, Exception {
