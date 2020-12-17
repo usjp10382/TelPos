@@ -19,6 +19,15 @@
 					<p:menuitem value="Search" icon="pi pi-refresh"
 						partialSubmit="true" />
 				</p:submenu>
+				
+				<p:submenu label="Stock Operations">
+				
+					<p:menuitem value="Add Products" icon="pi pi-shopping-cart"
+						outcome="StockView" ajax="false">
+						<f:param value="create" name="createPrd" />
+					</p:menuitem>
+
+				</p:submenu>
 
 				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.bdls']}">
 					<p:menuitem value="#{msg['tel.pos.mn.it.exp']}" icon="pi pi-shopping-cart"
@@ -49,16 +58,6 @@
 
 				</p:submenu>
 				
-				<p:submenu label="Stock Operations">
-				
-					<p:menuitem value="Add Products" icon="pi pi-shopping-cart"
-						outcome="StockView" ajax="false">
-						<f:param value="exps" name="test" />
-					</p:menuitem>
-
-				</p:submenu>
-
-
 			</p:panelMenu>
 		</h:form>
 	</ui:composition>
