@@ -11,7 +11,7 @@ import com.teleios.pos.model.Convertor;
 public interface ConvertorDao {
 	int createNewConvertor(Convertor convertor) throws DuplicateKeyException, Exception;
 
-	int[][] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception;
+	int[] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception;
 
 	int updateConvertor(Convertor convertor) throws DuplicateKeyException, Exception;
 

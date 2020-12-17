@@ -1,5 +1,6 @@
 package com.teleios.pos.dao.impl;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -28,6 +30,8 @@ public class ConvertorDaoImpl implements ConvertorDao {
 	// Define Sql Query
 	static final String CREATE_CONVERTOR_SQL = "INSERT INTO settings.convertor(base_uom_id,rat_uom_id,val,create_by,create_date,con_state) "
 			+ "VALUES(:base_uom_id,:rat_uom_id,:val,:create_by,:create_date,:con_state)";
+	static final String CREATE_BATCH_CONVERTOR_SQL = "INSERT INTO settings.convertor(base_uom_id,rat_uom_id,val,create_by,create_date,con_state) "
+			+ "VALUES(?,?,?,?,?,?)";
 	static final String ACTIVE_CONV_SQL = "SELECT con_id,base_uom_id,rat_uom_id,val,create_by,create_date,con_state FROM settings.convertor WHERE con_state=?";
 
 	@Autowired
@@ -54,9 +58,25 @@ public class ConvertorDaoImpl implements ConvertorDao {
 	}
 
 	@Override
-	public int[][] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public int[] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception {
+		return this.jdbcTemplate.batchUpdate(CREATE_BATCH_CONVERTOR_SQL, new BatchPreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setInt(1, convertors.get(i).getBaseUom().getUomId());
+				ps.setInt(2, convertors.get(i).getRatUom().getUomId());
+				ps.setDouble(3, convertors.get(i).getValue());
+				ps.setString(4, convertors.get(i).getCreateby());
+				ps.setDate(5, new java.sql.Date(convertors.get(i).getCreateDate().getTime()));
+				ps.setShort(6, convertors.get(i).getState());
+			}
+
+			@Override
+			public int getBatchSize() {
+				return convertors.size();
+			}
+		});
+
 	}
 
 	@Override
@@ -92,7 +112,8 @@ public class ConvertorDaoImpl implements ConvertorDao {
 						if (convertor != null) {
 							convertor.setBaseUom(uomDaoImpl.getUomByNumber(
 									new Uom(rs.getInt("base_uom_id"), null, null, null, null, (short) 1)));
-							convertor.setRatUom(uomDaoImpl.getUomByNumber(new Uom(rs.getInt("rat_uom_id"), null, null, null, null, (short) 1)));
+							convertor.setRatUom(uomDaoImpl.getUomByNumber(
+									new Uom(rs.getInt("rat_uom_id"), null, null, null, null, (short) 1)));
 						}
 
 						return convertor;

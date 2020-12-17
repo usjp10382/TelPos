@@ -8,6 +8,7 @@ package com.teleios.pos.controls;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,11 +46,14 @@ public class ConvertorController implements Serializable {
 	// Define Uom Variables
 	private List<Uom> uoms;
 
+	private boolean cartEmpty = true;
 	private List<Convertor> allActiveConvertors;
 	private List<Convertor> filteredConvertor;
+	private List<Convertor> convertorCart = new LinkedList<Convertor>();
 
 	private Integer selBaseUomId;
 	private Integer selDerUomId;
+	private Convertor havRemObj;
 
 	private Convertor newConvertorObj = new Convertor();
 
@@ -102,6 +106,83 @@ public class ConvertorController implements Serializable {
 				|| convertor.getBaseUom().getUomChar().toLowerCase().contains(filterText);
 	}
 
+	public void addToCart() {
+		LOGGER.info("<-----Execute Convertor Add To Cart----->");
+		try {
+			if (this.uoms == null) {
+				return;
+			}
+			if (this.uoms.size() <= 0) {
+				return;
+			}
+			if (getSelBaseUomId() == null) {
+				addErrorMessage("Create New Convertor Item", "Select Base Unit Is Required!");
+				return;
+			}
+			if (getSelDerUomId() == null) {
+				addErrorMessage("Create New Convertor Item", "Select Derived Unit Is Required!");
+				return;
+			}
+			if (getSelBaseUomId().equals(getSelDerUomId())) {
+				addErrorMessage("Create New Convertor Item", "The Derived Unit Can't Be the Base Unti!");
+				return;
+			}
+			if (getNewConvertorObj().getValue() <= 0.0) {
+				addErrorMessage("Create New Convertor Item", "Ratio Value Shuld Be Gretter Than Zero!");
+				return;
+			}
+
+			Convertor newConvertor = new Convertor();
+
+			newConvertor.setBaseUom(getSelUomObj(getSelBaseUomId()));
+			newConvertor.setRatUom(getSelUomObj(getSelDerUomId()));
+			newConvertor.setValue(Double.valueOf(getNewConvertorObj().getValue()));
+			newConvertor.setCreateby(SecurityContextHolder.getContext().getAuthentication().getName());
+			newConvertor.setCreateDate(new Date());
+			newConvertor.setState((short) 1);
+			if (isDuplicateConvCombination(newConvertor)) {
+				addErrorMessage("Add New Convertors To Cart", "Duplicate Convertor Combination");
+			} else {
+				getConvertorCart().add(newConvertor);
+				setCartEmpty(false);
+				clearInput(0);
+				addMessage("Add New Convertors To Cart", "New Converor Successfuly Added !");
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Add To Cart Convertor Error Ocured--->", e);
+			addErrorMessage("Create New Convertor Item", "Add To Cart New Converto Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public void removeFromCart() {
+		LOGGER.info("<--------- Execute Remove From Convertor Cart ----------->");
+		Iterator<Convertor> iterator;
+		try {
+			if (getConvertorCart().size() <= 0)
+				return;
+			iterator = getConvertorCart().iterator();
+
+			while (iterator.hasNext()) {
+				Convertor chekedConvertor = iterator.next();
+
+				if (getHavRemObj() == chekedConvertor) {
+					iterator.remove();
+					break;
+				}
+
+			}
+			if (getConvertorCart().isEmpty())
+				setCartEmpty(true);
+
+			addMessage("Remove Convertors From Cart", "Successfuly Removed !");
+
+		} catch (Exception e) {
+			LOGGER.error("Remove From Convertor Cart Error--->", e);
+			addErrorMessage("Create New Convertor", "Remove From Convertor Cart Error\n" + e.getLocalizedMessage());
+		}
+	}
+
 	public void createNewConvertor() {
 		LOGGER.info("<----Execute Create New Convertor------>");
 		int createState = 0;
@@ -125,6 +206,11 @@ public class ConvertorController implements Serializable {
 				return;
 			}
 
+			if (getNewConvertorObj().getValue() <= 0.0) {
+				addErrorMessage("Create New Convertor Item", "Ratio Value Shuld Be Gretter Than Zero!");
+				return;
+			}
+
 			getNewConvertorObj().setBaseUom(getSelUomObj(getSelBaseUomId()));
 			getNewConvertorObj().setRatUom(getSelUomObj(getSelDerUomId()));
 			getNewConvertorObj().setCreateby(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -134,6 +220,7 @@ public class ConvertorController implements Serializable {
 			createState = this.convertorService.createNewConvertor(getNewConvertorObj());
 			if (createState > 0) {
 				addMessage("Create New Convertor Item", "Successfuly Create New Convertor Item !");
+				clearInput(0);
 			} else {
 				addErrorMessage("Create New Convertor Item", "Create New Convertor Item Is Failed !");
 			}
@@ -143,6 +230,55 @@ public class ConvertorController implements Serializable {
 			addErrorMessage("Create New Convertor Item",
 					"Create New Convertor Item Is Failed !\n" + e.getLocalizedMessage());
 		}
+	}
+
+	public void createAllConvertors() {
+		LOGGER.info("<----------- Execute Create All Convertors ------------>");
+		int[] batchSize;
+		try {
+			if (getAllActiveConvertors().isEmpty()) {
+				addErrorMessage("Create Batch Of Convertors", "Doesent Contains Any COnvertors");
+				return;
+			}
+			batchSize = this.convertorService.createNewConvertor(getConvertorCart());
+			if (batchSize.length > 0) {
+				addMessage("Create Batch Of Convertors", "Create Batch Of Convertors Succcess !");
+				clearInput(1);
+			} else {
+				addErrorMessage("Create Batch Of Convertors", "Create Batch Of Convertors Failed!");
+			}
+		} catch (Exception e) {
+			LOGGER.error("Create All Convertors Error--> ", e);
+			addErrorMessage("Create Batch Of Convertors",
+					"Create Batch Of Convertors Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	private boolean isDuplicateConvCombination(final Convertor convertor) {
+		boolean isDuplicate = false;
+		Iterator<Convertor> iterator;
+		try {
+			if (this.convertorCart.size() <= 0)
+				return isDuplicate;
+
+			iterator = convertorCart.iterator();
+			while (iterator.hasNext()) {
+				Convertor checkConvertor = iterator.next();
+
+				if ((convertor.getBaseUom().getUomId().equals(checkConvertor.getBaseUom().getUomId()))
+						&& (convertor.getRatUom().getUomId().equals(checkConvertor.getRatUom().getUomId()))) {
+					isDuplicate = true;
+					break;
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Check Duplicate Combinaton Error---> ", e);
+			addErrorMessage("Create New Convertor Item",
+					"Check Duplicate Convertor Combination Error !\n" + e.getLocalizedMessage());
+		}
+		return isDuplicate;
 	}
 
 	private Uom getSelUomObj(final Integer checkUom) {
@@ -167,6 +303,22 @@ public class ConvertorController implements Serializable {
 					"Search Selected Uom Item ErrorOcurr\n" + e.getLocalizedMessage());
 		}
 		return selObj;
+	}
+
+	private void clearInput(final int flag) {
+		try {
+			this.selBaseUomId = null;
+			this.selDerUomId = null;
+			this.newConvertorObj.setValue(null);
+			if (flag == 1) {
+				getConvertorCart().clear();
+				loadAllActiveConvertors();
+				setCartEmpty(true);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Clear Input Error--> ", e);
+			addErrorMessage("Create New Convertor", "Clear Input System Error\n" + e.getLocalizedMessage());
+		}
 	}
 
 	private void addMessage(String summery, String details) {
@@ -200,12 +352,28 @@ public class ConvertorController implements Serializable {
 		this.allActiveConvertors = allActiveConvertors;
 	}
 
+	public boolean isCartEmpty() {
+		return cartEmpty;
+	}
+
+	public void setCartEmpty(boolean cartEmpty) {
+		this.cartEmpty = cartEmpty;
+	}
+
 	public List<Convertor> getFilteredConvertor() {
 		return filteredConvertor;
 	}
 
 	public void setFilteredConvertor(List<Convertor> filteredConvertor) {
 		this.filteredConvertor = filteredConvertor;
+	}
+
+	public List<Convertor> getConvertorCart() {
+		return convertorCart;
+	}
+
+	public void setConvertorCart(List<Convertor> convertorCart) {
+		this.convertorCart = convertorCart;
 	}
 
 	public Integer getSelBaseUomId() {
@@ -222,6 +390,15 @@ public class ConvertorController implements Serializable {
 
 	public void setSelDerUomId(Integer selDerUomId) {
 		this.selDerUomId = selDerUomId;
+	}
+
+	public Convertor getHavRemObj() {
+		return havRemObj;
+	}
+
+	public void setHavRemObj(Convertor havRemObj) {
+		this.havRemObj = havRemObj;
+		removeFromCart();
 	}
 
 	public Convertor getNewConvertorObj() {

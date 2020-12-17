@@ -20,9 +20,8 @@ public class ConvertorService {
 		return this.convertoDaoImpl.createNewConvertor(convertor);
 	}
 
-	public int[][] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public int[] createNewConvertor(List<Convertor> convertors) throws DuplicateKeyException, Exception {
+		return this.convertoDaoImpl.createNewConvertor(convertors);
 	}
 
 	public int updateConvertor(Convertor convertor) throws DuplicateKeyException, Exception {

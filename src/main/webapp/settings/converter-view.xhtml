@@ -64,7 +64,7 @@
 
 						<p:column style="width:32px;text-align: center">
 							<p:commandButton icon="pi pi-refresh" title="Update"
-								process="convTable" update=":converform:brandUpdates"
+								process="convTable" update=":converform:convUpdates"
 								oncomplete="saveDisable()" style="width:20px;height:20px">
 								<f:setPropertyActionListener value="#{brand}"
 									target="#{brandController.selectedBrand}" />
@@ -89,7 +89,7 @@
 
 				<!-- conversion  Controls - Start -->
 				<p:fieldset legend="#{msg['tel.pos.cc.ctl']}"
-					style="margin-bottom:20px" id="brandUpdates">
+					style="margin-bottom:20px" id="convUpdates">
 
 					<p:confirmDialog global="true" showEffect="expLode"
 						hideEffect="fade">
@@ -111,6 +111,8 @@
 									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.bunit']}" />
 								</div>
 								<p:selectOneMenu id="baseUnit" effect="fold" filter="true"
+									required="true"
+									requiredMessage="Select Base Convertor Is Required!"
 									editable="true" value="#{convertorController.selBaseUomId}">
 									<f:selectItem itemLabel="- select one -" itemValue="" />
 									<f:selectItems value="#{convertorController.uoms}" var="uom"
@@ -131,6 +133,8 @@
 									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.dunit']}" />
 								</div>
 								<p:selectOneMenu id="cimty" effect="fold" filter="true"
+									required="true"
+									requiredMessage="Select Derived Convertor Is Required!"
 									editable="true" value="#{convertorController.selDerUomId}">
 									<f:selectItem itemLabel="- select one -" itemValue="" />
 									<f:selectItems value="#{convertorController.uoms}" var="uom"
@@ -140,11 +144,17 @@
 
 							<div class="cc-display-inline">
 								<div>
+									<p:remoteCommand name="myRemCo"
+										action="#{convertorController.addToCart}"
+										process="@this convUpdates"
+										update=":converform:convertorCart,:converform:growl,:converform:convUpdates" />
 									<p:outputLabel for="@next" value="#{msg['tel.pos.cc.value']}" />
 								</div>
-								<p:inputText required="true"
+								<p:inputText required="true" type="number"
 									requiredMessage="Convertor Ratio Is Required!"
-									value="#{convertorController.newConvertorObj.value}" />
+									value="#{convertorController.newConvertorObj.value}"
+									onkeypress="if (event.keyCode === 13) { myRemCo(); return false; }" />
+
 							</div>
 
 
@@ -160,8 +170,8 @@
 
 								<p:commandButton value="#{msg['tel.pos.cwc.drt.save']}"
 									icon="pi pi-check-circle" style="margin-top:10px; width:25%"
-									update=":converform:growl,:converform:convTable,:converform:brandUpdates"
-									process="brandUpdates" ajax="true" partialSubmit="true"
+									update=":converform:growl,:converform:convTable,:converform:convUpdates"
+									process="convUpdates" ajax="true" partialSubmit="true"
 									action="#{convertorController.createNewConvertor}"
 									widgetVar="btnSave">
 									<p:confirm header="#{msg['tel.pos.cm.info']}"
@@ -172,7 +182,7 @@
 									icon="pi pi-refresh" style="margin-top:10px; width:25%"
 									styleClass="green-button" widgetVar="btnUpdate"
 									disabled="false" action="#{brandController.updateBrand}"
-									update=":converform:growl,:converform:convTable,:converform:brandUpdates"
+									update=":converform:growl,:converform:convTable,:converform:convUpdates"
 									process="@form" ajax="true">
 									<p:confirm header="#{msg['tel.pos.cm.wrn']}"
 										message="#{msg['tel.pos.cm.updte']}" />
@@ -187,53 +197,52 @@
 
 						<!-- Table 2 - Start -->
 						<div class="p-col-6">
-							<p:dataTable emptyMessage="#{msg['tel.pos.cm.tbl.content']}">
+							<p:dataTable emptyMessage="#{msg['tel.pos.cm.tbl.content']}"
+								id="convertorCart" value="#{convertorController.convertorCart}"
+								var="convTw">
 								<p:column headerText="#{msg['tel.pos.cc.bunit']}">
-									<h:outputText />
+									<h:outputText value="#{convTw.baseUom.uomName}" />
 								</p:column>
 
 								<p:column headerText="#{msg['tel.pos.cc.dunit']}">
-									<h:outputText />
+									<h:outputText value="#{convTw.ratUom.uomName}" />
 								</p:column>
 
 								<p:column headerText="#{msg['tel.pos.cc.value']}">
-									<h:outputText />
+									<h:outputText value="#{convTw.value}" />
 								</p:column>
 
 								<p:column style="width:32px;text-align: center">
 									<p:commandButton icon="pi pi-trash" title="Delete"
-										style="width:20px;height:20px" process="convTable"
-										update=":converform:growl,:converform:convTable"
+										style="width:20px;height:20px" process="convertorCart"
+										update=":converform:growl,:converform:convertorCart,:converform:btnSaveAllConv"
 										styleClass="red-button">
-										<f:setPropertyActionListener value="#{brand}"
-											target="#{brandController.deleteBrand}" />
-										<p:confirm header="#{msg['tel.pos.cm.wrn']}"
-											message="#{msg['tel.pos.cm.dlt']}" icon="pi pi-trash" />
+										<f:setPropertyActionListener value="#{convTw}"
+											target="#{convertorController.havRemObj}" />
+										<p:confirm header="Remove Convertor"
+											message="Are You Sure Remove Convertor From Cart?"
+											icon="pi pi-trash" />
 									</p:commandButton>
 								</p:column>
 							</p:dataTable>
 
 							<p:commandButton value="#{msg['tel.pos.cwc.save.all']}"
-								icon="pi pi-check-circle"
+								icon="pi pi-check-circle" id="btnSaveAllConv"
+								disabled="#{convertorController.cartEmpty}"
 								style="margin-top:10px; width:40%; float:right; "
-								update=":converform:growl,:converform:convTable,:converform:brandUpdates"
-								process="@form" ajax="true"
-								action="#{brandController.creaeNewBrand}" widgetVar="btnSave">
-								<p:confirm header="#{msg['tel.pos.cm.info']}"
-									message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
+								update=":converform:growl,:converform:convTable,:converform:convUpdates"
+								process="convertorCart,@this" ajax="true"
+								action="#{convertorController.createAllConvertors}"
+								widgetVar="btnSave">
+								<p:confirm header="Create Batch Of Convertors"
+									message="Are You Sure Save All Convertors?"
+									icon="fa fa-floppy-o" />
 							</p:commandButton>
 
 						</div>
 						<!-- Table 2 - End -->
 
-
-
-
 					</div>
-
-
-
-
 
 				</p:fieldset>
 			</h:form>
