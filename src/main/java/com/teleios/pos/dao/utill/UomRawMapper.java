@@ -1,4 +1,4 @@
-package com.teleios.pos.utill;
+package com.teleios.pos.dao.utill;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
