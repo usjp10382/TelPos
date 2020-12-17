@@ -19,7 +19,7 @@
 					showSummary="false" />
 
 				<!-- Uom Details - Start -->
-				<p:fieldset legend="#{msg['tel.pos.uom.ct.det']}"
+				<p:fieldset legend="#{msg['tel.pos.bc.det']}"
 					style="margin-bottom:20px" toggleable="true" toggleSpeed="400">
 
 					<p:dataTable var="brand" value="#{brandController.brandList}"
@@ -30,14 +30,14 @@
 
 						<f:facet name="header">
 							<p:outputPanel>
-								<h:outputText value="#{msg['tel.pos.uom.ct.srh_uom']}" />
+								<h:outputText value="#{msg['tel.pos.bc.srh_bn']}" />
 								<p:inputText id="globalFilter"
 									onkeyup="PF('brandTable').filter()" style="width:250px"
 									placeholder="#{msg['tel.pos.cwc.srh']}" />
 							</p:outputPanel>
 						</f:facet>
 
-						<p:column headerText="#{msg['tel.pos.cwc.des']}">
+						<p:column headerText="#{msg['tel.pos.bc.bnme']}">
 							<h:outputText value="#{brand.brandName}" />
 						</p:column>
 
@@ -76,7 +76,7 @@
 				<!-- Uom Details - End -->
 
 				<!-- UOM  Controlls - Start -->
-				<p:fieldset legend="#{msg['tel.pos.uom.ct.ctl']}"
+				<p:fieldset legend="#{msg['tel.pos.bc.ctl']}"
 					style="margin-bottom:20px" id="brandUpdates">
 
 					<p:confirmDialog global="true" showEffect="expLode"
@@ -92,7 +92,7 @@
 					<div class="p-grid ">
 
 						<div class="p-col-2">
-							<p:outputLabel for="uomId" value="#{msg['tel.pos.cwc.des']}"
+							<p:outputLabel for="uomId" value="#{msg['tel.pos.bc.bnme']}"
 								style="padding-right:50px" />
 						</div>
 

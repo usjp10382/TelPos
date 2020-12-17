@@ -21,43 +21,35 @@
 				<p:growl id="growl" sticky="false" life="2000" showDetail="true"
 					showSummary="true" />
 
-				<p:fieldset legend="Expendature Details" style="margin-bottom:20px"
+				<p:fieldset legend="#{msg['tel.pos.ec.eet']}" style="margin-bottom:20px"
 					toggleable="true" toggleSpeed="400">
 
 
 					<p:dataTable var="exp" value="#{expeControl.expenditures}"
 						widgetVar="expTable" id="expTble"
-						emptyMessage="No Expenditure found with given criteria"
+						emptyMessage="#{msg['tel.pos.cm.tbl.content']}"
 						filteredValue="#{expeControl.filExpenditures}"
 						globalFilterFunction="#{expeControl.globalFilterFunction}">
 
 						<f:facet name="header">
 							<p:outputPanel>
-								<h:outputText value="Search Expenditures  " />
+								<h:outputText value="#{msg['tel.pos.ec.srh_exp']}" />
 								<p:inputText id="globalFilter" onkeyup="PF('expTable').filter()"
-									style="width:250px" placeholder="Enter keyword" />
+									style="width:250px" placeholder="#{msg['tel.pos.cwc.srh']}" />
 							</p:outputPanel>
 						</f:facet>
 
-						<p:column headerText="Id" width="15">
-							<h:outputText value="#{exp.expId}" />
-						</p:column>
-
-						<p:column headerText="Description">
+						<p:column headerText="#{msg['tel.pos.cwc.des']}">
 							<h:outputText value="#{exp.dec}" />
 						</p:column>
 
-						<p:column headerText="Create By">
+						<p:column headerText="#{msg['tel.pos.cwc.cby']}">
 							<h:outputText value="#{exp.createBy}" />
 						</p:column>
 
-						<p:column headerText="Create Date">
+						<p:column headerText="#{msg['tel.pos.cwc.cdt']}">
 							<h:outputText value="#{exp.createDate}">
 							</h:outputText>
-						</p:column>
-
-						<p:column headerText="Status">
-							<h:outputText value="#{exp.expState=='1' ? 'Active': 'InActive'}" />
 						</p:column>
 
 						<p:column style="width:32px;text-align: center">
@@ -88,7 +80,7 @@
 
 
 
-				<p:fieldset legend="Expendature Controlls"
+				<p:fieldset legend="#{msg['tel.pos.ec.etl']}"
 					style="margin-bottom:20px" id="expUpdates">
 
 					<p:confirmDialog global="true" showEffect="expLode"
@@ -104,23 +96,23 @@
 						columnClasses="ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3"
 						contentStyleClass="p-align-baseline ui-fluid">
 
-						<p:outputLabel for="expId" value="ID" />
+						<p:outputLabel for="expId" value="#{msg['tel.pos.ec.id']}" />
 						<p:inputText id="expId" readonly="true"
 							value="#{expeControl.selectedExpenditure.expId}"
 							style="font-weight:bold" />
 
-						<p:outputLabel for="expDes" value="Description" />
+						<p:outputLabel for="expDes" value="#{msg['tel.pos.cwc.des']}" />
 						<p:inputText widgetVar="expDes" id="expDes" required="true"
 							requiredMessage="Expenditure Name Is Required!"
 							value="#{expeControl.selectedExpenditure.dec}"
 							style="font-weight:bold" />
 
-						<p:outputLabel for="expCreBy" value="Create By" />
+						<p:outputLabel for="expCreBy" value="#{msg['tel.pos.cwc.cby']}" />
 						<p:inputText id="expCreBy" readonly="true"
 							value="#{expeControl.selectedExpenditure.createBy}"
 							style="font-weight:bold" />
 
-						<p:outputLabel for="expCreDt" value="Create Date" />
+						<p:outputLabel for="expCreDt" value="#{msg['tel.pos.cwc.cdt']}" />
 						<p:inputText id="expCreDt" readonly="true"
 							value="#{expeControl.selectedExpenditure.createDate}"
 							style="font-weight:bold">
