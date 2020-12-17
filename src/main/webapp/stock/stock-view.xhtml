@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="/template/common/commonLayout.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="productform">
+
+				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+					showSummary="false" />
+
+				<!--  Product details - Start -->
+				<p:fieldset legend="Product Details" style="margin-bottom:20px">
+
+					<!-- Field set 1 - Start -->
+
+					<div class="p-grid">
+						<div class=" p-col-4">
+							<p:outputLabel for="@next" value="Item Code" />
+							<br />
+							<p:inputText style="width:100%" />
+						</div>
+
+						<div class=" p-col-4">
+							<p:outputLabel for="@next" value="Product Name" />
+							<br />
+							<p:inputText style="width:100%" />
+						</div>
+
+						<div class=" p-col-2">
+							<p:outputLabel for="@next" value="Create By" />
+							<br />
+							<p:inputText style="width:100%" />
+						</div>
+
+						<div class=" p-col-2">
+							<p:outputLabel for="@next" value="Create Date" />
+							<br />
+							<p:inputText style="width:100%" />
+						</div>
+					</div>
+					<br />
+					<div class="p-grid">
+						<div class="p-col-4">
+							<p:outputLabel for="@next" value="Brand" />
+							<br />
+							<p:selectOneMenu style="width:100%" id="cimty" effect="fold"
+								filter="true" editable="true"
+								value="#{convertorController.selDerUomId}">
+								<f:selectItem itemLabel="- select one -" itemValue="" />
+								<f:selectItems value="#{convertorController.uoms}" var="uom"
+									itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
+							</p:selectOneMenu>
+						</div>
+
+						<div class="p-col-4">
+							<p:outputLabel for="@next" value="Category" />
+							<br />
+							<p:selectOneMenu style="width:100%" id="cpimty" effect="fold"
+								filter="true" editable="true"
+								value="#{convertorController.selDerUomId}">
+								<f:selectItem itemLabel="- select one -" itemValue="" />
+								<f:selectItems value="#{convertorController.uoms}" var="uom"
+									itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
+							</p:selectOneMenu>
+						</div>
+
+						<div class="p-col-4">
+							<p:outputLabel for="@next" value="UOM" />
+							<br />
+							<p:selectOneMenu style="width:100%" id="cikmty" effect="fold"
+								filter="true" editable="true"
+								value="#{convertorController.selDerUomId}">
+								<f:selectItem itemLabel="- select one -" itemValue="" />
+								<f:selectItems value="#{convertorController.uoms}" var="uom"
+									itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
+							</p:selectOneMenu>
+						</div>
+
+					</div>
+
+					<!-- Buttion - start -->
+
+					<div class="p-col-4"></div>
+					<div class="p-col-4"></div>
+					<div class="p-col-4" style="float: right;" align="center">
+						<p:button value="Add to cart" icon="pi pi-shopping-cart"
+							style="width:48%;margin-right:2;">
+							<f:param name="productId" value="20" />
+						</p:button>
+						<p:button value="Direct Save" icon="pi pi-check-circle"
+							style="width:48%;margin:0;" styleClass="green-button">
+							<f:param name="productId" value="20" />
+						</p:button>
+					</div>
+					<!-- Buttion - end -->
+
+					<!-- Field set 1 - End -->
+
+				</p:fieldset>
+				<!-- Product details - End -->
+
+			</h:form>
+
+			<div id="template-footer">
+				<ui:include src="/template/common/commonFooter.xhtml" />
+			</div>
+
+		</ui:define>
+
+	</ui:composition>
+
+</h:body>
+</html>
+
+
