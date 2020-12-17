@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.teleios.pos.dao.ExpenditureDao;
+import com.teleios.pos.dao.utill.ExpenditureResExecutor;
 import com.teleios.pos.model.Expenditure;
 
 @Repository
@@ -96,15 +97,15 @@ public class ExpenditureDaoImpl implements ExpenditureDao {
 		String SQL = "SELECT exp_det_id,description,create_by,create_date,exp_det_state FROM expen_schema.exp_det ORDER BY exp_det_id ASC ";
 		List<Expenditure> expenditures = null;
 
-		expenditures = this.jdbctemplate.query(SQL, new RowMapper<Expenditure>() {
-
-			@Override
-			public Expenditure mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Expenditure exp = new Expenditure(rs.getInt("exp_det_id"), rs.getString("description"),
-						rs.getString("create_by"), rs.getDate("create_date"), rs.getShort("exp_det_state"));
-				return exp;
-			}
-		});
+		/*
+		 * expenditures = this.jdbctemplate.query(SQL, new RowMapper<Expenditure>() {
+		 * 
+		 * @Override public Expenditure mapRow(ResultSet rs, int rowNum) throws
+		 * SQLException { Expenditure exp = new Expenditure(rs.getInt("exp_det_id"),
+		 * rs.getString("description"), rs.getString("create_by"),
+		 * rs.getDate("create_date"), rs.getShort("exp_det_state")); return exp; } });
+		 */
+		expenditures = this.jdbctemplate.query(SQL, new ExpenditureResExecutor());
 
 		return expenditures;
 	}
