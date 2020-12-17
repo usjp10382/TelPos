@@ -116,12 +116,19 @@
 	font-size: 14px;
 }
 
-.cc-display-inline{
+.cc-display-inline {
 	display: inline-block;
 	margin-bottom: 15px;
 	margin-right: 15px;
-	}
+}
 
 .ui-paginator {
-    text-align: right !important;
+	text-align: right !important;
+}
+
+.ui-datatable thead th {
+	background-color: #e02365 !important;
+	font-weight: bold !important;
+	color: white !important;
+	font-size: medium;
 }
