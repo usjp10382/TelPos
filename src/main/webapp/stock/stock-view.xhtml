@@ -19,7 +19,7 @@
 					showSummary="false" />
 
 				<!--  Product details - Start -->
-				<p:fieldset legend="Product Details" style="margin-bottom:20px">
+				<p:fieldset legend="Product Details" style="margin-bottom:20px" id="fieldSet1">
 
 					<!-- Field set 1 - Start -->
 
@@ -27,25 +27,25 @@
 						<div class=" p-col-4">
 							<p:outputLabel for="@next" value="Item Code" />
 							<br />
-							<p:inputText style="width:100%" />
+							<p:inputText style="width:100%" id="itemCode"/>
 						</div>
 
 						<div class=" p-col-4">
 							<p:outputLabel for="@next" value="Product Name" />
 							<br />
-							<p:inputText style="width:100%" />
+							<p:inputText style="width:100%" id="productName"/>
 						</div>
 
 						<div class=" p-col-2">
 							<p:outputLabel for="@next" value="Create By" />
 							<br />
-							<p:inputText style="width:100%" />
+							<p:inputText style="width:100%" id="createBy" readonly="true"/>
 						</div>
 
 						<div class=" p-col-2">
 							<p:outputLabel for="@next" value="Create Date" />
 							<br />
-							<p:inputText style="width:100%" />
+							<p:inputText style="width:100%" id="createDate" readonly="true"/>
 						</div>
 					</div>
 					<br />
@@ -53,7 +53,7 @@
 						<div class="p-col-4">
 							<p:outputLabel for="@next" value="Brand" />
 							<br />
-							<p:selectOneMenu style="width:100%" id="cimty" effect="fold"
+							<p:selectOneMenu style="width:100%" id="brand" effect="fold"
 								filter="true" editable="true"
 								value="#{convertorController.selDerUomId}">
 								<f:selectItem itemLabel="- select one -" itemValue="" />
@@ -65,7 +65,7 @@
 						<div class="p-col-4">
 							<p:outputLabel for="@next" value="Category" />
 							<br />
-							<p:selectOneMenu style="width:100%" id="cpimty" effect="fold"
+							<p:selectOneMenu style="width:100%" id="category" effect="fold"
 								filter="true" editable="true"
 								value="#{convertorController.selDerUomId}">
 								<f:selectItem itemLabel="- select one -" itemValue="" />
@@ -77,7 +77,7 @@
 						<div class="p-col-4">
 							<p:outputLabel for="@next" value="UOM" />
 							<br />
-							<p:selectOneMenu style="width:100%" id="cikmty" effect="fold"
+							<p:selectOneMenu style="width:100%" id="uom" effect="fold"
 								filter="true" editable="true"
 								value="#{convertorController.selDerUomId}">
 								<f:selectItem itemLabel="- select one -" itemValue="" />
@@ -111,14 +111,14 @@
 
 				<!--  Product cart - Start -->
 				<p:fieldset legend="Item Details" style="margin-bottom:20px"
-					toggleable="true" toggleSpeed="400">
+					toggleable="true" toggleSpeed="400" id="fieldSet2">
 
 					<!-- Table - Start -->
 					<div class="p-grid">
 
 						<div class=" p-col-12"></div>
-						<p:dataTable var="car" value="#{dtFilterView.cars2}"
-							widgetVar="carsTable2"
+						<p:dataTable id="itemDetails" var="itemDetails" value="#{dtFilterView.cars2}"
+							widgetVar="itemDetails"
 							emptyMessage="No cars found with given criteria"
 							filteredValue="#{dtFilterView.filteredCars2}"
 							globalFilterFunction="#{dtFilterView.globalFilterFunction}">
