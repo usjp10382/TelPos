@@ -4,29 +4,207 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:p="http://primefaces.org/ui"
-	xmlns:pe="http://primefaces.org/ui/extensions">
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:head>
-	<title>Login</title>
-	<link href="#{request.contextPath}/resources/css/login.css"
+
+
+	<h:outputStylesheet name="common-style.css" library="css" />
+	<h:outputStylesheet name="primeicons/primeicons.css"
+		library="primefaces" />
+	<link href="#{request.contextPath}/resources/css/inputText.css"
 		rel="stylesheet" />
+	<link href="#{request.contextPath}/resources/css/primeflex.css"
+		rel="stylesheet" />
+	<link rel="shortcut icon" type="image/x-icon"
+		href="#{request.contextPath}/resources/img/fav.png" />
+
+	<title>Login</title>
+
+	<style>
+@media screen and (orientation:landscape) {
+	#image {
+		height: 100vh !important;
+		width: 50vw;
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
+	#img23 {
+		background-image: linear-gradient(to right, #1b7dd1, #1e4768);
+		top: 0;
+		right: 0;
+		position: fixed;
+		height: 100px"
+	}
+	#img24 {
+		background-image: linear-gradient(to right, #1b7dd1, #1e4768);
+		bottom: 0;
+		right: 0;
+		position: fixed;
+		height: 50px"
+	}
+	#asd {
+		position: relative;
+		top: 150px;
+		border: 10px solid #57B2E9 !important;
+		padding: 50px;
+		height: 50vh
+	}
+}
+
+.input-icons i {
+	position: absolute;
+}
+
+.input-icons {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.icon {
+	padding: 10px;
+	color: #57B2E9;
+	min-width: 50px;
+	text-align: center;
+}
+
+.input-field {
+	width: 100%;
+	padding: 10px;
+	text-align: center;
+	border: 3px solid #57B2E9 !important;
+	border-right: 10px solid #57B2E9 !important;
+}
+
+h2 {
+	color: green;
+}
+</style>
+
 </h:head>
 
-<h:body>
+<h:body style="background:white">
+
+
+
+
+
 	<h:form prependId="false">
 
-		<p:panelGrid columns="1" styleClass="ui-fluid center ui-noborder">
-			<h2>Please login</h2>
+		<div class="p-grid">
 
-			<p:outputLabel value="Login failed!" styleClass="red"
-				rendered="${!empty param['error']}" />
+			<div class="p-col-6">
+				<p:imageSwitch effect="fade" id="fadeEffect">
+					<ui:repeat value="#{imageView.images}" var="image"
+						id="fadeEffectImages">
+						<p:graphicImage value="/resources/img/#{image}" id="image"/>
+					</ui:repeat>
+				</p:imageSwitch>
+			</div>
 
-			<p:inputText id="username" placeholder="User name" />
-			<p:password id="password" placeholder="Password" />
+			<div class="p-col-6" id="img23">
+				<p align="center" style="color: white;">
+					<span style="font-size: x-large;">WELCOME</span><br /> <span
+						style="font-size: large;">Teleios Software Solutions</span>
+				</p>
+			</div>
 
-			<p:commandButton value="Login" ajax="false" />
-		</p:panelGrid>
+
+			<div class="p-col-1"></div>
+			<div class="p-col-4" align="center" id="asd">
+
+
+
+				<div class="input-icons">
+					<i class="fa fa-user icon"> </i>
+					<p:inputText id="username" placeholder="User name"
+						class="input-field" />
+				</div>
+
+				<div class="input-icons">
+					<i class="fa fa-lock icon"></i>
+					<p:password id="password" placeholder="Password"
+						class="input-field" />
+				</div>
+				<div>
+					<p:outputLabel value="Login failed!" style="color:red;"
+						rendered="${!empty param['error']}" />
+				</div>
+				<br />
+				<div>
+					<p:commandButton value="Login" ajax="false"
+						style="width:30%; float:right;" />
+				</div>
+
+			</div>
+
+			<div class="p-col-1"></div>
+
+
+			<div id="img24" class="p-col-6" align="center">
+				<a href="https://www.teleios.lk" target="new"
+					style="color: white; font-size: large;">Teleios Software
+					Solutions</a>
+			</div>
+
+
+
+			<!-- <div class="p-col-6" align="center"
+				style="position: relative; top: 150px; border: 10px solid #ccc !important; padding: 50px;">
+
+				
+
+				<div class="input-icons">
+					<i class="fa fa-user icon"> </i>
+					<p:inputText id="username" placeholder="User name"
+						class="input-field" />
+				</div>
+
+				<div class="input-icons">
+					<i class="fa fa-lock icon"></i>
+					<p:password id="password" placeholder="Password"
+						class="input-field" />
+				</div>
+				<div>
+					<p:outputLabel value="Login failed!" style="color:red;"
+						rendered="${!empty param['error']}" />
+				</div>
+				<br />
+				<div>
+					<p:commandButton value="Login" ajax="false"
+						style="width:30%; float:right;" />
+				</div>
+
+			</div> -->
+
+		</div>
+
 
 	</h:form>
+
+	<!-- <div class="p-grid">
+
+		<div class="p-col-12" align="center"
+			style="background-image: linear-gradient(to right, #1b7dd1, #1e4768); width: 100%; bottom: 0; left: 0; position: fixed; height: 50px">
+			<a href="https://www.teleios.lk" target="new"
+				style="color: white; font-size: large;">Teleios Software
+				Solutions</a>
+		</div>
+
+	</div>
+ -->
+
+
+
+
+
+
+
+
+
+
+
 </h:body>
 </html>
