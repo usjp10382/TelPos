@@ -87,7 +87,8 @@ public class Uom implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Uom [uomName=" + uomName + ", uomChar=" + uomChar + "]";
+		return uomName + "-" + uomChar;
+
 	}
 
 }

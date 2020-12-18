@@ -19,7 +19,8 @@
 					showSummary="false" />
 
 				<!--  Product details - Start -->
-				<p:fieldset legend="Product Details" style="margin-bottom:20px" id="fieldSet1">
+				<p:fieldset legend="Product Details" style="margin-bottom:20px"
+					id="fieldSet1">
 
 					<!-- Field set 1 - Start -->
 
@@ -27,25 +28,31 @@
 						<div class=" p-col-4">
 							<p:outputLabel for="@next" value="Item Code" />
 							<br />
-							<p:inputText style="width:100%" id="itemCode"/>
+							<p:inputText style="width:100%" id="itemCode"
+								value="#{prdController.newProduct.prdCode}" maxlength="50" />
 						</div>
 
 						<div class=" p-col-4">
 							<p:outputLabel for="@next" value="Product Name" />
 							<br />
-							<p:inputText style="width:100%" id="productName"/>
+							<p:inputText style="width:100%" id="productName"
+								value="#{prdController.newProduct.prdName}" maxlength="100" />
 						</div>
 
 						<div class=" p-col-2">
 							<p:outputLabel for="@next" value="Create By" />
 							<br />
-							<p:inputText style="width:100%" id="createBy" readonly="true"/>
+							<p:inputText style="width:100%" id="createBy"
+								value="#{prdController.newProduct.createBy}" readonly="true" />
 						</div>
 
 						<div class=" p-col-2">
 							<p:outputLabel for="@next" value="Create Date" />
 							<br />
-							<p:inputText style="width:100%" id="createDate" readonly="true"/>
+							<p:inputText style="width:100%" id="createDate" readonly="true"
+								value="#{prdController.newProduct.createDate}">
+								<f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+							</p:inputText>
 						</div>
 					</div>
 					<br />
@@ -55,10 +62,10 @@
 							<br />
 							<p:selectOneMenu style="width:100%" id="brand" effect="fold"
 								filter="true" editable="true"
-								value="#{convertorController.selDerUomId}">
-								<f:selectItem itemLabel="- select one -" itemValue="" />
-								<f:selectItems value="#{convertorController.uoms}" var="uom"
-									itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
+								value="#{prdController.selectedBrand}">
+								<f:selectItem itemLabel="- Select Brand -" itemValue="" />
+								<f:selectItems value="#{prdController.allActiveBrand}"
+									var="brand" itemValue="#{brand}" itemLabel="#{brand.brandName}" />
 							</p:selectOneMenu>
 						</div>
 
@@ -66,11 +73,11 @@
 							<p:outputLabel for="@next" value="Category" />
 							<br />
 							<p:selectOneMenu style="width:100%" id="category" effect="fold"
-								filter="true" editable="true"
-								value="#{convertorController.selDerUomId}">
-								<f:selectItem itemLabel="- select one -" itemValue="" />
-								<f:selectItems value="#{convertorController.uoms}" var="uom"
-									itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
+								filter="true" editable="true" converter="categoryConvertor"
+								value="#{prdController.selectedCategory}">
+								
+								<f:selectItems value="#{prdController.allActiveCategories}"
+									var="catg" itemValue="#{catg}" itemLabel="#{catg.categoryName}" />
 							</p:selectOneMenu>
 						</div>
 
@@ -79,10 +86,10 @@
 							<br />
 							<p:selectOneMenu style="width:100%" id="uom" effect="fold"
 								filter="true" editable="true"
-								value="#{convertorController.selDerUomId}">
-								<f:selectItem itemLabel="- select one -" itemValue="" />
-								<f:selectItems value="#{convertorController.uoms}" var="uom"
-									itemValue="#{uom.uomId}" itemLabel="#{uom.uomChar}" />
+								value="#{prdController.selectedUom}">
+								<f:selectItem itemLabel="- Select UOM -" itemValue="" />
+								<f:selectItems value="#{prdController.allActiveUoms}" var="uom"
+									itemValue="#{uom}" itemLabel="#{uom.uomChar}" />
 							</p:selectOneMenu>
 						</div>
 
@@ -93,14 +100,14 @@
 					<div class="p-col-4"></div>
 					<div class="p-col-4"></div>
 					<div class="p-col-4" style="float: right;" align="center">
-						<p:button value="Add to cart" icon="pi pi-shopping-cart"
-							style="width:48%;margin-right:2;" styleClass="green-button">
-							<f:param name="productId" value="20"/>
-						</p:button>
-						<p:button value="Direct Save" icon="pi pi-check-circle"
-							style="width:48%;margin:0;" styleClass="blue-button">
-							<f:param name="productId" value="20" />
-						</p:button>
+						<p:commandButton value="Add to cart" icon="pi pi-shopping-cart"
+							ajax="false" action="#{prdController.addToCart}"
+							style="width:48%;margin-right:2;" styleClass="green-button" />
+
+						<p:commandButton value="Direct Save" icon="pi pi-check-circle"
+							process="fieldSet1" style="width:48%;margin:0;"
+							styleClass="blue-button" />
+
 					</div>
 					<!-- Buttion - end -->
 
@@ -117,8 +124,8 @@
 					<div class="p-grid">
 
 						<div class=" p-col-12"></div>
-						<p:dataTable id="itemDetails" var="itemDetails" value="#{dtFilterView.cars2}"
-							widgetVar="itemDetails"
+						<p:dataTable id="itemDetails" var="itemDetails"
+							value="#{dtFilterView.cars2}" widgetVar="itemDetails"
 							emptyMessage="No cars found with given criteria"
 							filteredValue="#{dtFilterView.filteredCars2}"
 							globalFilterFunction="#{dtFilterView.globalFilterFunction}">

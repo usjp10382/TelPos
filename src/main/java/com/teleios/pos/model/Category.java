@@ -12,6 +12,7 @@ import java.util.Date;
  * @version :1.0
  *
  */
+
 public class Category implements Serializable {
 
 	/**
@@ -80,7 +81,7 @@ public class Category implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Category [categoryId=" + categoryId + ", categoryName=" + categoryName + "]";
+		return categoryName;
 	}
 
 }

@@ -71,7 +71,7 @@ public class Brand implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Brand [brandId=" + brandId + ", brandName=" + brandName + "]";
+		return brandName;
 	}
 
 }
