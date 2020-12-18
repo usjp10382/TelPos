@@ -63,23 +63,14 @@
 						</p:column>
 
 						<p:column style="width:32px;text-align: center">
-							<p:commandButton icon="pi pi-refresh" title="Update"
-								process="convTable" update=":converform:convUpdates"
-								oncomplete="saveDisable()" style="width:20px;height:20px">
-								<f:setPropertyActionListener value="#{brand}"
-									target="#{brandController.selectedBrand}" />
-							</p:commandButton>
-						</p:column>
-
-						<p:column style="width:32px;text-align: center">
 							<p:commandButton icon="pi pi-trash" title="Delete"
 								style="width:20px;height:20px" process="convTable"
 								update=":converform:growl,:converform:convTable"
 								styleClass="red-button">
-								<f:setPropertyActionListener value="#{brand}"
-									target="#{brandController.deleteBrand}" />
-								<p:confirm header="#{msg['tel.pos.cm.wrn']}"
-									message="#{msg['tel.pos.cm.dlt']}" icon="pi pi-trash" />
+								<f:setPropertyActionListener value="#{conv}"
+									target="#{convertorController.selcDelConvertor}" />
+								<p:confirm header="Delete Convertor"
+									message="Are You Sure Delete Convertor?" icon="pi pi-trash" />
 							</p:commandButton>
 						</p:column>
 					</p:dataTable>
@@ -178,15 +169,6 @@
 										message="#{msg['tel.pos.cm.save']}" icon="fa fa-floppy-o" />
 								</p:commandButton>
 
-								<p:commandButton value="#{msg['tel.pos.cwc.update']}"
-									icon="pi pi-refresh" style="margin-top:10px; width:25%"
-									styleClass="green-button" widgetVar="btnUpdate"
-									disabled="false" action="#{brandController.updateBrand}"
-									update=":converform:growl,:converform:convTable,:converform:convUpdates"
-									process="@form" ajax="true">
-									<p:confirm header="#{msg['tel.pos.cm.wrn']}"
-										message="#{msg['tel.pos.cm.updte']}" />
-								</p:commandButton>
 
 							</div>
 

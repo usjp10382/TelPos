@@ -30,8 +30,7 @@ public class ConvertorService {
 	}
 
 	public int deleteConvertor(Convertor convertor) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.convertoDaoImpl.deleteConvertor(convertor);
 	}
 
 	public Convertor getConvertorByNumber(Convertor convertor)

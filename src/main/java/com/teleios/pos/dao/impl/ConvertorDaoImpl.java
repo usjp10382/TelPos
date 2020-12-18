@@ -32,6 +32,7 @@ public class ConvertorDaoImpl implements ConvertorDao {
 			+ "VALUES(:base_uom_id,:rat_uom_id,:val,:create_by,:create_date,:con_state)";
 	static final String CREATE_BATCH_CONVERTOR_SQL = "INSERT INTO settings.convertor(base_uom_id,rat_uom_id,val,create_by,create_date,con_state) "
 			+ "VALUES(?,?,?,?,?,?)";
+	static final String DELETE_CONVERTOR_SQL = "UPDATE settings.convertor SET con_state=:con_state WHERE con_id=:con_id";
 	static final String ACTIVE_CONV_SQL = "SELECT con_id,base_uom_id,rat_uom_id,val,create_by,create_date,con_state FROM settings.convertor WHERE con_state=?";
 
 	@Autowired
@@ -87,8 +88,13 @@ public class ConvertorDaoImpl implements ConvertorDao {
 
 	@Override
 	public int deleteConvertor(Convertor convertor) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		LOGGER.info("Execute Delete Convertor Repositort-----------> ");
+		int deleteState = 0;
+		Map<String, Object> paraMap = new HashMap<String, Object>();
+		paraMap.put("con_state", (short) 0);
+		paraMap.put("con_id", convertor.getConvId());
+		deleteState = this.namedParameterJdbcTemplate.update(DELETE_CONVERTOR_SQL, paraMap);
+		return deleteState;
 	}
 
 	@Override

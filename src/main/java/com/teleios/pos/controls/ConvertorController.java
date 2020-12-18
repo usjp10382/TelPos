@@ -54,6 +54,7 @@ public class ConvertorController implements Serializable {
 	private Integer selBaseUomId;
 	private Integer selDerUomId;
 	private Convertor havRemObj;
+	private Convertor selcDelConvertor;
 
 	private Convertor newConvertorObj = new Convertor();
 
@@ -140,6 +141,10 @@ public class ConvertorController implements Serializable {
 			newConvertor.setCreateby(SecurityContextHolder.getContext().getAuthentication().getName());
 			newConvertor.setCreateDate(new Date());
 			newConvertor.setState((short) 1);
+			if (checkIsDuplicateConvertor(newConvertor)) {
+				addErrorMessage("Create New Convertor", "Entered Convertor Combination Allready Exist In Database");
+				return;
+			}
 			if (isDuplicateConvCombination(newConvertor)) {
 				addErrorMessage("Add New Convertors To Cart", "Duplicate Convertor Combination");
 			} else {
@@ -217,10 +222,16 @@ public class ConvertorController implements Serializable {
 			getNewConvertorObj().setCreateDate(new Date());
 			getNewConvertorObj().setState((short) 1);
 
+			if (checkIsDuplicateConvertor(getNewConvertorObj())) {
+				addErrorMessage("Create New Convertor", "Entered Convertor Combination Allready Exist In Database");
+				return;
+			}
+
 			createState = this.convertorService.createNewConvertor(getNewConvertorObj());
 			if (createState > 0) {
 				addMessage("Create New Convertor Item", "Successfuly Create New Convertor Item !");
 				clearInput(0);
+				loadAllActiveConvertors();
 			} else {
 				addErrorMessage("Create New Convertor Item", "Create New Convertor Item Is Failed !");
 			}
@@ -241,6 +252,7 @@ public class ConvertorController implements Serializable {
 				return;
 			}
 			batchSize = this.convertorService.createNewConvertor(getConvertorCart());
+
 			if (batchSize.length > 0) {
 				addMessage("Create Batch Of Convertors", "Create Batch Of Convertors Succcess !");
 				clearInput(1);
@@ -252,6 +264,52 @@ public class ConvertorController implements Serializable {
 			addErrorMessage("Create Batch Of Convertors",
 					"Create Batch Of Convertors Error\n" + e.getLocalizedMessage());
 		}
+	}
+
+	public void deleteConvertor() {
+		LOGGER.info("<---------------- Execute Delete Convertor -------------->");
+		int deleteState = 0;
+		try {
+			deleteState = this.convertorService.deleteConvertor(getSelcDelConvertor());
+			if (deleteState > 0) {
+				addMessage("Delete Convertor", "Delete Convertor Success!");
+				loadAllActiveConvertors();
+			} else {
+				addErrorMessage("Delete Convertor", "Delete Convertor Failed !");
+			}
+		} catch (Exception e) {
+			LOGGER.error("Delete Convertor Error---->", e);
+			addErrorMessage("Delete Convertor", "Delete Convertor Error Ocured!\n" + e.getLocalizedMessage());
+		}
+
+	}
+
+	private boolean checkIsDuplicateConvertor(final Convertor checkConvertor) {
+		boolean isDuplicate = false;
+		Iterator<Convertor> iterator = null;
+		try {
+			if (getAllActiveConvertors() != null) {
+				if (getAllActiveConvertors().size() <= 0)
+					return isDuplicate;
+
+				iterator = getAllActiveConvertors().iterator();
+				while (iterator.hasNext()) {
+					Convertor convertor = iterator.next();
+					if ((checkConvertor.getBaseUom().getUomId().equals(convertor.getBaseUom().getUomId()))
+							&& (checkConvertor.getRatUom().getUomId().equals(convertor.getRatUom().getUomId()))) {
+						isDuplicate = true;
+						break;
+					}
+
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.info("Check Is Duplicate Combination Error---> ", e);
+			addErrorMessage("Create New Convertor", "Check Duplicate Combination Error\n" + e.getLocalizedMessage());
+		}
+		return isDuplicate;
 	}
 
 	private boolean isDuplicateConvCombination(final Convertor convertor) {
@@ -407,6 +465,15 @@ public class ConvertorController implements Serializable {
 
 	public void setNewConvertorObj(Convertor newConvertorObj) {
 		this.newConvertorObj = newConvertorObj;
+	}
+
+	public Convertor getSelcDelConvertor() {
+		return selcDelConvertor;
+	}
+
+	public void setSelcDelConvertor(Convertor selcDelConvertor) {
+		this.selcDelConvertor = selcDelConvertor;
+		deleteConvertor();
 	}
 
 }
