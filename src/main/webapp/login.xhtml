@@ -8,8 +8,6 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:head>
-
-
 	<h:outputStylesheet name="common-style.css" library="css" />
 	<h:outputStylesheet name="primeicons/primeicons.css"
 		library="primefaces" />
@@ -24,7 +22,7 @@
 
 	<style>
 @media screen and (orientation:landscape) {
-	#image {
+	#image1 {
 		height: 100vh !important;
 		width: 50vw;
 		position: absolute;
@@ -51,6 +49,18 @@
 		border: 10px solid #57B2E9 !important;
 		padding: 50px;
 		height: 50vh
+	}
+	#msgToLand {
+		display: none;
+	}
+}
+
+@media screen and (orientation:portrait) {
+	#image1, #img23, #img24, #asd {
+		display: none;
+	}
+	#msgToLand {
+		display: block;
 	}
 }
 
@@ -87,21 +97,27 @@ h2 {
 
 <h:body style="background:white">
 
-
-
-
+	<div id="msgToLand">
+		<h1>Turn the cell phone and use the landscape mode !</h1>
+	</div>
 
 	<h:form prependId="false">
 
 		<div class="p-grid">
 
-			<div class="p-col-6">
-				<p:imageSwitch effect="fade" id="fadeEffect">
-					<ui:repeat value="#{imageView.images}" var="image"
-						id="fadeEffectImages">
-						<p:graphicImage value="/resources/img/#{image}" id="image"/>
-					</ui:repeat>
-				</p:imageSwitch>
+			<div class="p-col-6 ">
+
+				<div class="mySlides">
+					<img src="resources/img/pos1.jpg" id="image1" />
+				</div>
+
+				<div class="mySlides">
+					<img src="resources/img/pos2.jpg" id="image1" />
+				</div>
+
+				<div class="mySlides">
+					<img src="resources/img/pos3.jpg" id="image1" />
+				</div>
 			</div>
 
 			<div class="p-col-6" id="img23">
@@ -111,16 +127,13 @@ h2 {
 				</p>
 			</div>
 
-
 			<div class="p-col-1"></div>
 			<div class="p-col-4" align="center" id="asd">
-
-
 
 				<div class="input-icons">
 					<i class="fa fa-user icon"> </i>
 					<p:inputText id="username" placeholder="User name"
-						class="input-field" />
+						class="input-field" autocomplete="off" />
 				</div>
 
 				<div class="input-icons">
@@ -141,7 +154,6 @@ h2 {
 			</div>
 
 			<div class="p-col-1"></div>
-
 
 			<div id="img24" class="p-col-6" align="center">
 				<a href="https://www.teleios.lk" target="new"
@@ -149,62 +161,30 @@ h2 {
 					Solutions</a>
 			</div>
 
-
-
-			<!-- <div class="p-col-6" align="center"
-				style="position: relative; top: 150px; border: 10px solid #ccc !important; padding: 50px;">
-
-				
-
-				<div class="input-icons">
-					<i class="fa fa-user icon"> </i>
-					<p:inputText id="username" placeholder="User name"
-						class="input-field" />
-				</div>
-
-				<div class="input-icons">
-					<i class="fa fa-lock icon"></i>
-					<p:password id="password" placeholder="Password"
-						class="input-field" />
-				</div>
-				<div>
-					<p:outputLabel value="Login failed!" style="color:red;"
-						rendered="${!empty param['error']}" />
-				</div>
-				<br />
-				<div>
-					<p:commandButton value="Login" ajax="false"
-						style="width:30%; float:right;" />
-				</div>
-
-			</div> -->
-
 		</div>
 
 
 	</h:form>
 
-	<!-- <div class="p-grid">
+	<script>
+var slideIndex = 0;
+showSlides();
 
-		<div class="p-col-12" align="center"
-			style="background-image: linear-gradient(to right, #1b7dd1, #1e4768); width: 100%; bottom: 0; left: 0; position: fixed; height: 50px">
-			<a href="https://www.teleios.lk" target="new"
-				style="color: white; font-size: large;">Teleios Software
-				Solutions</a>
-		</div>
-
-	</div>
- -->
-
-
-
-
-
-
-
-
-
-
+function showSlides() {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  
+	for (i = 0; i &lt; slides.length; i++) {
+			slides[i].style.display = "none";
+		}
+		slideIndex++;
+		if (slideIndex > slides.length) {
+			slideIndex = 1
+		}
+		slides[slideIndex - 1].style.display = "block";
+		setTimeout(showSlides, 3000);
+	}
+</script>
 
 </h:body>
 </html>
