@@ -13,6 +13,15 @@
 
 		<ui:define name="content">
 
+			<p:ajaxStatus onstart="PF('statusDialog').show()"
+				onsuccess="PF('statusDialog').hide()" />
+
+			<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+				closable="false" resizable="false" showHeader="false">
+				<p:graphicImage value="../resources/img/ajax-loader.gif" />
+			</p:dialog>
+
+
 			<h:form id="productform">
 
 				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
@@ -21,36 +30,38 @@
 				<!--  Product details - Start -->
 				<p:fieldset legend="Product Details" style="margin-bottom:20px"
 					id="fieldSet1">
-
+					<p:focus context="fieldSet1" />
 					<!-- Field set 1 - Start -->
 
 					<div class="p-grid">
 						<div class=" p-col-4">
 							<p:outputLabel for="@next" value="Item Code" />
 							<br />
-							<p:inputText style="width:100%" id="itemCode"
-								value="#{prdController.newProduct.prdCode}" maxlength="50" />
+							<p:inputText style="width:100%" id="itemCode" required="true"
+								requiredMessage="Porduct Code Required!"
+								value="#{productController.newProduct.prdCode}" maxlength="50" />
 						</div>
 
 						<div class=" p-col-4">
 							<p:outputLabel for="@next" value="Product Name" />
 							<br />
 							<p:inputText style="width:100%" id="productName"
-								value="#{prdController.newProduct.prdName}" maxlength="100" />
+								value="#{productController.newProduct.prdName}" maxlength="100"
+								required="true" requiredMessage="Product Name Is Required!" />
 						</div>
 
 						<div class=" p-col-2">
 							<p:outputLabel for="@next" value="Create By" />
 							<br />
 							<p:inputText style="width:100%" id="createBy"
-								value="#{prdController.newProduct.createBy}" readonly="true" />
+								value="#{productController.newProduct.createBy}" readonly="true" />
 						</div>
 
 						<div class=" p-col-2">
 							<p:outputLabel for="@next" value="Create Date" />
 							<br />
 							<p:inputText style="width:100%" id="createDate" readonly="true"
-								value="#{prdController.newProduct.createDate}">
+								value="#{productController.newProduct.createDate}">
 								<f:convertDateTime type="date" pattern="yyyy-MM-dd" />
 							</p:inputText>
 						</div>
@@ -61,10 +72,11 @@
 							<p:outputLabel for="@next" value="Brand" />
 							<br />
 							<p:selectOneMenu style="width:100%" id="brand" effect="fold"
-								filter="true" editable="true"
-								value="#{prdController.selectedBrand}">
-								<f:selectItem itemLabel="- Select Brand -" itemValue="" />
-								<f:selectItems value="#{prdController.allActiveBrand}"
+								required="true" requiredMessage="Select Brand Is Required"
+								filter="true" editable="true" converter="brandConvertor"
+								placeholder="- Select Brand -"
+								value="#{productController.selectedBrand}">
+								<f:selectItems value="#{productController.allActiveBrand}"
 									var="brand" itemValue="#{brand}" itemLabel="#{brand.brandName}" />
 							</p:selectOneMenu>
 						</div>
@@ -72,11 +84,12 @@
 						<div class="p-col-4">
 							<p:outputLabel for="@next" value="Category" />
 							<br />
-							<p:selectOneMenu style="width:100%" id="category" effect="fold"
+							<p:selectOneMenu style="width:100%"
+								placeholder="-Select Category -" id="category" effect="fold"
+								required="true" requiredMessage="Select Category Is Required"
 								filter="true" editable="true" converter="categoryConvertor"
-								value="#{prdController.selectedCategory}">
-								
-								<f:selectItems value="#{prdController.allActiveCategories}"
+								value="#{productController.selectedCategory}">
+								<f:selectItems value="#{productController.allActiveCategories}"
 									var="catg" itemValue="#{catg}" itemLabel="#{catg.categoryName}" />
 							</p:selectOneMenu>
 						</div>
@@ -85,11 +98,13 @@
 							<p:outputLabel for="@next" value="UOM" />
 							<br />
 							<p:selectOneMenu style="width:100%" id="uom" effect="fold"
-								filter="true" editable="true"
-								value="#{prdController.selectedUom}">
-								<f:selectItem itemLabel="- Select UOM -" itemValue="" />
-								<f:selectItems value="#{prdController.allActiveUoms}" var="uom"
-									itemValue="#{uom}" itemLabel="#{uom.uomChar}" />
+								required="true" requiredMessage="Select UOM Is Required"
+								filter="true" editable="true" placeholder="- Select Uom -"
+								converter="uomConvertor"
+								value="#{productController.selectedUom}">
+								<f:selectItems value="#{productController.allActiveUoms}"
+									var="uom" itemValue="#{uom}"
+									itemLabel="#{uom.uomChar}-#{uom.uomName}" />
 							</p:selectOneMenu>
 						</div>
 
@@ -101,12 +116,14 @@
 					<div class="p-col-4"></div>
 					<div class="p-col-4" style="float: right;" align="center">
 						<p:commandButton value="Add to cart" icon="pi pi-shopping-cart"
-							ajax="false" action="#{prdController.addToCart}"
-							style="width:48%;margin-right:2;" styleClass="green-button" />
+							ajax="true" action="#{productController.addToCart}"
+							partialSubmit="true"
+							update=":productform:growl,:productform:fieldSet1,:productform:itemDetail"
+							process="fieldSet1" style="width:48%;margin-right:2;"
+							styleClass="green-button" />
 
 						<p:commandButton value="Direct Save" icon="pi pi-check-circle"
-							process="fieldSet1" style="width:48%;margin:0;"
-							styleClass="blue-button" />
+							style="width:48%;margin:0;" styleClass="blue-button" />
 
 					</div>
 					<!-- Buttion - end -->
@@ -124,58 +141,59 @@
 					<div class="p-grid">
 
 						<div class=" p-col-12"></div>
-						<p:dataTable id="itemDetails" var="itemDetails"
-							value="#{dtFilterView.cars2}" widgetVar="itemDetails"
-							emptyMessage="No cars found with given criteria"
-							filteredValue="#{dtFilterView.filteredCars2}"
-							globalFilterFunction="#{dtFilterView.globalFilterFunction}">
+						<p:dataTable id="itemDetail" var="itemDetails"
+							value="#{productController.productsCart}" widgetVar="itemDetails"
+							emptyMessage="No Product found with given criteria"
+							filteredValue="#{productController.filteredPrdList}"
+							globalFilterFunction="#{productController.globalFilterFunction}">
 
 							<f:facet name="header">
 								<p:outputPanel>
 									<h:outputText
 										value="Search all fields using globalFilterFunction:" />
 									<p:inputText id="globalFilter"
-										onkeyup="PF('carsTable2').filter()" style="width:150px"
+										onkeyup="PF('itemDetails').filter()" style="width:150px"
 										placeholder="Enter keyword" />
 								</p:outputPanel>
 							</f:facet>
 
 							<p:column headerText="Item Code">
-								<h:outputText value="#{car.id}" />
+								<h:outputText value="#{itemDetails.prdCode}" />
 							</p:column>
 
 							<p:column headerText="Product Name">
-								<h:outputText value="#{car.year}" />
+								<h:outputText value="#{itemDetails.prdName}" />
 							</p:column>
 
 							<p:column headerText="Brand">
-								<h:outputText value="#{car.brand}" />
+								<h:outputText value="#{itemDetails.brand.brandName}" />
 							</p:column>
 
 							<p:column headerText="Category">
-								<h:outputText value="#{car.color}" />
+								<h:outputText value="#{itemDetails.category.categoryName}" />
 							</p:column>
 
 							<p:column headerText="UOM">
-								<h:outputText value="#{car.sold ? 'Sold': 'Sale'}" />
+								<h:outputText value="#{itemDetails.uom.uomName}" />
 							</p:column>
 
 							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-refresh" title="Update"
-									process="expTble" update=":expform:expUpdates"
+									process="itemDetail"
+									update=":productform:itemDetail,:productform:growl"
 									oncomplete="saveDisable()" style="width:20px;height:20px">
-									<f:setPropertyActionListener value="#{exp}"
-										target="#{expeControl.selectedExpenditure}" />
+									<f:setPropertyActionListener value="#{itemDetails}"
+										target="#{productController.newProduct}" />
 								</p:commandButton>
 							</p:column>
 
 							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-trash" title="Delete"
-									style="width:20px;height:20px" process="expTble"
-									update=":expform:growl,:expform:expTble"
+									style="width:20px;height:20px" process="itemDetail"
+									update=":productform:growl,:productform:itemDetail"
 									styleClass="red-button">
-									<f:setPropertyActionListener value="#{exp}"
-										target="#{expeControl.deleteExpenditure}" />
+									<f:setPropertyActionListener value="#{itemDetails}"
+										target="#{productController.newProduct}" />
 									<p:confirm header="Warning!"
 										message="Do you need to delete this item permenently?"
 										icon="pi pi-trash" />
@@ -203,6 +221,16 @@
 
 				</p:fieldset>
 				<!--  Product cart - End -->
+
+				<p:confirmDialog global="true" showEffect="expLode"
+					hideEffect="fade">
+					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+						type="button" styleClass="red-button ui-confirmdialog-yes"
+						icon="pi pi-check" />
+					<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
+						type="button" styleClass="green-button ui-confirmdialog-no"
+						icon="pi pi-times" />
+				</p:confirmDialog>
 
 			</h:form>
 

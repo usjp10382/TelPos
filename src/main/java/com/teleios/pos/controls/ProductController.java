@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -26,7 +27,7 @@ import com.teleios.pos.service.BrandService;
 import com.teleios.pos.service.CategoryService;
 import com.teleios.pos.service.UomService;
 
-@Named("prdController")
+@Named("productController")
 @ViewScoped
 public class ProductController implements Serializable {
 	private static final long serialVersionUID = 2993540332188987445L;
@@ -53,6 +54,7 @@ public class ProductController implements Serializable {
 	// New Product Object and Cart List
 	private Product newProduct = new Product();
 	private List<Product> productsCart = new LinkedList<Product>();
+	private List<Product> filteredPrdList;
 
 	@PostConstruct
 	public void init() {
@@ -64,6 +66,7 @@ public class ProductController implements Serializable {
 			this.allActiveBrand = this.brandService.getActiveBrands();
 			this.allActiveCategories = this.categoryService.getActiveCategories();
 			this.allActiveUoms = this.uomService.getActiveUoms();
+
 		} catch (EmptyResultDataAccessException empe) {
 			LOGGER.error("Init Load Error", empe);
 			addWarMessage("Init Load Error", "Doesnt Contains Any Category/s Or UOMS Or Brands Or All");
@@ -76,9 +79,56 @@ public class ProductController implements Serializable {
 		}
 	}
 
+	// Filter Function For Product Table
+	public boolean globalFilterFunction(Object value, Object filter, Locale locale) {
+		LOGGER.info("<----Global Filter Function Called----->");
+		String filterText = (filter == null) ? null : filter.toString().trim().toLowerCase();
+		if (filterText == null || filterText.equals("")) {
+			return true;
+		}
+
+		Product product = (Product) value;
+
+		return product.getPrdName().toLowerCase().contains(filterText)
+				|| product.getPrdCode().toLowerCase().contains(filterText);
+	}
+
 	public void addToCart() {
 		LOGGER.info("<---------- Execute Add To Product Cart -------->");
-		LOGGER.info("Selected Category---> " + getSelectedCategory());
+		try {
+			if (getSelectedBrand() == null) {
+				addErrorMessage("Product Add To Cart", "Select Product Brand Is Required!");
+				return;
+			}
+			if (getSelectedCategory() == null) {
+				addErrorMessage("Product Add To Cart", "Select Product Category Is Required!");
+				return;
+			}
+			if (getSelectedUom() == null) {
+				addErrorMessage("Product Add To Cart", "Select Product UOM Is Required!");
+				return;
+			}
+			Product product = new Product();
+			product.setBrand(getSelectedBrand());
+			product.setCategory(getSelectedCategory());
+			product.setCreateBy(getNewProduct().getCreateBy());
+			product.setCreateDate(new Date());
+			product.setPrdCode(getNewProduct().getPrdCode().trim());
+			product.setPrdName(getNewProduct().getPrdName().trim());
+			product.setState((short) 1);
+			product.setUom(getSelectedUom());
+
+			if (this.getProductsCart().add(product)) {
+				addMessage("Product Add To Cart", "Product Successfuly Added To Cart!");
+				clearFiled();
+			} else {
+				addErrorMessage("Product Add To Cart", "Product  Added To Cart Failed!");
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Product Add To Cart Error---> ", e);
+			addErrorMessage("New Product Add To Cart", "Error Ocured!\n" + e.getLocalizedMessage());
+		}
 	}
 
 	private void addMessage(String summery, String details) {
@@ -94,6 +144,22 @@ public class ProductController implements Serializable {
 	private void addErrorMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summery, details);
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
+	}
+
+	private void clearFiled() {
+		LOGGER.info("<------ Clear Product Added Det Called --------->");
+		try {
+			if (getNewProduct() != null) {
+				this.newProduct.setPrdCode(null);
+				this.newProduct.setPrdName(null);
+			}
+			this.selectedBrand = null;
+			this.selectedCategory = null;
+			this.selectedUom = null;
+		} catch (Exception e) {
+			LOGGER.error("Prodcut Added List Clear Error--->", e);
+			addErrorMessage("Clear Product Input", "Error Ocured\n" + e.getLocalizedMessage());
+		}
 	}
 
 	public BrandService getBrandService() {
@@ -182,6 +248,14 @@ public class ProductController implements Serializable {
 
 	public void setProductsCart(List<Product> productsCart) {
 		this.productsCart = productsCart;
+	}
+
+	public List<Product> getFilteredPrdList() {
+		return filteredPrdList;
+	}
+
+	public void setFilteredPrdList(List<Product> filteredPrdList) {
+		this.filteredPrdList = filteredPrdList;
 	}
 
 }
