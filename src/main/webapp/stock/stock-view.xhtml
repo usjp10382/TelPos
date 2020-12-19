@@ -13,19 +13,19 @@
 
 		<ui:define name="content">
 
-			<p:ajaxStatus onstart="PF('statusDialog').show()"
+			<!-- <p:ajaxStatus onstart="PF('statusDialog').show()"
 				onsuccess="PF('statusDialog').hide()" />
 
 			<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
 				closable="false" resizable="false" showHeader="false">
 				<p:graphicImage value="../resources/img/ajax-loader.gif" />
-			</p:dialog>
+			</p:dialog> -->
 
 
 			<h:form id="productform">
 
 				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
-					showSummary="false" />
+					showSummary="true" skipDetailIfEqualsSummary="true" />
 
 				<!--  Product details - Start -->
 				<p:fieldset legend="Product Details" style="margin-bottom:20px"
@@ -118,12 +118,23 @@
 						<p:commandButton value="Add to cart" icon="pi pi-shopping-cart"
 							ajax="true" action="#{productController.addToCart}"
 							partialSubmit="true"
-							update=":productform:growl,:productform:fieldSet1,:productform:itemDetail"
+							update=":productform:growl,:productform:fieldSet1,:productform:fieldSet2"
 							process="fieldSet1" style="width:48%;margin-right:2;"
-							styleClass="green-button" />
+							styleClass="green-button">
+							<p:confirm header="Add New Prodcut To Cart"
+								message="Are You Sure Add this to Cart?" icon="pi pi-trash" />
+						</p:commandButton>
 
 						<p:commandButton value="Direct Save" icon="pi pi-check-circle"
-							style="width:48%;margin:0;" styleClass="blue-button" />
+							action="#{productController.createNewProduct}" ajax="true"
+							partialSubmit="true"
+							update=":productform:growl,:productform:fieldSet1"
+							process="fieldSet1" style="width:48%;margin:0;"
+							styleClass="blue-button">
+							<p:confirm header="Create New Product"
+								message="Are You Sure Directly Create this Product?"
+								icon="pi pi-trash" />
+						</p:commandButton>
 
 					</div>
 					<!-- Buttion - end -->
@@ -178,24 +189,14 @@
 							</p:column>
 
 							<p:column style="width:32px;text-align: center">
-								<p:commandButton icon="pi pi-refresh" title="Update"
-									process="itemDetail"
-									update=":productform:itemDetail,:productform:growl"
-									oncomplete="saveDisable()" style="width:20px;height:20px">
-									<f:setPropertyActionListener value="#{itemDetails}"
-										target="#{productController.newProduct}" />
-								</p:commandButton>
-							</p:column>
-
-							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-trash" title="Delete"
 									style="width:20px;height:20px" process="itemDetail"
-									update=":productform:growl,:productform:itemDetail"
+									update=":productform:growl,:productform:fieldSet2"
 									styleClass="red-button">
 									<f:setPropertyActionListener value="#{itemDetails}"
-										target="#{productController.newProduct}" />
+										target="#{productController.havRemObj}" />
 									<p:confirm header="Warning!"
-										message="Do you need to delete this item permenently?"
+										message="Do you need to delete this From Cart"
 										icon="pi pi-trash" />
 								</p:commandButton>
 							</p:column>
@@ -205,16 +206,21 @@
 						<div class="p-col-4"></div>
 						<div class="p-col-4"></div>
 						<div class="p-col-2" align="right">
-							<p:button value="Print" icon="pi pi-print"
+							<p:commandButton value="Print" icon="pi pi-print" type="button"
 								style="width:100%;5argin:0; background-color: #FFA500 !important; border: 2px solid #FFA500 !important;">
-								<f:param name="productId" value="20" />
-							</p:button>
+								<p:printer target="itemDetail"></p:printer>
+							</p:commandButton>
 						</div>
 						<div class="p-col-2" align="right">
-							<p:button value="Direct Save" icon="pi pi-check-circle"
+							<p:commandButton value="Direct Save" icon="pi pi-check-circle"
+								disabled="#{productController.cartEmpty}"
+								action="#{productController.createNewProducts}"
+								process="fieldSet2"
+								update=":productform:growl,:productform:fieldSet1,:productform:fieldSet2"
 								style="width:100%;5argin:0;" styleClass="blue-button">
-								<f:param name="productId" value="20" />
-							</p:button>
+								<p:confirm header="Create Bulk Of Products"
+									message="Are You Sure Save All Products?" icon="pi pi-trash" />
+							</p:commandButton>
 						</div>
 					</div>
 					<!-- Table - End -->

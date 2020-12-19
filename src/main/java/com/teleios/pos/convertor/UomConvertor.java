@@ -16,7 +16,7 @@ public class UomConvertor implements Converter<Uom> {
 		if (value == null) {
 			return null;
 		} else {
-			String[] strArr = value.split("-");
+			String[] strArr = value.split(">");
 			selectedUom = new Uom();
 			selectedUom.setUomId(Integer.parseInt(strArr[0]));
 			selectedUom.setUomName(strArr[1]);
@@ -30,7 +30,7 @@ public class UomConvertor implements Converter<Uom> {
 	public String getAsString(FacesContext context, UIComponent component, Uom value) {
 		if (value != null) {
 			StringBuilder uomBuilder = new StringBuilder();
-			uomBuilder.append(value.getUomId()).append("-").append(value.getUomName()).append("-")
+			uomBuilder.append(value.getUomId()).append(">").append(value.getUomName()).append(">")
 					.append(value.getUomChar());
 
 			return uomBuilder.toString();
