@@ -212,7 +212,7 @@
 							</p:commandButton>
 						</div>
 						<div class="p-col-2" align="right">
-							<p:commandButton value="Direct Save" icon="pi pi-check-circle"
+							<p:commandButton value="Save All" icon="pi pi-check-circle"
 								disabled="#{productController.cartEmpty}"
 								action="#{productController.createNewProducts}"
 								process="fieldSet2"
@@ -228,9 +228,9 @@
 				</p:fieldset>
 				<!--  Product cart - End -->
 
-				<p:confirmDialog global="true" showEffect="expLode"
+				<p:confirmDialog global="true" showEffect="expLode" closeOnEscape="true"
 					hideEffect="fade">
-					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}" 
 						type="button" styleClass="red-button ui-confirmdialog-yes"
 						icon="pi pi-check" />
 					<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"

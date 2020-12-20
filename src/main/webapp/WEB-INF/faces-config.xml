@@ -14,10 +14,11 @@
 			<base-name>bundle</base-name>
 			<var>msg</var>
 		</resource-bundle>
-		<!-- <el-resolver>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerELResolver</el-resolver> -->
+		<el-resolver>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerELResolver</el-resolver>
 	</application>
-	<!-- <factory> <exception-handler-factory>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerFactory</exception-handler-factory> 
-		</factory> -->
+	<factory>
+		<exception-handler-factory>com.teleios.pos.config.ExtendedPrimeExceptionHandlerFactory</exception-handler-factory>
+	</factory>
 
 	<navigation-rule>
 		<navigation-case>
@@ -39,28 +40,28 @@
 			<to-view-id>/settings/uom-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
-	
+
 	<navigation-rule>
 		<navigation-case>
 			<from-outcome>CatView</from-outcome>
 			<to-view-id>/settings/category-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
-	
+
 	<navigation-rule>
 		<navigation-case>
 			<from-outcome>BrdView</from-outcome>
 			<to-view-id>/settings/brand-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
-	
+
 	<navigation-rule>
 		<navigation-case>
 			<from-outcome>ConView</from-outcome>
 			<to-view-id>/settings/converter-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
-	
+
 	<navigation-rule>
 		<navigation-case>
 			<from-outcome>StockView</from-outcome>

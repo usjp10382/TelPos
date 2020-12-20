@@ -16,11 +16,15 @@ public class BrandConvertor implements Converter<Brand> {
 		if (value == null) {
 			return null;
 		} else {
-			String[] strArr = value.split("-");
-			selectedBrand = new Brand();
-			selectedBrand.setBrandId(Integer.parseInt(strArr[0]));
-			selectedBrand.setBrandName(strArr[1]);
-			return selectedBrand;
+			try {
+				String[] strArr = value.split("_");
+				selectedBrand = new Brand();
+				selectedBrand.setBrandId(Integer.parseInt(strArr[0]));
+				selectedBrand.setBrandName(strArr[1]);
+				return selectedBrand;
+			} catch (NumberFormatException npe) {
+				return null;
+			}
 		}
 	}
 
@@ -28,7 +32,7 @@ public class BrandConvertor implements Converter<Brand> {
 	public String getAsString(FacesContext context, UIComponent component, Brand value) {
 		if (value != null) {
 			StringBuilder brandBuilder = new StringBuilder();
-			brandBuilder.append(value.getBrandId()).append("-").append(value.getBrandName());
+			brandBuilder.append(value.getBrandId()).append("_").append(value.getBrandName());
 
 			return brandBuilder.toString();
 		}

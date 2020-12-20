@@ -7,7 +7,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
-	
+
 </h:head>
 <h:body>
 
@@ -21,8 +21,8 @@
 				<p:growl id="growl" sticky="false" life="2000" showDetail="true"
 					showSummary="true" />
 
-				<p:fieldset legend="#{msg['tel.pos.ec.eet']}" style="margin-bottom:20px"
-					toggleable="true" toggleSpeed="400">
+				<p:fieldset legend="#{msg['tel.pos.ec.eet']}"
+					style="margin-bottom:20px" toggleable="true" toggleSpeed="400">
 
 
 					<p:dataTable var="exp" value="#{expeControl.expenditures}"
@@ -161,9 +161,9 @@
 
 
 
-<div id="template-footer">
-<ui:include src="/template/common/commonFooter.xhtml" />
-</div>
+			<div id="template-footer">
+				<ui:include src="/template/common/commonFooter.xhtml" />
+			</div>
 			<script>
 				function saveEnable() {
 					PF('btnUpdate').disable();

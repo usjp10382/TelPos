@@ -16,12 +16,16 @@ public class CategoryConvertor implements Converter<Category> {
 		if (value == null) {
 			return null;
 		} else {
-			String[] str = value.split("-");
-			selcCategory = new Category();
-			int categoryId = Integer.parseInt(str[0]);
-			selcCategory.setCategoryId(categoryId);
-			selcCategory.setCategoryName(str[1]);
-			return selcCategory;
+			try {
+				String[] str = value.split("_");
+				selcCategory = new Category();
+				int categoryId = Integer.parseInt(str[0]);
+				selcCategory.setCategoryId(categoryId);
+				selcCategory.setCategoryName(str[1]);
+				return selcCategory;
+			} catch (NumberFormatException npe) {
+				return null;
+			}
 
 		}
 	}
@@ -30,7 +34,7 @@ public class CategoryConvertor implements Converter<Category> {
 	public String getAsString(FacesContext context, UIComponent component, Category value) {
 		if (value != null) {
 			StringBuilder categBuilder = new StringBuilder();
-			categBuilder.append(value.getCategoryId()).append("-").append(value.getCategoryName());
+			categBuilder.append(value.getCategoryId()).append("_").append(value.getCategoryName());
 			return categBuilder.toString();
 		}
 		return null;

@@ -85,10 +85,5 @@ public class Uom implements Serializable {
 		this.state = state;
 	}
 
-	@Override
-	public String toString() {
-		return uomName + "-" + uomChar;
-
-	}
 
 }

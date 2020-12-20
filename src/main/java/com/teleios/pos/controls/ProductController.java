@@ -177,6 +177,7 @@ public class ProductController implements Serializable {
 							"Succesfuly Create Number Of-> " + saveState.length + " Products !");
 					clearFiled(1);
 					loadAllActiveProducts();
+					setCartEmpty(true);
 				} else {
 					addErrorMessage("Create Bulk Of Products", "Create Prodcuts Failed !");
 				}
