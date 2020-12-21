@@ -28,6 +28,15 @@
 					</p:menuitem>
 
 				</p:submenu>
+				
+				<p:submenu label="User Management">
+				
+					<p:menuitem value="Create New User" icon="fa fa-cart-plus"
+						outcome="NewUser" ajax="false">
+						<f:param value="create" name="createUser" />
+					</p:menuitem>
+
+				</p:submenu>
 
 				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.bdls']}">
 					<p:menuitem value="#{msg['tel.pos.mn.it.exp']}" icon="fa fa-money"

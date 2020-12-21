@@ -21,10 +21,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/javax.faces.resource/**", "/resources/**").permitAll().anyRequest()
 				.authenticated();
 
-		http.formLogin().loginPage("/login.xhtml").permitAll().failureUrl("/login.xhtml?error=true");
-		http.formLogin().defaultSuccessUrl("/index.xhtml", true);
+		http.formLogin().loginPage("/login.xhtml").permitAll().failureUrl("/login.xhtml?error=true")
+				.defaultSuccessUrl("/index.xhtml", true);
 		// logout
-		http.logout().logoutSuccessUrl("/login.xhtml");
+		http.logout().invalidateHttpSession(true).clearAuthentication(true).logoutSuccessUrl("/login.xhtml")
+				.permitAll();
 
 		http.csrf().disable();
 	}

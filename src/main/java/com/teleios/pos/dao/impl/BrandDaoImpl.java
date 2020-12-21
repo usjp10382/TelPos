@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class BrandDaoImpl implements BrandDao {
 	static final String ALL_BRAND_SQL = "SELECT brand_id,brand_name,create_by,create_date,brnd_state FROM inv_schema.brand";
 
 	@Autowired
+	private DataSource dataSource;
+	
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -41,6 +46,7 @@ public class BrandDaoImpl implements BrandDao {
 	@Override
 	public int createNewBrand(Brand brand) throws DuplicateKeyException {
 		LOGGER.info("Execute Create New Brand Repositort-----------> ");
+		System.out.println("*******  Datasouce** "+dataSource);
 		int createstate = 0;
 		Map<String, Object> paraMap = new HashMap<String, Object>();
 		paraMap.put("brand_name", brand.getBrandName());
