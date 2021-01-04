@@ -25,7 +25,8 @@
 							paginator="true" rows="50"
 							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 							currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-							rowsPerPageTemplate="25,50,100" paginatorPosition="bottom" resizableColumns="true">
+							rowsPerPageTemplate="25,50,100" paginatorPosition="bottom"
+							resizableColumns="true">
 
 							<f:facet name="header">
 								<p:outputPanel>
@@ -67,8 +68,7 @@
 
 							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-refresh" title="Update"
-									style="width:20px;height:20px"
-									onclick="PF('updateSupplier').show();">
+									style="width:20px;height:20px" onclick="PF('proSrh').show();">
 								</p:commandButton>
 							</p:column>
 
@@ -85,6 +85,72 @@
 				</div>
 			</div>
 			<!-- Product Details Table - End -->
+
+			<!-- Product Details Update - Start -->
+			<div class="p-grid">
+				<div class="p-col-12">
+
+					<p:dialog header="Update this Product" widgetVar="proSrh"
+						showEffect="clip" hideEffect="clip" height="100%" width="50%"
+						style="position: absolute;z-index: -1">
+						<h:form id="proSrhFrm">
+
+							<div class="p-col-12">
+								<p:outputLabel for="itemCode" value="Item Code" />
+								<br />
+								<p:inputText id="itemCode" styleClass="inputTexts"
+									required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel for="proName" value="Product Name" />
+								<br />
+								<p:inputText id="proName" styleClass="inputTexts"
+									required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel for="brnd" value="Brand" />
+								<br />
+								<p:inputText id="brnd" styleClass="inputTexts" required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel for="cat" value="Category" />
+								<br />
+								<p:inputText id="cat" styleClass="inputTexts" required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel for="uom" value="UOM" />
+								<br />
+								<p:inputText id="uom" styleClass="inputTexts" required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel for="minQuantity" value="Minimum quanitiy" />
+								<br />
+								<p:inputText id="minQuantity" styleClass="inputTexts"
+									required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel for="rack" value="Rack Number" />
+								<br />
+								<p:inputText id="rack" styleClass="inputTexts" required="true" />
+							</div>
+
+							<div class="p-col-12" align="right">
+								<p:commandButton icon="pi pi-refresh" value="Update"
+									style="width:25%" styleClass="orange-btn" />
+							</div>
+
+						</h:form>
+					</p:dialog>
+
+				</div>
+			</div>
+			<!-- Product Details Update - End -->
 
 		</ui:define>
 	</ui:composition>

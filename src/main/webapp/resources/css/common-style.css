@@ -132,3 +132,8 @@
 	color: white !important;
 	font-size: medium;
 }
+
+.orange-btn {
+	background: orange !important;
+	border: 1px solid orange !important;
+}
