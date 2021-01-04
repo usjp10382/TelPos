@@ -12,31 +12,38 @@
 			<p:panelMenu style="width:100%">
 
 				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.pos']}">
+
 					<p:menuitem value="Billing" icon="pi pi-shopping-cart"
 						outcome="BillingView" ajax="false">
 						<f:param value="billing" name="test" />
 					</p:menuitem>
+
 					<p:menuitem value="Search" icon="pi pi-refresh"
 						partialSubmit="true" />
+
 				</p:submenu>
-				
+
 				<p:submenu label="#{msg['tel.pos.mn.it.sp']}">
-				
-					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.addproducts']}" icon="fa fa-cart-plus"
-						outcome="StockView" ajax="false">
+
+					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.addproducts']}"
+						icon="fa fa-cart-plus" outcome="StockView" ajax="false">
 						<f:param value="create" name="createPrd" />
 					</p:menuitem>
 
+					<p:menuitem value="View Products" icon="pi pi-search"
+						outcome="productSearch" ajax="false" />
+
 				</p:submenu>
-				
+
 				<p:submenu label="Supplier Management">
-				
-				<p:menuitem value="Create New Supplier" icon="fa fa-truck" outcome="newSupp" ajax="false"/>
-				
+
+					<p:menuitem value="Create New Supplier" icon="fa fa-truck"
+						outcome="newSupp" ajax="false" />
+
 				</p:submenu>
-				
+
 				<p:submenu label="User Management">
-				
+
 					<p:menuitem value="Create New User" icon="fa fa-cart-plus"
 						outcome="NewUser" ajax="false">
 						<f:param value="create" name="createUser" />
@@ -45,34 +52,34 @@
 				</p:submenu>
 
 				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.bdls']}">
+
 					<p:menuitem value="#{msg['tel.pos.mn.it.exp']}" icon="fa fa-money"
 						outcome="SettingView" ajax="false">
 						<f:param value="exps" name="test" />
 					</p:menuitem>
 
-					<p:menuitem value="#{msg['tel.pos.mn.it.uom']}" icon="fa fa-balance-scale"
-						outcome="UomView" ajax="false">
-						<f:param value="#" name="#" />
-					</p:menuitem>
-					
-					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.ctyp']}" icon="fa fa-industry"
-						outcome="CatView" ajax="false">
-						<f:param value="#" name="#" />
-					</p:menuitem>
-					
-					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.btyp']}" icon="fa fa-list-alt"
-						outcome="BrdView" ajax="false">
-						<f:param value="#" name="#" />
-					</p:menuitem>
-					
-					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.contyp']}" icon="fa fa-calculator"
-						outcome="ConView" ajax="false">
+					<p:menuitem value="#{msg['tel.pos.mn.it.uom']}"
+						icon="fa fa-balance-scale" outcome="UomView" ajax="false">
 						<f:param value="#" name="#" />
 					</p:menuitem>
 
+					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.ctyp']}"
+						icon="fa fa-industry" outcome="CatView" ajax="false">
+						<f:param value="#" name="#" />
+					</p:menuitem>
+
+					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.btyp']}"
+						icon="fa fa-list-alt" outcome="BrdView" ajax="false">
+						<f:param value="#" name="#" />
+					</p:menuitem>
+
+					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.contyp']}"
+						icon="fa fa-calculator" outcome="ConView" ajax="false">
+						<f:param value="#" name="#" />
+					</p:menuitem>
 
 				</p:submenu>
-				
+
 			</p:panelMenu>
 		</h:form>
 	</ui:composition>

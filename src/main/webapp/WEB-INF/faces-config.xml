@@ -62,12 +62,21 @@
 		</navigation-case>
 	</navigation-rule>
 
+	<!-- Stock Operations - Start -->
 	<navigation-rule>
 		<navigation-case>
 			<from-outcome>StockView</from-outcome>
 			<to-view-id>/stock/stock-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
+	
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>productSearch</from-outcome>
+			<to-view-id>/stock/product-search.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<!-- Stock Operation - End -->
 
 	<!-- User Management Navigation Rules Start -->
 	<navigation-rule>
@@ -78,14 +87,14 @@
 	</navigation-rule>
 	<!-- User Management Navigation Rules End -->
 
-<!-- Supplier Management Navigation Rules - Start -->
-<navigation-rule>
-	<navigation-case>
-		<from-outcome>newSupp</from-outcome>
-		<to-view-id>/supplier/add-supplier.xhtml</to-view-id>
-	</navigation-case>
-</navigation-rule>
-<!-- Supplier Management Navigation Rules - End -->
+	<!-- Supplier Management Navigation Rules - Start -->
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>newSupp</from-outcome>
+			<to-view-id>/supplier/add-supplier.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<!-- Supplier Management Navigation Rules - End -->
 
 </faces-config>
 
