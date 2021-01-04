@@ -22,7 +22,8 @@
 			</p:dialog> -->
 
 
-			<h:form id="productform">
+			<h:form id="productform" prependId="false"
+				onkeypress="if (event.keyCode == 13) { return false; }">
 
 				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
 					showSummary="true" skipDetailIfEqualsSummary="true" />
@@ -38,6 +39,7 @@
 							<p:outputLabel for="@next" value="Item Code" />
 							<br />
 							<p:inputText style="width:100%" id="itemCode" required="true"
+								onkeypress="if (event.keyCode == 13) { moveCursor(); }"
 								requiredMessage="Porduct Code Required!"
 								value="#{productController.newProduct.prdCode}" maxlength="50" />
 						</div>
@@ -228,9 +230,9 @@
 				</p:fieldset>
 				<!--  Product cart - End -->
 
-				<p:confirmDialog global="true" showEffect="expLode" closeOnEscape="true"
-					hideEffect="fade">
-					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}" 
+				<p:confirmDialog global="true" showEffect="expLode"
+					closeOnEscape="true" hideEffect="fade">
+					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
 						type="button" styleClass="red-button ui-confirmdialog-yes"
 						icon="pi pi-check" />
 					<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
@@ -243,6 +245,12 @@
 			<div id="template-footer">
 				<ui:include src="/template/common/commonFooter.xhtml" />
 			</div>
+
+			<script>
+				function moveCursor() {
+					$("#productName").focus();
+				}
+			</script>
 
 		</ui:define>
 
