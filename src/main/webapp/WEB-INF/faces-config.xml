@@ -76,4 +76,17 @@
 			<to-view-id>/user/create-new-user-view.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
+	<!-- User Management Navigation Rules End -->
+
+<!-- Supplier Management Navigation Rules - Start -->
+<navigation-rule>
+	<navigation-case>
+		<from-outcome>newSupp</from-outcome>
+		<to-view-id>/supplier/add-supplier.xhtml</to-view-id>
+	</navigation-case>
+</navigation-rule>
+<!-- Supplier Management Navigation Rules - End -->
+
 </faces-config>
+
+

@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf16069771639600" configfile="/TeleiosPos/src/main/webapp/WEB-INF/faces-config.xml">
-  <nodes xsi:type="pageflow:PFPage" x="122" y="562" id="pf16071213663970" referenceLink="//@navigationRule.0/@fromViewId|"/>
-  <nodes xsi:type="pageflow:PFPage" name="pos/billing-view.xhtml" x="122" y="2098" id="pf16073193081451" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" path="/pos/billing-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="*" id="pf16084214878600" outlinks="pf16084214878601 pf16084214878602 pf16084214878603 pf16084214878604 pf16084214878605 pf16084214878606 pf16084214878607" path="*"/>
-  <nodes xsi:type="pageflow:PFPage" name="settings/expenditure-view.xhtml" id="pf16084214878608" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" inlinks="pf16084214878601" path="/settings/expenditure-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="pos/billing.xhtml" id="pf16084214878609" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" inlinks="pf16084214878602" path="/pos/billing.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="settings/uom-view.xhtml" id="pf160842148786010" referenceLink="//@navigationRule.2/@navigationCase.0/@toViewId|" inlinks="pf16084214878603" path="/settings/uom-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="settings/category-view.xhtml" id="pf160842148786011" referenceLink="//@navigationRule.3/@navigationCase.0/@toViewId|" inlinks="pf16084214878604" path="/settings/category-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="settings/brand-view.xhtml" id="pf160842148786012" referenceLink="//@navigationRule.4/@navigationCase.0/@toViewId|" inlinks="pf16084214878605" path="/settings/brand-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="settings/converter-view.xhtml" id="pf160842148786013" referenceLink="//@navigationRule.5/@navigationCase.0/@toViewId|" inlinks="pf16084214878606" path="/settings/converter-view.xhtml"/>
-  <nodes xsi:type="pageflow:PFPage" name="stock/stock-view.xhtml" id="pf160842148786014" referenceLink="//@navigationRule.6/@navigationCase.0/@toViewId|" inlinks="pf16084214878607" path="/stock/stock-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" x="122" y="370" id="pf16071213663970" referenceLink="//@navigationRule.0/@fromViewId|"/>
+  <nodes xsi:type="pageflow:PFPage" name="pos/billing-view.xhtml" x="122" y="946" id="pf16073193081451" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" path="/pos/billing-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="*" x="122" y="1522" id="pf16084214878600" outlinks="pf16084214878601 pf16084214878602 pf16084214878603 pf16084214878604 pf16084214878605 pf16084214878606 pf16084214878607 pf16097403228110 pf16097404123273" path="*"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/expenditure-view.xhtml" x="338" y="178" id="pf16084214878608" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" inlinks="pf16084214878601" path="/settings/expenditure-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="pos/billing.xhtml" x="338" y="562" id="pf16084214878609" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" inlinks="pf16084214878602" path="/pos/billing.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/uom-view.xhtml" x="338" y="946" id="pf160842148786010" referenceLink="//@navigationRule.2/@navigationCase.0/@toViewId|" inlinks="pf16084214878603" path="/settings/uom-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/category-view.xhtml" x="338" y="1330" id="pf160842148786011" referenceLink="//@navigationRule.3/@navigationCase.0/@toViewId|" inlinks="pf16084214878604" path="/settings/category-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/brand-view.xhtml" x="338" y="1714" id="pf160842148786012" referenceLink="//@navigationRule.4/@navigationCase.0/@toViewId|" inlinks="pf16084214878605" path="/settings/brand-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="settings/converter-view.xhtml" x="338" y="2098" id="pf160842148786013" referenceLink="//@navigationRule.5/@navigationCase.0/@toViewId|" inlinks="pf16084214878606" path="/settings/converter-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="stock/stock-view.xhtml" x="338" y="2482" id="pf160842148786014" referenceLink="//@navigationRule.6/@navigationCase.0/@toViewId|" inlinks="pf16084214878607" path="/stock/stock-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="user/create-new-user-view.xhtml" x="338" y="2866" id="pf16097403228111" referenceLink="/0/@navigationRule.8/@navigationCase.0/@toViewId|" inlinks="pf16097403228110" path="/user/create-new-user-view.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="supplier/add-supplier.xhtml" id="pf16097404123284" referenceLink="//@navigationRule.8/@navigationCase.0/@toViewId|" inlinks="pf16097404123273" path="/supplier/add-supplier.xhtml"/>
   <links id="pf16084214878601" target="pf16084214878608" source="pf16084214878600" outcome="SettingView"/>
   <links id="pf16084214878602" target="pf16084214878609" source="pf16084214878600" outcome="BillingView"/>
   <links id="pf16084214878603" target="pf160842148786010" source="pf16084214878600" outcome="UomView"/>
@@ -17,4 +19,6 @@
   <links id="pf16084214878605" target="pf160842148786012" source="pf16084214878600" outcome="BrdView"/>
   <links id="pf16084214878606" target="pf160842148786013" source="pf16084214878600" outcome="ConView"/>
   <links id="pf16084214878607" target="pf160842148786014" source="pf16084214878600" outcome="StockView"/>
+  <links id="pf16097403228110" target="pf16097403228111" source="pf16084214878600" outcome="NewUser"/>
+  <links id="pf16097404123273" target="pf16097404123284" source="pf16084214878600" outcome="newSupp"/>
 </pageflow:Pageflow>
