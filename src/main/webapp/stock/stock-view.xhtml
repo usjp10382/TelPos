@@ -52,24 +52,13 @@
 								required="true" requiredMessage="Product Name Is Required!" />
 						</div>
 
-						<div class=" p-col-2">
-							<p:outputLabel for="@next" value="Create By" />
+						<div class=" p-col-4">
+							<p:outputLabel for="@next" value="Minimum quanitiy" />
 							<br />
-							<p:inputText style="width:100%" id="createBy"
-								value="#{productController.newProduct.createBy}" readonly="true" />
-						</div>
-
-						<div class=" p-col-2">
-							<p:outputLabel for="@next" value="Create Date" />
-							<br />
-							<p:inputText style="width:100%" id="createDate" readonly="true"
-								value="#{productController.newProduct.createDate}">
-								<f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+							<p:inputText style="width:100%" id="minQuant" required="true">
 							</p:inputText>
 						</div>
-					</div>
-					<br />
-					<div class="p-grid">
+
 						<div class="p-col-4">
 							<p:outputLabel for="@next" value="Brand" />
 							<br />
@@ -108,6 +97,29 @@
 									var="uom" itemValue="#{uom}"
 									itemLabel="#{uom.uomChar}-#{uom.uomName}" />
 							</p:selectOneMenu>
+						</div>
+
+						<div class=" p-col-4">
+							<p:outputLabel for="@next" value="Rack Number" />
+							<br />
+							<p:inputText style="width:100%" id="rkNo">
+							</p:inputText>
+						</div>
+
+						<div class=" p-col-4">
+							<p:outputLabel for="@next" value="Create By" />
+							<br />
+							<p:inputText style="width:100%" id="createBy"
+								value="#{productController.newProduct.createBy}" readonly="true" />
+						</div>
+
+						<div class=" p-col-4">
+							<p:outputLabel for="@next" value="Create Date" />
+							<br />
+							<p:inputText style="width:100%" id="createDate" readonly="true"
+								value="#{productController.newProduct.createDate}">
+								<f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+							</p:inputText>
 						</div>
 
 					</div>
