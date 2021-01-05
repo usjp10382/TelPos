@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+
+	<ui:composition template="/template/common/commonLayout.xhtml">
+		<ui:define name="content">
+			<h:form id="grnFrm">
+
+				<!-- GRN Main - Start -->
+				<div class="p-grid">
+					<div class="p-col-12">
+						<p:fieldset legend="Good Received Note" style="margin-bottom:20px">
+
+							<p:wizard>
+
+								<!-- GRN Header - Start -->
+								<p:tab id="tabOne" title="GRN Details">
+									<p:panel header="Main Details">
+										<h:panelGrid columns="2" columnClasses="label, value">
+
+											<h:outputText value="Firstname: *" />
+											<p:selectOneMenu id="console" label="Firstname:"
+												value="#{selectOneMenuView.console}" style="width:125px">
+												<f:selectItem itemLabel="Select One" itemValue="" />
+												<f:selectItem itemLabel="Xbox One" itemValue="Xbox One" />
+												<f:selectItem itemLabel="PS4" itemValue="PS4" />
+												<f:selectItem itemLabel="Wii U" itemValue="Wii U" />
+												<f:facet name="footer">
+													<p:separator />
+													<h:outputText value="3 consoles" style="font-weight:bold;" />
+												</f:facet>
+											</p:selectOneMenu>
+
+
+
+
+											
+
+											<h:outputText value="Lastname: *" />
+											<p:inputText value="#{userWizard.user.lastname}"
+												required="true" label="Lastname" />
+
+											<h:outputText value="Age: " />
+											<p:inputText value="#{userWizard.user.age}" />
+
+											<h:outputText value="Skip to last: " />
+											<h:selectBooleanCheckbox value="#{userWizard.skip}" />
+										</h:panelGrid>
+									</p:panel>
+								</p:tab>
+								<!-- GRN Header - End -->
+
+								<p:tab id="address" title="Address">
+									<p:panel header="Address Details">
+										<p:messages />
+										<h:panelGrid columns="2" columnClasses="label, value">
+											<h:outputText value="Street: " />
+											<p:inputText value="#{userWizard.user.street}" />
+
+											<h:outputText value="Postal Code: " />
+											<p:inputText value="#{userWizard.user.postalCode}" />
+
+											<h:outputText value="City: " />
+											<p:inputText value="#{userWizard.user.city}" />
+
+											<h:outputText value="Skip to last: " />
+											<h:selectBooleanCheckbox value="#{userWizard.skip}" />
+										</h:panelGrid>
+									</p:panel>
+								</p:tab>
+
+								<p:tab id="contact" title="Contact">
+									<p:panel header="Contact Information">
+										<p:messages />
+										<h:panelGrid columns="2" columnClasses="label, value">
+											<h:outputText value="Email: *" />
+											<p:inputText value="#{userWizard.user.email}" required="true"
+												label="Email" />
+
+											<h:outputText value="Phone: " />
+											<p:inputText value="#{userWizard.user.phone}" />
+
+											<h:outputText value="Additional Info: " />
+											<p:inputText value="#{userWizard.user.info}" />
+										</h:panelGrid>
+									</p:panel>
+								</p:tab>
+
+								<p:tab id="confirm" title="Confirmation">
+									<p:panel header="Confirmation">
+										<h:panelGrid id="confirmation" columns="3"
+											columnClasses="grid,grid,grid">
+											<h:panelGrid columns="2" columnClasses="label, value">
+												<h:outputText value="Firstname: " />
+												<h:outputText value="#{userWizard.user.firstname}"
+													styleClass="outputLabel" />
+
+												<h:outputText value="Lastname: " />
+												<h:outputText value="#{userWizard.user.lastname}"
+													styleClass="outputLabel" />
+
+												<h:outputText value="Age: " />
+												<h:outputText value="#{userWizard.user.age}"
+													styleClass="outputLabel" />
+											</h:panelGrid>
+
+											<h:panelGrid columns="2" columnClasses="label, value">
+												<h:outputText value="Street: " />
+												<h:outputText value="#{userWizard.user.street}"
+													styleClass="outputLabel" />
+
+												<h:outputText value="Postal: " />
+												<h:outputText value="#{userWizard.user.postalCode}"
+													styleClass="outputLabel" />
+
+												<h:outputText value="City: " />
+												<h:outputText value="#{userWizard.user.city}"
+													styleClass="outputLabel" />
+											</h:panelGrid>
+
+											<h:panelGrid columns="2" columnClasses="label, value">
+												<h:outputText value="Email: " />
+												<h:outputText value="#{userWizard.user.email}"
+													styleClass="outputLabel" />
+
+												<h:outputText value="Phone " />
+												<h:outputText value="#{userWizard.user.phone}"
+													styleClass="outputLabel" />
+
+												<h:outputText value="Info: " />
+												<h:outputText value="#{userWizard.user.info}"
+													styleClass="outputLabel" />
+
+												<h:outputText />
+												<h:outputText />
+											</h:panelGrid>
+										</h:panelGrid>
+
+										<p:commandButton value="Submit" action="#{userWizard.save}"
+											update="growl" process="@this" />
+									</p:panel>
+								</p:tab>
+							</p:wizard>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+							<div class="p-col-3">
+								<p:outputLabel for="grnNo" value="GRN No" />
+								<br />
+								<p:inputText id="grnNo" />
+							</div>
+
+
+
+						</p:fieldset>
+					</div>
+				</div>
+				<!-- GRN Main - End -->
+
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+</html>
+
+

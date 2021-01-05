@@ -76,6 +76,13 @@
 			<to-view-id>/stock/product-search.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
+	
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>grnView</from-outcome>
+			<to-view-id>/stock/grn.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
 	<!-- Stock Operation - End -->
 
 	<!-- User Management Navigation Rules Start -->

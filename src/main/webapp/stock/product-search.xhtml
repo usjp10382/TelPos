@@ -102,7 +102,8 @@
 					<div class="p-col-12">
 						<p:outputLabel for="itemCode" value="Item Code" />
 						<br />
-						<p:inputText id="itemCode" styleClass="inputTexts" required="true" value="#{productController.havUpdateProduct.prdCode}"/>
+						<p:inputText id="itemCode" styleClass="inputTexts" required="true"
+							value="#{productController.havUpdateProduct.prdCode}" />
 					</div>
 
 					<div class="p-col-12">
@@ -114,19 +115,28 @@
 					<div class="p-col-12">
 						<p:outputLabel for="brnd" value="Brand" />
 						<br />
-						<p:inputText id="brnd" styleClass="inputTexts" required="true" />
+						<p:selectOneMenu id="brnd" value="#{selectOneMenuView.console}"
+							style="width:100%">
+							<f:selectItem itemLabel="Select One" itemValue="" />
+						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel for="cat" value="Category" />
 						<br />
-						<p:inputText id="cat" styleClass="inputTexts" required="true" />
+						<p:selectOneMenu id="cat" value="#{selectOneMenuView.console}"
+							style="width:100%">
+							<f:selectItem itemLabel="Select One" itemValue="" />
+						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel for="uom" value="UOM" />
 						<br />
-						<p:inputText id="uom" styleClass="inputTexts" required="true" />
+						<p:selectOneMenu id="uom" value="#{selectOneMenuView.console}"
+							style="width:100%">
+							<f:selectItem itemLabel="Select One" itemValue="" />
+						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
