@@ -2,6 +2,7 @@ package com.teleios.pos.controls;
 
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
+import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.Brand;
@@ -70,8 +72,6 @@ public class ProductController implements Serializable {
 		LOGGER.info("<------------ Execute Product Controller Init ------------->");
 		loadAllActiveProducts();
 		try {
-			this.newProduct.setCreateBy(SecurityContextHolder.getContext().getAuthentication().getName());
-			this.newProduct.setCreateDate(new Date());
 			this.allActiveBrand = this.brandService.getActiveBrands();
 			this.allActiveCategories = this.categoryService.getActiveCategories();
 			this.allActiveUoms = this.uomService.getActiveUoms();
@@ -138,9 +138,32 @@ public class ProductController implements Serializable {
 				return;
 			}
 			if (getNewProduct() != null) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth != null) {
+					getNewProduct().setCreateBy(auth.getName());
+				} else {
+					throw new AccessDeniedException("Un Authorized Access !");
+				}
+
+				if (getNewProduct().getMinQtyLevel() == null) {
+					addErrorMessage("Create New Product", "Minimumm Quantity Level Is Required!");
+					return;
+				}
+
+				if (getNewProduct().getMinQtyLevel() < 0.0) {
+					addErrorMessage("Create New Product", "Minimumm Quantity Level Canot'be Minus!");
+					return;
+				}
+
+				if (getNewProduct().getRackDet().isEmpty()) {
+					getNewProduct().setRackDet("N/A");
+				}
+
+				getNewProduct().setCreateDate(new Date());
 				getNewProduct().setBrand(getSelectedBrand());
 				getNewProduct().setCategory(getSelectedCategory());
 				getNewProduct().setUom(getSelectedUom());
+
 				saveState = this.productService.createNewProduct(getNewProduct());
 				if (saveState > 0) {
 					addMessage("Create New Product", "Succesfuly Create New Prodcut!");
@@ -197,6 +220,11 @@ public class ProductController implements Serializable {
 	public void addToCart() {
 		LOGGER.info("<---------- Execute Add To Product Cart -------->");
 		try {
+			Thread.sleep(5000);
+			if (getProductsCart().size() >= 30) {
+				addErrorMessage("Product Add To Cart", "Product Cart Size Is Exeed Plz Save Added Items To System!");
+				return;
+			}
 			if (getSelectedBrand() == null) {
 				addErrorMessage("Product Add To Cart", "Select Product Brand Is Required!");
 				return;
@@ -211,14 +239,39 @@ public class ProductController implements Serializable {
 			}
 
 			Product product = new Product();
+
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+			if (auth != null) {
+				product.setCreateBy(auth.getName());
+			} else {
+				throw new AccessDeniedException("Un Authorized Access !");
+			}
+
+			if (getNewProduct().getMinQtyLevel() == null) {
+				addErrorMessage("Create New Product", "Minimumm Quantity Level Is Required!");
+				return;
+			}
+
+			if (getNewProduct().getMinQtyLevel() < 0.0) {
+				addErrorMessage("Create New Product", "Minimumm Quantity Level Canot'be Minus!");
+				return;
+			}
+
+			if (getNewProduct().getRackDet().isEmpty()) {
+				product.setRackDet("N/A");
+			} else {
+				product.setRackDet(getNewProduct().getRackDet());
+			}
+
 			product.setBrand(getSelectedBrand());
 			product.setCategory(getSelectedCategory());
-			product.setCreateBy(getNewProduct().getCreateBy());
 			product.setCreateDate(new Date());
 			product.setPrdCode(getNewProduct().getPrdCode().trim().toLowerCase());
 			product.setPrdName(getNewProduct().getPrdName().trim());
 			product.setState((short) 1);
 			product.setUom(getSelectedUom());
+			product.setMinQtyLevel(getNewProduct().getMinQtyLevel());
 
 			if (isDuplicateOfDb(product)) {
 				addErrorMessage("Add New Product To Cart",
@@ -295,6 +348,8 @@ public class ProductController implements Serializable {
 			if (getNewProduct() != null) {
 				this.newProduct.setPrdCode(null);
 				this.newProduct.setPrdName(null);
+				this.newProduct.setRackDet(null);
+				this.newProduct.setMinQtyLevel(null);
 			}
 			this.selectedBrand = null;
 			this.selectedCategory = null;

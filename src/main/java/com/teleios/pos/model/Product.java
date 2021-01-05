@@ -10,9 +10,6 @@ import java.util.Date;
  *
  */
 public class Product implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1040479535446223502L;
 
 	private Integer prdId;
@@ -21,6 +18,8 @@ public class Product implements Serializable {
 	private Brand brand;
 	private Category category;
 	private Uom uom;
+	private Double minQtyLevel;
+	private String rackDet;
 	private String createBy;
 	private Date createDate;
 	private short state;
@@ -30,7 +29,7 @@ public class Product implements Serializable {
 	}
 
 	public Product(Integer prdId, String prdCode, String prdName, Brand brand, Category category, Uom uom,
-			String createBy, Date createDate, short state) {
+			Double minQtyLevel, String rackDet, String createBy, Date createDate, short state) {
 		super();
 		this.prdId = prdId;
 		this.prdCode = prdCode;
@@ -38,6 +37,8 @@ public class Product implements Serializable {
 		this.brand = brand;
 		this.category = category;
 		this.uom = uom;
+		this.minQtyLevel = minQtyLevel;
+		this.rackDet = rackDet;
 		this.createBy = createBy;
 		this.createDate = createDate;
 		this.state = state;
@@ -118,6 +119,22 @@ public class Product implements Serializable {
 	@Override
 	public String toString() {
 		return "Product [prdCode=" + prdCode + ", prdName=" + prdName + "]";
+	}
+
+	public Double getMinQtyLevel() {
+		return minQtyLevel;
+	}
+
+	public void setMinQtyLevel(Double minQtyLevel) {
+		this.minQtyLevel = minQtyLevel;
+	}
+
+	public String getRackDet() {
+		return rackDet;
+	}
+
+	public void setRackDet(String rackDet) {
+		this.rackDet = rackDet;
 	}
 
 }

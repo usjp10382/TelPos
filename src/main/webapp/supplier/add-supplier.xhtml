@@ -19,30 +19,32 @@
 				<div class="p-col-12" align="right">
 
 					<div style="display: inline;">
-						<pe:tooltip for="newSupp" value="Create a New Supplier"
-							showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
-							myPosition="top center" atPosition="bottom center" />
-
 						<p:commandButton icon="pi pi-user-plus" style="margin-right:5px;"
-							id="newSupp" onclick="PF('pdfSheet').show();" />
+							type="button" id="newSupp" onclick="PF('pdfSheet').show();">
+							<pe:tooltip for="newSupp" value="Create a New Supplier"
+								showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
+								myPosition="top center" atPosition="bottom center" />
+						</p:commandButton>
 					</div>
 
 					<div style="display: inline;">
-						<pe:tooltip for="exlSheet" value="Import Excel Sheet"
-							showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
-							myPosition="top center" atPosition="bottom center" />
 
 						<p:commandButton icon="pi pi-file-excel" style="margin-right:5px;"
-							title="Icon Only" id="exlSheet" />
+							title="Icon Only" id="exlSheet" type="button">
+							<pe:tooltip for="exlSheet" value="Import Excel Sheet"
+								showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
+								myPosition="top center" atPosition="bottom center" />
+
+						</p:commandButton>
 					</div>
 
 					<div style="display: inline;">
-						<pe:tooltip for="pdfSheet" value="Export PDF Sheet"
-							showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
-							myPosition="top center" atPosition="bottom center" />
-
 						<p:commandButton icon="pi pi-file-pdf" style="margin-right:5px;"
-							title="Icon Only" id="pdfSheet" />
+							title="Icon Only" id="pdfSheet" type="button">
+							<pe:tooltip for="pdfSheet" value="Export PDF Sheet"
+								showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
+								myPosition="top center" atPosition="bottom center" />
+						</p:commandButton>
 					</div>
 
 				</div>
@@ -50,58 +52,7 @@
 			<!-- Top Icon Button - End -->
 
 			<!-- Create New Supplier - Start -->
-			<div class="p-grid">
-				<div class="p-col-12">
 
-					<p:dialog header="Create a New Supplier" widgetVar="pdfSheet"
-						showEffect="clip" hideEffect="clip" height="100%" width="50%">
-						<h:form id="newSuppFrm">
-
-							<div class="p-col-12">
-								<p:outputLabel for="supName" value="Supplier Name" />
-								<br />
-								<p:inputText id="supName" styleClass="inputTexts"
-									required="true" maxlength="50" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel for="supAddress" value="Address" />
-								<br />
-								<p:inputText id="supAddress" styleClass="inputTexts"
-									required="true" maxlength="100" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel for="supContact" value="Contact Number 1" />
-								<br />
-								<p:inputText type="tel" id="supContact" styleClass="inputTexts"
-									required="true" maxlength="10" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel for="supContactTwo" value="Contact Number 2" />
-								<br />
-								<p:inputText type="tel" id="supContactTwo"
-									styleClass="inputTexts" maxlength="10" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel for="supEmail" value="Email Address" />
-								<br />
-								<p:inputText type="email" id="supEmail" styleClass="inputTexts"
-									maxlength="50" />
-							</div>
-
-							<div class="p-col-12" align="right">
-								<p:commandButton icon="pi pi-pencil" value="Create"
-									style="width:25%" />
-							</div>
-
-						</h:form>
-					</p:dialog>
-
-				</div>
-			</div>
 			<!-- Create New Supplier - End -->
 
 			<!-- Supplier Main Table - Start -->
@@ -169,6 +120,67 @@
 				</div>
 			</h:form>
 			<!-- Supplier Main Table - End -->
+
+			<p:dialog header="Create a New Supplier" widgetVar="pdfSheet"
+				showEffect="clip" appendTo="@(supTable)" hideEffect="clip"
+				height="100%" width="50%">
+				<h:form id="newSuppFrm">
+					<div class="p-col-12">
+						<p:outputLabel for="supName" value="Supplier Name" />
+						<br />
+						<p:inputText id="supName" styleClass="inputTexts" required="true"
+							maxlength="50" value="#{suppController.newSupplier.supplierName}"
+							requiredMessage="The Suppliyer Name Is Required!" />
+						<p:message for="supName" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel for="supAddress" value="Address" />
+						<br />
+						<p:inputText id="supAddress" styleClass="inputTexts"
+							requiredMessage="The Suppliyer Address Is Required!"
+							required="true" value="#{suppController.newSupplier.address}"
+							maxlength="100" />
+						<p:message for="supAddress" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel for="supContact" value="Contact Number 1" />
+						<br />
+						<p:inputText type="tel" id="supContact" styleClass="inputTexts"
+							requiredMessage="The Suppliyer Contact Is Required!"
+							value="#{suppController.newSupplier.fixedNumber}" required="true"
+							maxlength="10" />
+						<p:message for="supContact" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel for="supContactTwo" value="Contact Number 2" />
+						<br />
+						<p:inputText type="tel" id="supContactTwo"
+							value="#{suppController.newSupplier.contactNumber}"
+							styleClass="inputTexts" maxlength="10" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel for="supEmail" value="Email Address" />
+						<br />
+						<p:inputText type="email" id="supEmail" styleClass="inputTexts"
+							value="#{suppController.newSupplier.email}" maxlength="50" />
+						<p:growl for="supEmail" id="invEmlId" sticky="false" life="5000"
+							showDetail="true" showSummary="true"
+							skipDetailIfEqualsSummary="true" />
+					</div>
+					<p:separator></p:separator>
+					<div class="p-col-12" align="right">
+						<p:commandButton icon="pi pi-pencil" value="Create"
+							process="@this,newSuppFrm"
+							update=":newSuppFrm:invEmlId,:newSuppFrm,"
+							action="#{suppController.createNewSuppliyer}" style="width:25%" />
+					</div>
+
+				</h:form>
+			</p:dialog>
 
 			<!-- Update Supplier - Start -->
 			<div class="p-grid">

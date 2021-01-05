@@ -26,12 +26,12 @@ import com.teleios.pos.model.Product;
 public class ProductDaoImpl implements ProductDao {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductDaoImpl.class);
 
-	private static final String CREATE_PRD_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state)"
-			+ " VALUES(:code,:prd_name,:brand,:category,:uom,:create_by,:create_date,:prd_state)";
-	static final String CREATE_BATCH_PRODUCTS_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state) "
-			+ "VALUES(?,?,?,?,?,?,?,?)";
+	private static final String CREATE_PRD_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,rack_no)"
+			+ " VALUES(:code,:prd_name,:brand,:category,:uom,:create_by,:create_date,:prd_state,:min_qty_lev,:rack_no)";
+	static final String CREATE_BATCH_PRODUCTS_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,rack_no) "
+			+ "VALUES(?,?,?,?,?,?,?,?,?,?)";
 
-	private static final String ALL_ACTIVE_PRD_SQL = "SELECT p.prd_id,p.code,p.prd_name,p.create_by,p.create_date,p.prd_state,"
+	private static final String ALL_ACTIVE_PRD_SQL = "SELECT p.prd_id,p.code,p.prd_name,p.create_by,p.create_date,p.prd_state,p.min_qty_lev,p.rack_no,"
 			+ "b.brand_id,b.brand_name,c.categ_id,c.categ_name,u.uom_id,u.uom_name,u.char_prifix "
 			+ "FROM inv_schema.product p INNER JOIN inv_schema.brand b ON P.brand=b.brand_id "
 			+ "INNER JOIN inv_schema.category c ON p.category=c.categ_id "
@@ -56,6 +56,8 @@ public class ProductDaoImpl implements ProductDao {
 		paraMap.put("create_by", product.getCreateBy());
 		paraMap.put("create_date", product.getCreateDate());
 		paraMap.put("prd_state", (short) 1);
+		paraMap.put("min_qty_lev", product.getMinQtyLevel());
+		paraMap.put("rack_no", product.getRackDet());
 
 		saveState = this.namedParameterJdbcTemplate.update(CREATE_PRD_SQL, paraMap);
 
@@ -79,6 +81,8 @@ public class ProductDaoImpl implements ProductDao {
 				ps.setString(6, products.get(i).getCreateBy());
 				ps.setDate(7, new java.sql.Date(products.get(i).getCreateDate().getTime()));
 				ps.setShort(8, products.get(i).getState());
+				ps.setDouble(9, products.get(i).getMinQtyLevel());
+				ps.setString(10, products.get(i).getRackDet());
 
 			}
 
