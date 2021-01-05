@@ -59,12 +59,16 @@
 			<h:form id="supMainTble">
 				<div class="p-grid">
 
+					<p:growl id="tblGrowl" sticky="false" life="5000" showDetail="true"
+						showSummary="true" skipDetailIfEqualsSummary="true" />
+
 					<div class="p-col-12">
-						<p:dataTable var="supTable" id="supTable" widgetVar="supTable"
-							emptyMessage="No Data found with given criteria"
-							filteredValue="#{dtFilterView.filteredCars2}"
-							globalFilterFunction="#{dtFilterView.globalFilterFunction}"
-							paginator="true" rows="50"
+						<p:dataTable var="supl" id="supTable" widgetVar="supTable"
+							editable="false" emptyMessage="No Data found with given criteria"
+							filteredValue="#{suppController.allActiveSuppFiltered}"
+							globalFilterFunction="#{suppController.globalFilterFunction}"
+							value="#{suppController.allActiveSuppliyers}" paginator="true"
+							rows="50"
 							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 							currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
 							rowsPerPageTemplate="25,50,100" paginatorPosition="bottom">
@@ -74,43 +78,52 @@
 									<h:outputText
 										value="Search all fields using globalFilterFunction:" />
 									<p:inputText id="globalFilter"
-										onkeyup="PF('carsTable2').filter()" style="width:150px"
+										onkeyup="PF('supTable').filter()" style="width:150px"
 										placeholder="Enter keyword" />
 								</p:outputPanel>
 							</f:facet>
 
 							<p:column headerText="Supplier Name">
-								<h:outputText value="#{car.id}" />
+								<h:outputText value="#{supl.supplierName}" />
 							</p:column>
 
 							<p:column headerText="Address">
-								<h:outputText value="#{car.year}" />
+								<h:outputText value="#{supl.address}" />
 							</p:column>
 
 							<p:column headerText="Contact 1">
-								<h:outputText value="#{car.brand}" />
+								<h:outputText
+									value="#{empty supl.contactNumber ? 'N/A' : supl.contactNumber}" />
 							</p:column>
 
 							<p:column headerText="Contact 2">
-								<h:outputText value="#{car.color}" />
+								<h:outputText value="#{supl.fixedNumber}" />
 							</p:column>
 
 							<p:column headerText="Email Address">
-								<h:outputText value="#{car.sold ? 'Sold': 'Sale'}" />
+								<h:outputText value="#{empty supl.email?'N/A':supl.email}" />
 							</p:column>
 
 							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-refresh" title="Update"
-									style="width:20px;height:20px"
-									onclick="PF('updateSupplier').show();">
+									update=":newSuppFrmUpdate" style="width:20px;height:20px"
+									oncomplete="PF('updateSupplier').show();">
+									<f:setPropertyActionListener value="#{supl}"
+										target="#{suppController.havUpdateSuppliyer}" />
 								</p:commandButton>
 							</p:column>
 
 
 							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-trash" title="Delete"
-									style="width:20px;height:20px" process="uomTble"
+									style="width:20px;height:20px" process="supTable"
+									update=":supMainTble"
 									styleClass="red-button">
+									<f:setPropertyActionListener value="#{supl}"
+										target="#{suppController.havDeleteSuppliyer}" />
+									<p:confirm header="Delete Suppliyer"
+										message="Are You Sure Delete Selected Suppliyer ?"
+										icon="pi pi-refresh" />
 								</p:commandButton>
 							</p:column>
 
@@ -125,6 +138,7 @@
 				showEffect="clip" appendTo="@(supTable)" hideEffect="clip"
 				height="100%" width="50%">
 				<h:form id="newSuppFrm">
+
 					<div class="p-col-12">
 						<p:outputLabel for="supName" value="Supplier Name" />
 						<br />
@@ -175,66 +189,94 @@
 					<div class="p-col-12" align="right">
 						<p:commandButton icon="pi pi-pencil" value="Create"
 							process="@this,newSuppFrm"
-							update=":newSuppFrm:invEmlId,:newSuppFrm,"
-							action="#{suppController.createNewSuppliyer}" style="width:25%" />
+							update=":newSuppFrm,:supMainTble:supTable"
+							action="#{suppController.createNewSuppliyer}" style="width:25%">
+							<p:confirm header="Create New Suppliyer"
+								message="Are You Sure Create New Suppliyer?"
+								icon="fa fa-floppy-o" />
+						</p:commandButton>
 					</div>
 
 				</h:form>
 			</p:dialog>
 
 			<!-- Update Supplier - Start -->
-			<div class="p-grid">
-				<div class="p-col-12">
+			<p:dialog header="Update this Supplier" widgetVar="updateSupplier"
+				dynamic="true" appendTo="@(supTable)" showEffect="clip"
+				hideEffect="clip" height="100%" width="50%">
+				<h:form id="newSuppFrmUpdate">
 
-					<p:dialog header="Update this Supplier" widgetVar="updateSupplier"
-						showEffect="clip" hideEffect="clip" height="100%" width="50%">
-						<h:form id="newSuppFrmUpdate">
+					<div class="p-col-12">
+						<p:outputLabel for="supNameUp" value="Supplier Name" />
+						<br />
+						<p:inputText id="supNameUp" styleClass="inputTexts"
+							value="#{suppController.havUpdateSuppliyer.supplierName}"
+							requiredMessage="Suppliyer Name Is Required!" required="true"
+							maxlength="50" />
+						<p:message for="supNameUp" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="supNameUp" value="Supplier Name" />
-								<br />
-								<p:inputText id="supNameUp" styleClass="inputTexts"
-									required="true" maxlength="50" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="supAddressUp" value="Address" />
+						<br />
+						<p:inputText id="supAddressUp" styleClass="inputTexts"
+							value="#{suppController.havUpdateSuppliyer.address}"
+							requiredMessage="Suppliyer Address Is Required!" required="true"
+							maxlength="100" />
+						<p:message for="supAddressUp" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="supAddressUp" value="Address" />
-								<br />
-								<p:inputText id="supAddressUp" styleClass="inputTexts"
-									required="true" maxlength="100" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="supContactUp" value="Contact Number 1" />
+						<br />
+						<p:inputText type="tel" id="supContactUp" styleClass="inputTexts"
+							value="#{suppController.havUpdateSuppliyer.fixedNumber}"
+							requiredMessage="Suppliyer Contact Is Required!" required="true"
+							maxlength="10" />
+						<p:message for="supContactUp" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="supContactUp" value="Contact Number 1" />
-								<br />
-								<p:inputText type="tel" id="supContactUp"
-									styleClass="inputTexts" required="true" maxlength="10" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="supContactTwoUp" value="Contact Number 2" />
+						<br />
+						<p:inputText type="tel" id="supContactTwoUp"
+							value="#{suppController.havUpdateSuppliyer.contactNumber}"
+							styleClass="inputTexts" maxlength="10" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="supContactTwoUp" value="Contact Number 2" />
-								<br />
-								<p:inputText type="tel" id="supContactTwoUp"
-									styleClass="inputTexts" maxlength="10" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="supEmailUp" value="Email Address" />
+						<br />
+						<p:inputText type="email" id="supEmailUp" styleClass="inputTexts"
+							value="#{suppController.havUpdateSuppliyer.email}" maxlength="50" />
+						<p:growl for="supEmailUp" id="invUpdEmlId" sticky="false"
+							life="5000" showDetail="true" showSummary="true"
+							skipDetailIfEqualsSummary="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="supEmailUp" value="Email Address" />
-								<br />
-								<p:inputText type="email" id="supEmailUp"
-									styleClass="inputTexts" maxlength="50" />
-							</div>
+					<div class="p-col-12" align="right">
+						<p:commandButton icon="pi pi-refresh" value="Update"
+							process="@this,newSuppFrmUpdate"
+							update=":newSuppFrmUpdate,:supMainTble:supTable"
+							oncomplete="if(!args.validationFailed){PF('updateSupplier').hide();}"
+							action="#{suppController.updateSuppliyer}" style="width:25%"
+							styleClass="red-btn">
+							<p:confirm header="Update Suppliyer"
+								message="Are You Sure Update Suppliyer?" icon="fa fa-floppy-o" />
+						</p:commandButton>
+					</div>
 
-							<div class="p-col-12" align="right">
-								<p:commandButton icon="pi pi-refresh" value="Create"
-									style="width:25%" styleClass="red-btn" />
-							</div>
+				</h:form>
+			</p:dialog>
 
-						</h:form>
-					</p:dialog>
-
-				</div>
-			</div>
+			<p:confirmDialog global="true" showEffect="expLode" hideEffect="fade">
+				<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+					type="button" styleClass="red-button ui-confirmdialog-yes"
+					icon="pi pi-check" />
+				<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
+					type="button" styleClass="green-button ui-confirmdialog-no"
+					icon="pi pi-times" />
+			</p:confirmDialog>
 			<!-- Update Supplier - End -->
 
 

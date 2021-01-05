@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 
@@ -18,16 +19,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeRequests().antMatchers("/javax.faces.resource/**", "/resources/**").permitAll().anyRequest()
-				.authenticated();
-
-		http.formLogin().loginPage("/login.xhtml").permitAll().failureUrl("/login.xhtml?error=true")
-				.defaultSuccessUrl("/index.xhtml", true);
-		// logout
-		http.logout().invalidateHttpSession(true).clearAuthentication(true).logoutSuccessUrl("/login.xhtml")
-				.permitAll();
+		http.authorizeRequests().antMatchers("/javax.faces.resource/**", "/resources/**", "/error/403_err.xhtml/**")
+				.permitAll().antMatchers("/settings/**").hasRole("ADMIN").anyRequest().authenticated().and()
+				.exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and().formLogin()
+				.loginPage("/login.xhtml").permitAll().failureUrl("/login.xhtml?error=true")
+				.defaultSuccessUrl("/index.xhtml", true).and().logout().invalidateHttpSession(true)
+				.clearAuthentication(true).logoutSuccessUrl("/login.xhtml").deleteCookies("JSESSIONID").permitAll();
 
 		http.csrf().disable();
+	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new TeleiosAccessDeniedHandler();
 	}
 
 	@Autowired

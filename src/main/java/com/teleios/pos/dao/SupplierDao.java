@@ -20,9 +20,9 @@ public interface SupplierDao {
 	Supplier getSuppliyerById(final Integer suppId)
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception;
 
-	List<Supplier> getAllActiveSuppliyer(Supplier supplier)
+	List<Supplier> getAllActiveSuppliyer(short stateNumber)
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception;
 
-	List<Supplier> getAllSuppliyer(Supplier supplier)
+	List<Supplier> getAllSuppliyer()
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception;
 }

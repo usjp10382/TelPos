@@ -11,12 +11,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.teleios.pos.dao.SupplierDao;
 import com.teleios.pos.dao.impl.SupplierDaoImpl;
 import com.teleios.pos.model.Supplier;
 
 @Service
-public class SupplierService implements Serializable, SupplierDao {
+public class SupplierService implements Serializable {
 
 	private static final long serialVersionUID = -3825519826925671189L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(SupplierService.class);
@@ -40,13 +39,13 @@ public class SupplierService implements Serializable, SupplierDao {
 	}
 
 	public int updateSuppliyer(Supplier supplier) throws SocketTimeoutException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		LOGGER.info("<----- Execute Update Suppliyer Name: {} In Service ----> ", supplier.getSupplierName());
+		return this.supplierDaoImpl.updateSuppliyer(supplier);
 	}
 
 	public int deleteSuppliyer(Supplier supplier) throws SocketTimeoutException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		LOGGER.info("<----- Execute Delete Suppliyer Name: {} In Service ----> ", supplier.getSupplierName());
+		return this.supplierDaoImpl.deleteSuppliyer(supplier);
 	}
 
 	public Supplier getSuppliyerById(Integer suppId)
@@ -55,10 +54,10 @@ public class SupplierService implements Serializable, SupplierDao {
 		return null;
 	}
 
-	public List<Supplier> getAllActiveSuppliyer(Supplier supplier)
+	public List<Supplier> getAllActiveSuppliyer(final short suppStateNumber)
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("<----- Execute Get All Active Suppliyers in Service ---->");
+		return this.supplierDaoImpl.getAllActiveSuppliyer(suppStateNumber);
 	}
 
 	public List<Supplier> getAllSuppliyer(Supplier supplier)
