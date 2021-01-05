@@ -27,6 +27,8 @@ public class ProductResExecutor implements ResultSetExtractor<List<Product>> {
 			product.setCreateBy(rs.getString("create_by"));
 			product.setCreateDate(rs.getDate("create_date"));
 			product.setState(rs.getShort("prd_state"));
+			product.setRackDet(rs.getString("rack_no"));
+			product.setMinQtyLevel(rs.getDouble("min_qty_lev"));
 
 			Brand brand = new Brand();
 			brand.setBrandId(rs.getInt("brand_id"));

@@ -13,143 +13,142 @@
 		<ui:define name="content">
 
 			<!-- Product Details Table - Start -->
-			<div class="p-grid">
-				<div class="p-col-12">
-					<p:fieldset legend="Product Details" style="margin-bottom:20px"
-						id="proSrhFld">
+			<h:form>
+				<div class="p-grid">
+					<div class="p-col-12">
+						<p:fieldset legend="Product Details" style="margin-bottom:20px"
+							id="proSrhFld">
 
-						<p:dataTable var="psrhTable" id="psrhTable" widgetVar="psrhTable"
-							emptyMessage="No Data found with given criteria"
-							filteredValue="#{dtFilterView.filteredCars2}"
-							globalFilterFunction="#{dtFilterView.globalFilterFunction}"
-							paginator="true" rows="50"
-							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-							currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-							rowsPerPageTemplate="25,50,100" paginatorPosition="bottom"
-							resizableColumns="true">
+							<p:dataTable var="prd" id="psrhTable" widgetVar="psrhTable"
+								emptyMessage="No Data found with given criteria"
+								value="#{productController.allActiveProducts}"
+								filteredValue="#{productController.filteredPrdList}"
+								globalFilterFunction="#{productController.globalFilterFunction}"
+								paginator="true" rows="50"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+								rowsPerPageTemplate="25,50,100" paginatorPosition="bottom"
+								resizableColumns="true">
 
-							<f:facet name="header">
-								<p:outputPanel>
-									<h:outputText
-										value="Search all fields using globalFilterFunction:" />
-									<p:inputText id="globalFilter"
-										onkeyup="PF('carsTable2').filter()" style="width:150px"
-										placeholder="Enter keyword" />
-								</p:outputPanel>
-							</f:facet>
+								<f:facet name="header">
+									<p:outputPanel>
+										<h:outputText
+											value="Search all fields using globalFilterFunction:" />
+										<p:inputText id="globalFilter"
+											onkeyup="PF('psrhTable').filter()" style="width:150px"
+											placeholder="Enter keyword" />
+									</p:outputPanel>
+								</f:facet>
 
-							<p:column headerText="Item Code">
-								<h:outputText value="#{car.id}" />
-							</p:column>
+								<p:column headerText="Item Code">
+									<h:outputText value="#{prd.prdCode}" />
+								</p:column>
 
-							<p:column headerText="Product Name">
-								<h:outputText value="#{car.year}" />
-							</p:column>
+								<p:column headerText="Product Name">
+									<h:outputText value="#{prd.prdName}" />
+								</p:column>
 
-							<p:column headerText="Brand">
-								<h:outputText value="#{car.brand}" />
-							</p:column>
+								<p:column headerText="Brand">
+									<h:outputText value="#{prd.brand.brandName}" />
+								</p:column>
 
-							<p:column headerText="Category">
-								<h:outputText value="#{car.color}" />
-							</p:column>
+								<p:column headerText="Category">
+									<h:outputText value="#{prd.category.categoryName}" />
+								</p:column>
 
-							<p:column headerText="UOM">
-								<h:outputText value="#{car.sold ? 'Sold': 'Sale'}" />
-							</p:column>
+								<p:column headerText="UOM">
+									<h:outputText value="#{prd.uom.uomName}" />
+								</p:column>
 
-							<p:column headerText="Minimum quanitiy">
-								<h:outputText value="#{car.sold ? 'Sold': 'Sale'}" />
-							</p:column>
+								<p:column headerText="Minimum QTY">
+									<h:outputText value="#{prd.minQtyLevel}" />
+								</p:column>
 
-							<p:column headerText="Rack Number">
-								<h:outputText value="#{car.sold ? 'Sold': 'Sale'}" />
-							</p:column>
+								<p:column headerText="Rack Number">
+									<h:outputText value="#{prd.rackDet}" />
+								</p:column>
 
-							<p:column style="width:32px;text-align: center">
-								<p:commandButton icon="pi pi-refresh" title="Update"
-									style="width:20px;height:20px" onclick="PF('proSrh').show();">
-								</p:commandButton>
-							</p:column>
+								<p:column style="width:32px;text-align: center">
+									<p:commandButton icon="pi pi-refresh" title="Update"
+										update=":proSrhFrm" style="width:20px;height:20px"
+										oncomplete="PF('proSrh').show();">
+										<f:setPropertyActionListener value="#{prd}"
+											target="#{productController.havUpdateProduct}" />
+									</p:commandButton>
+								</p:column>
 
-							<p:column style="width:32px;text-align: center">
-								<p:commandButton icon="pi pi-trash" title="Delete"
-									style="width:20px;height:20px" process="uomTble"
-									styleClass="red-button">
-								</p:commandButton>
-							</p:column>
+								<p:column style="width:32px;text-align: center">
+									<p:commandButton icon="pi pi-trash" title="Delete"
+										style="width:20px;height:20px" process="psrhTable"
+										styleClass="red-button">
+									</p:commandButton>
+								</p:column>
 
-						</p:dataTable>
+							</p:dataTable>
 
-					</p:fieldset>
+						</p:fieldset>
+					</div>
 				</div>
-			</div>
+			</h:form>
 			<!-- Product Details Table - End -->
 
 			<!-- Product Details Update - Start -->
-			<div class="p-grid">
-				<div class="p-col-12">
+			<p:dialog header="Update this Product" widgetVar="proSrh"
+				showEffect="clip" hideEffect="clip" height="100%" width="50%"
+				appendTo="@(psrhTable)" dynamic="true"
+				style="position: absolute;z-index: -1">
+				<h:form id="proSrhFrm">
 
-					<p:dialog header="Update this Product" widgetVar="proSrh"
-						showEffect="clip" hideEffect="clip" height="100%" width="50%"
-						style="position: absolute;z-index: -1">
-						<h:form id="proSrhFrm">
+					<div class="p-col-12">
+						<p:outputLabel for="itemCode" value="Item Code" />
+						<br />
+						<p:inputText id="itemCode" styleClass="inputTexts" required="true" value="#{productController.havUpdateProduct.prdCode}"/>
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="itemCode" value="Item Code" />
-								<br />
-								<p:inputText id="itemCode" styleClass="inputTexts"
-									required="true" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="proName" value="Product Name" />
+						<br />
+						<p:inputText id="proName" styleClass="inputTexts" required="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="proName" value="Product Name" />
-								<br />
-								<p:inputText id="proName" styleClass="inputTexts"
-									required="true" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="brnd" value="Brand" />
+						<br />
+						<p:inputText id="brnd" styleClass="inputTexts" required="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="brnd" value="Brand" />
-								<br />
-								<p:inputText id="brnd" styleClass="inputTexts" required="true" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="cat" value="Category" />
+						<br />
+						<p:inputText id="cat" styleClass="inputTexts" required="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="cat" value="Category" />
-								<br />
-								<p:inputText id="cat" styleClass="inputTexts" required="true" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="uom" value="UOM" />
+						<br />
+						<p:inputText id="uom" styleClass="inputTexts" required="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="uom" value="UOM" />
-								<br />
-								<p:inputText id="uom" styleClass="inputTexts" required="true" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="minQuantity" value="Minimum quanitiy" />
+						<br />
+						<p:inputText id="minQuantity" styleClass="inputTexts"
+							required="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="minQuantity" value="Minimum quanitiy" />
-								<br />
-								<p:inputText id="minQuantity" styleClass="inputTexts"
-									required="true" />
-							</div>
+					<div class="p-col-12">
+						<p:outputLabel for="rack" value="Rack Number" />
+						<br />
+						<p:inputText id="rack" styleClass="inputTexts" required="true" />
+					</div>
 
-							<div class="p-col-12">
-								<p:outputLabel for="rack" value="Rack Number" />
-								<br />
-								<p:inputText id="rack" styleClass="inputTexts" required="true" />
-							</div>
+					<div class="p-col-12" align="right">
+						<p:commandButton icon="pi pi-refresh" value="Update"
+							style="width:25%" styleClass="orange-btn" />
+					</div>
 
-							<div class="p-col-12" align="right">
-								<p:commandButton icon="pi pi-refresh" value="Update"
-									style="width:25%" styleClass="orange-btn" />
-							</div>
-
-						</h:form>
-					</p:dialog>
-
-				</div>
-			</div>
+				</h:form>
+			</p:dialog>
 			<!-- Product Details Update - End -->
 
 		</ui:define>

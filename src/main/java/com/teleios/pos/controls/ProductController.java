@@ -51,6 +51,7 @@ public class ProductController implements Serializable {
 
 	// Required Helper List Of Objects
 	private List<Product> allActiveProducts;
+	private List<Product> filteredPrdList;
 	private List<Brand> allActiveBrand;
 	private List<Category> allActiveCategories;
 	private List<Uom> allActiveUoms;
@@ -63,9 +64,12 @@ public class ProductController implements Serializable {
 	// New Product Object and Cart List
 	private Product newProduct = new Product();
 	private List<Product> productsCart = new LinkedList<Product>();
-	private List<Product> filteredPrdList;
 	private boolean cartEmpty = true;
 	private Product havRemObj;
+	
+	//Delete And Update Product
+	private Product havUpdateProduct;
+	private Product havDeleteProduct;
 
 	@PostConstruct
 	public void init() {
@@ -109,7 +113,6 @@ public class ProductController implements Serializable {
 
 	// Filter Function For Product Table
 	public boolean globalFilterFunction(Object value, Object filter, Locale locale) {
-		LOGGER.info("<----Global Filter Function Called----->");
 		String filterText = (filter == null) ? null : filter.toString().trim().toLowerCase();
 		if (filterText == null || filterText.equals("")) {
 			return true;
@@ -545,5 +548,23 @@ public class ProductController implements Serializable {
 		this.havRemObj = havRemObj;
 		removeFromCart();
 	}
+
+	public Product getHavUpdateProduct() {
+		return havUpdateProduct;
+	}
+
+	public void setHavUpdateProduct(Product havUpdateProduct) {
+		this.havUpdateProduct = havUpdateProduct;
+	}
+
+	public Product getHavDeleteProduct() {
+		return havDeleteProduct;
+	}
+
+	public void setHavDeleteProduct(Product havDeleteProduct) {
+		this.havDeleteProduct = havDeleteProduct;
+	}
+	
+	
 
 }
