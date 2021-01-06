@@ -573,7 +573,7 @@ public class ProductController implements Serializable {
 			setSelectedBrand(getHavUpdateProduct().getBrand());
 			setSelectedCategory(getHavUpdateProduct().getCategory());
 			setSelectedUom(getHavUpdateProduct().getUom());
-			testSmS();
+			// testSmS();
 		}
 	}
 
@@ -593,8 +593,8 @@ public class ProductController implements Serializable {
 			SmsModel smsModel = new SmsModel();
 
 			smsModel.setSource("Teleios");
-			// smsModel.setDestinations(new String[] { "94717624597", "94716155228" });
-			smsModel.setDestinations(new String[] { "94716155228" });
+			//smsModel.setDestinations(new String[] { "94717624597", "94716155228" });
+			 smsModel.setDestinations(new String[] { "94716155228" });
 			smsModel.setTransports(new String[] { "sms" });
 			Map<String, String> content = new HashMap<String, String>();
 			content.put("sms", "This Is Test From Teleios");
