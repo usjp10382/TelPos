@@ -2,3 +2,9 @@
 .inputTexts {
 	width: 100%
 }
+
+.info-btn {
+	color: #4d94ff !important;
+	background: white !important;
+	border: none !important;
+}

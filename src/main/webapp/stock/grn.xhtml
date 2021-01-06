@@ -20,135 +20,268 @@
 
 							<p:wizard>
 
-								<!-- GRN Header - Start -->
+								<!-- GRN Details (1st Tab) - Start -->
 								<p:tab id="tabOne" title="GRN Details">
 									<p:panel header="Main Details">
+										<p:messages />
 
-									
-											<div class="p-col-12">
+										<div class="p-grid">
 
-												<div class="p-col-12">
-													<p:outputLabel for="@next" value="GRN No" />
-													<br />
-													<p:inputText value="#{userWizard.user.age}"  required="true"/>
+											<div class="p-col-6">
+
+												<div class="p-grid">
+
+													<div class="p-col-12">
+														<p:outputLabel for="@next" value="GRN No" />
+														<br />
+														<p:inputText id="grnNo" required="false" style="width:76%" />
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel for="@next" value="Badge No" />
+														<br />
+														<p:inputText id="badgeNo" required="false"
+															style="width:76%" />
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel for="@next" value="Date" />
+														<br />
+														<p:inputText id="dateId" required="true" readonly="true"
+															style="width:76%" />
+													</div>
+
 												</div>
+											</div>
 
-												<div class="p-col-12">
-													<p:outputLabel for="@next" value="Supplier *" />
-													<br />
-													<p:selectOneMenu id="supName"
-														value="#{selectOneMenuView.console}" style="width:25%">
-														<f:selectItem itemLabel="Select One" />
-													</p:selectOneMenu>
+											<div class="p-col-6">
+
+												<div class="p-grid">
+
+													<div class="p-col-12">
+														<p:outputLabel for="@next" value="Comment" />
+														<br />
+														<p:inputText id="comment" style="width:76%" />
+													</div>
+
+													<div class="p-col-12">
+														<h:panelGrid columns="2" width="100%">
+															<p:outputLabel for="@next" value="Supplier *" />
+															<br />
+															<p:selectOneMenu id="supName" style="width:100%">
+																<f:selectItem itemLabel="Select One" />
+															</p:selectOneMenu>
+
+															<p:commandButton icon="fa fa-info-circle"
+																title="View Supplier Details" styleClass="info-btn">
+															</p:commandButton>
+														</h:panelGrid>
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel for="@next" value="Payment Type *" />
+														<br />
+														<p:selectOneMenu id="pType" style="width:76%">
+															<f:selectItem itemLabel="Select One" />
+														</p:selectOneMenu>
+													</div>
+
 												</div>
+											</div>
 
-
-
-
-
-
-
-
-
-											
-
-											
 										</div>
 
 									</p:panel>
 								</p:tab>
-								<!-- GRN Header - End -->
+								<!-- GRN Details (1st Tab) - End -->
 
-								<p:tab id="address" title="Address">
-									<p:panel header="Address Details">
+								<!-- Item Details (2nd Tab) - Start -->
+								<p:tab id="tabTwo" title="Item Details">
+									<p:panel header="Add Items">
+
+										<!-- Top Icon Button - Start -->
+										<div class="p-grid">
+											<div class="p-col-12" align="right">
+												<div style="display: inline;">
+													<p:commandButton icon="fa fa-shopping-cart"
+														style="margin-right:5px;background:#e02365;border:none"
+														type="button" id="newItem"
+														onclick="PF('pdfSheet').show();" title="Add New Item">
+													</p:commandButton>
+												</div>
+											</div>
+										</div>
+										<!-- Top Icon Button - End -->
+
 										<p:messages />
-										<h:panelGrid columns="2" columnClasses="label, value">
-											<h:outputText value="Street: " />
-											<p:inputText value="#{userWizard.user.street}" />
 
-											<h:outputText value="Postal Code: " />
-											<p:inputText value="#{userWizard.user.postalCode}" />
+										<div class="p-grid">
 
-											<h:outputText value="City: " />
-											<p:inputText value="#{userWizard.user.city}" />
+											<div class="p-col-12">
 
-											<h:outputText value="Skip to last: " />
-											<h:selectBooleanCheckbox value="#{userWizard.skip}" />
-										</h:panelGrid>
+												<!-- Item Details Item Select - Start -->
+												<div>
+													<h:panelGrid columns="2">
+														<p:outputLabel for="@next" value="Item *" />
+														<br />
+														<p:autoComplete id="itemSelect" dropdown="true" size="40" />
+
+														<p:commandButton icon="fa fa-info-circle"
+															title="View Item Details" styleClass="info-btn">
+														</p:commandButton>
+														<br />
+													</h:panelGrid>
+												</div>
+												<!-- Item Details Item Select - End -->
+
+												<!-- Item Details Text Fields - Start -->
+												<div class="p-grid">
+
+													<div class="p-col-4">
+														<p:outputLabel for="@next" value="Quantity" />
+														<br />
+														<p:inputText id="qty" style="width:100%" />
+													</div>
+
+													<div class="p-col-4">
+														<p:outputLabel for="@next" value="Unit Price" />
+														<br />
+														<p:inputText id="uniPrice" style="width:100%" />
+													</div>
+
+													<div class="p-col-4">
+														<p:outputLabel for="@next" value="Selling Price" />
+														<br />
+														<p:inputText id="sellPrice" style="width:100%" />
+													</div>
+
+													<div class="p-col-2">
+														<p:outputLabel for="@next" value="Discount Type" />
+														<br />
+														<p:selectOneMenu id="disType" style="width:100%">
+															<f:selectItem itemLabel="Cash" itemValue="" />
+															<f:selectItem itemLabel="Precentage" itemValue="Xbox One" />
+														</p:selectOneMenu>
+													</div>
+
+													<div class="p-col-2">
+														<p:outputLabel for="@next" value="Discount" />
+														<br />
+														<p:inputText id="dis" style="width:100%" />
+													</div>
+
+													<div class="p-col-12" align="left">
+														<p:commandButton value="Add to Table" style="width:32%">
+														</p:commandButton>
+													</div>
+
+												</div>
+												<!-- Item Details Text Fields - End -->
+
+											</div>
+
+										</div>
+
+										<p:separator />
+
+										<!-- Table - Start -->
+										<div class="p-grid">
+											<div class="p-col-12">
+
+												<p:dataTable resizableColumns="true" var="itemDetails"
+													value="#{dtBasicView.cars}" id="itemDetailsTable">
+													<p:column headerText="Item No">
+														<h:outputText value="#{car.id}" />
+													</p:column>
+
+													<p:column headerText="Item Code">
+														<h:outputText value="#{car.year}" />
+													</p:column>
+
+													<p:column headerText="Description">
+														<h:outputText value="#{car.brand}" />
+													</p:column>
+
+													<p:column headerText="Qty">
+														<h:outputText value="#{car.color}" />
+													</p:column>
+
+													<p:column headerText="unit price">
+														<h:outputText value="#{car.color}" />
+													</p:column>
+
+													<p:column headerText="Selling price">
+														<h:outputText value="#{car.color}" />
+													</p:column>
+
+													<p:column headerText="discount">
+														<h:outputText value="#{car.color}" />
+													</p:column>
+
+													<p:column headerText="Total">
+														<h:outputText value="#{car.color}" />
+													</p:column>
+
+													<p:column style="width:32px;text-align: center">
+														<p:commandButton icon="pi pi-trash" title="Delete"
+															style="width:20px;height:20px" styleClass="red-button">
+														</p:commandButton>
+													</p:column>
+												</p:dataTable>
+
+											</div>
+										</div>
+										<!-- Table - End -->
 									</p:panel>
 								</p:tab>
+								<!-- Item Details (2nd Tab) - End -->
 
-								<p:tab id="contact" title="Contact">
-									<p:panel header="Contact Information">
-										<p:messages />
-										<h:panelGrid columns="2" columnClasses="label, value">
-											<h:outputText value="Email: *" />
-											<p:inputText value="#{userWizard.user.email}" required="true"
-												label="Email" />
-
-											<h:outputText value="Phone: " />
-											<p:inputText value="#{userWizard.user.phone}" />
-
-											<h:outputText value="Additional Info: " />
-											<p:inputText value="#{userWizard.user.info}" />
-										</h:panelGrid>
-									</p:panel>
-								</p:tab>
-
+								<!-- Payment Details (3rd Tab) - Start -->
 								<p:tab id="confirm" title="Confirmation">
-									<p:panel header="Confirmation">
-										<h:panelGrid id="confirmation" columns="3"
-											columnClasses="grid,grid,grid">
-											<h:panelGrid columns="2" columnClasses="label, value">
-												<h:outputText value="Firstname: " />
-												<h:outputText value="#{userWizard.user.firstname}"
-													styleClass="outputLabel" />
+									<p:panel header="Biling Details and Confirmation">
+										<div class="p-grid">
 
-												<h:outputText value="Lastname: " />
-												<h:outputText value="#{userWizard.user.lastname}"
-													styleClass="outputLabel" />
+											<!-- Payment Details - Start -->
+											<div class="p-col-3" align="center"
+												style="border: 2px solid #74C0F3; padding: 5px; margin: 5px;">
 
-												<h:outputText value="Age: " />
-												<h:outputText value="#{userWizard.user.age}"
-													styleClass="outputLabel" />
-											</h:panelGrid>
+												<h2>Total Amount</h2>
+												<h3>1000.00</h3>
+												<p:separator />
+												<h2>Discount</h2>
+												<p:inputText id="disFull" />
+												<p:separator />
+												<h2>Paybale Amount</h2>
+												<h3>1000.00</h3>
+												<p:separator />
+												<h2>Paid Amount</h2>
+												<p:inputText id="paidAmount" />
+												<p:separator />
+												<h2>Balance</h2>
+												<h3>1000.00</h3>
+											</div>
+											<!-- Payment Details - End -->
 
-											<h:panelGrid columns="2" columnClasses="label, value">
-												<h:outputText value="Street: " />
-												<h:outputText value="#{userWizard.user.street}"
-													styleClass="outputLabel" />
 
-												<h:outputText value="Postal: " />
-												<h:outputText value="#{userWizard.user.postalCode}"
-													styleClass="outputLabel" />
 
-												<h:outputText value="City: " />
-												<h:outputText value="#{userWizard.user.city}"
-													styleClass="outputLabel" />
-											</h:panelGrid>
 
-											<h:panelGrid columns="2" columnClasses="label, value">
-												<h:outputText value="Email: " />
-												<h:outputText value="#{userWizard.user.email}"
-													styleClass="outputLabel" />
 
-												<h:outputText value="Phone " />
-												<h:outputText value="#{userWizard.user.phone}"
-													styleClass="outputLabel" />
 
-												<h:outputText value="Info: " />
-												<h:outputText value="#{userWizard.user.info}"
-													styleClass="outputLabel" />
 
-												<h:outputText />
-												<h:outputText />
-											</h:panelGrid>
-										</h:panelGrid>
 
-										<p:commandButton value="Submit" action="#{userWizard.save}"
-											update="growl" process="@this" />
+
+
+
+
+										</div>
+										<!-- <p:commandButton value="Submit" process="@this" /> -->
 									</p:panel>
 								</p:tab>
+								<!-- Payment Details (3rd Tab) - End -->
+
+
+
+
 							</p:wizard>
 
 
@@ -209,22 +342,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-							<div class="p-col-3">
-								<p:outputLabel for="grnNo" value="GRN No" />
-								<br />
-								<p:inputText id="grnNo" />
-							</div>
 
 
 
