@@ -26,28 +26,39 @@ import com.teleios.pos.model.Product;
 public class ProductDaoImpl implements ProductDao {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductDaoImpl.class);
 
-	private static final String CREATE_PRD_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,rack_no)"
+	// Define Product Create SQL
+	private static final String CREATE_PRD_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,min_qty_lev)"
 			+ " VALUES(:code,:prd_name,:brand,:category,:uom,:create_by,:create_date,:prd_state,:min_qty_lev,:rack_no)";
 	static final String CREATE_BATCH_PRODUCTS_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,rack_no) "
 			+ "VALUES(?,?,?,?,?,?,?,?,?,?)";
 
+	// Define Product Update SQL
+	private static final String UPD_PRD_SQL = "UPDATE inv_schema.product SET code=:code,prd_name=:prd_name,brand=:brand,category=:category,uom=:uom,"
+			+ "create_by=:create_by,create_date=:create_date,prd_state=:prd_state,min_qty_lev=:min_qty_lev,min_qty_lev=:min_qty_lev WHERE prd_id=:prd_id";
+
+	// Define Product Search SQL
 	private static final String ALL_ACTIVE_PRD_SQL = "SELECT p.prd_id,p.code,p.prd_name,p.create_by,p.create_date,p.prd_state,p.min_qty_lev,p.rack_no,"
 			+ "b.brand_id,b.brand_name,c.categ_id,c.categ_name,u.uom_id,u.uom_name,u.char_prifix "
 			+ "FROM inv_schema.product p INNER JOIN inv_schema.brand b ON P.brand=b.brand_id "
 			+ "INNER JOIN inv_schema.category c ON p.category=c.categ_id "
 			+ "INNER JOIN inv_schema.uom u ON p.uom=u.uom_id " + "WHERE p.prd_state=? ORDER BY p.prd_id ASC";
 
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+	@Autowired
+	public ProductDaoImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+		super();
+		this.jdbcTemplate = jdbcTemplate;
+		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+	}
 
 	@Override
 	public int createNewProduct(Product product) throws SocketTimeoutException, DuplicateKeyException, Exception {
 		LOGGER.info("<-------- Execute Create New Product Repository ----->");
 		int saveState = 0;
-
 		Map<String, Object> paraMap = new HashMap<String, Object>();
+
 		paraMap.put("code", product.getPrdCode().toLowerCase());
 		paraMap.put("prd_name", product.getPrdName());
 		paraMap.put("brand", product.getBrand().getBrandId());
@@ -92,6 +103,35 @@ public class ProductDaoImpl implements ProductDao {
 			}
 		});
 
+	}
+
+	@Override
+	public int updateProduct(Product product) throws SocketTimeoutException, DuplicateKeyException, Exception {
+		LOGGER.info("<----- Execute Update Product Name:{} Execute In Repositiry --->", product.getPrdName());
+		int updState = 0;
+		Map<String, Object> paraMap = new HashMap<String, Object>();
+
+		paraMap.put("code", product.getPrdCode().toLowerCase());
+		paraMap.put("prd_name", product.getPrdName());
+		paraMap.put("brand", product.getBrand().getBrandId());
+		paraMap.put("category", product.getCategory().getCategoryId());
+		paraMap.put("uom", product.getUom().getUomId());
+		paraMap.put("create_by", product.getCreateBy());
+		paraMap.put("create_date", product.getCreateDate());
+		paraMap.put("prd_state", (short) 1);
+		paraMap.put("min_qty_lev", product.getMinQtyLevel());
+		paraMap.put("rack_no", product.getRackDet());
+		paraMap.put("prd_id", product.getPrdName());
+
+		updState = this.namedParameterJdbcTemplate.update(UPD_PRD_SQL, paraMap);
+
+		return updState;
+	}
+
+	@Override
+	public int deleteProduct(Integer prdNumber) throws SocketTimeoutException, Exception {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override

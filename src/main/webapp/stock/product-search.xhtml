@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:pe="http://primefaces.org/ui/extensions"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
@@ -65,13 +66,14 @@
 								</p:column>
 
 								<p:column headerText="Rack Number">
-									<h:outputText value="#{prd.rackDet}" />
+									<h:outputText value="#{empty prd.rackDet?'N/A' : prd.rackDet}" />
 								</p:column>
 
 								<p:column style="width:32px;text-align: center">
 									<p:commandButton icon="pi pi-refresh" title="Update"
 										update=":proSrhFrm" style="width:20px;height:20px"
-										oncomplete="PF('proSrh').show();">
+										onstart="PF('prdUpdBlock').block()"
+										oncomplete="PF('prdUpdBlock').unblock(),PF('proSrh').show();">
 										<f:setPropertyActionListener value="#{prd}"
 											target="#{productController.havUpdateProduct}" />
 									</p:commandButton>
@@ -89,8 +91,19 @@
 						</p:fieldset>
 					</div>
 				</div>
+
+				<pe:blockUI target="proSrhFld" widgetVar="prdUpdBlock">
+					<h:panelGrid columns="2">
+						<p:graphicImage value="../resources/img/ajax-loader.gif"
+							style="margin-right: 12px; vertical-align: middle;" />
+						<h:outputText value="Updating Commercial Tariff..."
+							style="white-space: nowrap;" />
+					</h:panelGrid>
+				</pe:blockUI>
+
 			</h:form>
 			<!-- Product Details Table - End -->
+
 
 			<!-- Product Details Update - Start -->
 			<p:dialog header="Update this Product" widgetVar="proSrh"
@@ -103,39 +116,54 @@
 						<p:outputLabel for="itemCode" value="Item Code" />
 						<br />
 						<p:inputText id="itemCode" styleClass="inputTexts" required="true"
+							requiredMessage="The Product Code Is Required!"
 							value="#{productController.havUpdateProduct.prdCode}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel for="proName" value="Product Name" />
 						<br />
-						<p:inputText id="proName" styleClass="inputTexts" required="true" />
+						<p:inputText id="proName" styleClass="inputTexts" required="true"
+							value="#{productController.havUpdateProduct.prdName}"
+							requiredMessage="The Product Name Is Required!" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel for="brnd" value="Brand" />
 						<br />
-						<p:selectOneMenu id="brnd" value="#{selectOneMenuView.console}"
-							style="width:100%">
-							<f:selectItem itemLabel="Select One" itemValue="" />
+						<p:selectOneMenu style="width:100%" id="brnd" effect="fold"
+							required="true" requiredMessage="Select Brand Is Required"
+							filter="true" editable="true" converter="brandConvertor"
+							placeholder="- Select Brand -"
+							value="#{productController.selectedBrand}">
+							<f:selectItems value="#{productController.allActiveBrand}"
+								var="brand" itemValue="#{brand}" itemLabel="#{brand.brandName}" />
 						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
-						<p:outputLabel for="cat" value="Category" />
+						<p:outputLabel for="category" value="Category" />
 						<br />
-						<p:selectOneMenu id="cat" value="#{selectOneMenuView.console}"
-							style="width:100%">
-							<f:selectItem itemLabel="Select One" itemValue="" />
+						<p:selectOneMenu style="width:100%"
+							placeholder="-Select Category -" id="category" effect="fold"
+							required="true" requiredMessage="Select Category Is Required"
+							filter="true" editable="true" converter="categoryConvertor"
+							value="#{productController.selectedCategory}">
+							<f:selectItems value="#{productController.allActiveCategories}"
+								var="catg" itemValue="#{catg}" itemLabel="#{catg.categoryName}" />
 						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel for="uom" value="UOM" />
 						<br />
-						<p:selectOneMenu id="uom" value="#{selectOneMenuView.console}"
-							style="width:100%">
-							<f:selectItem itemLabel="Select One" itemValue="" />
+						<p:selectOneMenu style="width:100%" id="uom" effect="fold"
+							required="true" requiredMessage="Select UOM Is Required"
+							filter="true" editable="true" placeholder="- Select Uom -"
+							converter="uomConvertor" value="#{productController.selectedUom}">
+							<f:selectItems value="#{productController.allActiveUoms}"
+								var="uom" itemValue="#{uom}"
+								itemLabel="#{uom.uomChar}-#{uom.uomName}" />
 						</p:selectOneMenu>
 					</div>
 
@@ -143,13 +171,16 @@
 						<p:outputLabel for="minQuantity" value="Minimum quanitiy" />
 						<br />
 						<p:inputText id="minQuantity" styleClass="inputTexts"
-							required="true" />
+							requiredMessage="The Minimumm Quantity Is Required!"
+							value="#{productController.havUpdateProduct.minQtyLevel}"
+							type="number" required="true" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel for="rack" value="Rack Number" />
 						<br />
-						<p:inputText id="rack" styleClass="inputTexts" required="true" />
+						<p:inputText id="rack" styleClass="inputTexts"
+							value="#{productController.havUpdateProduct.rackDet}" />
 					</div>
 
 					<div class="p-col-12" align="right">
@@ -160,6 +191,8 @@
 				</h:form>
 			</p:dialog>
 			<!-- Product Details Update - End -->
+
+
 
 		</ui:define>
 	</ui:composition>

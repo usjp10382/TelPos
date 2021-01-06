@@ -32,6 +32,11 @@ public class ProductService {
 		return this.productDaoImpl.createNewProduct(products);
 	}
 
+	public int updateProduct(Product product) throws DuplicateKeyException, SocketTimeoutException, Exception {
+		LOGGER.info("<----- Execute Update Product Name:{} Execute In Service --->", product.getPrdName());
+		return this.productDaoImpl.updateProduct(product);
+	}
+
 	public List<Product> getAllActiveProducts()
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
 		LOGGER.info("<--------- Execute Get All Active Products In Service ----------->");

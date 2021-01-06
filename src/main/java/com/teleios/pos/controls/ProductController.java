@@ -3,11 +3,14 @@ package com.teleios.pos.controls;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.nio.file.AccessDeniedException;
+import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -21,12 +24,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teleios.pos.dao.utill.TeleiosPosConstant;
 import com.teleios.pos.model.Brand;
 import com.teleios.pos.model.Category;
 import com.teleios.pos.model.Product;
+import com.teleios.pos.model.SmsModel;
 import com.teleios.pos.model.Uom;
 import com.teleios.pos.service.BrandService;
 import com.teleios.pos.service.CategoryService;
@@ -48,6 +60,8 @@ public class ProductController implements Serializable {
 	private CategoryService categoryService;
 	@Autowired
 	private ProductService productService;
+	@Autowired
+	private RestTemplate restTemplate;
 
 	// Required Helper List Of Objects
 	private List<Product> allActiveProducts;
@@ -66,8 +80,8 @@ public class ProductController implements Serializable {
 	private List<Product> productsCart = new LinkedList<Product>();
 	private boolean cartEmpty = true;
 	private Product havRemObj;
-	
-	//Delete And Update Product
+
+	// Delete And Update Product
 	private Product havUpdateProduct;
 	private Product havDeleteProduct;
 
@@ -555,6 +569,12 @@ public class ProductController implements Serializable {
 
 	public void setHavUpdateProduct(Product havUpdateProduct) {
 		this.havUpdateProduct = havUpdateProduct;
+		if (getHavUpdateProduct() != null) {
+			setSelectedBrand(getHavUpdateProduct().getBrand());
+			setSelectedCategory(getHavUpdateProduct().getCategory());
+			setSelectedUom(getHavUpdateProduct().getUom());
+			testSmS();
+		}
 	}
 
 	public Product getHavDeleteProduct() {
@@ -564,7 +584,44 @@ public class ProductController implements Serializable {
 	public void setHavDeleteProduct(Product havDeleteProduct) {
 		this.havDeleteProduct = havDeleteProduct;
 	}
-	
-	
+
+	private void testSmS() {
+		LOGGER.info("<------ Execute Test Mapper ----->");
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			SmsModel smsModel = new SmsModel();
+
+			smsModel.setSource("Teleios");
+			// smsModel.setDestinations(new String[] { "94717624597", "94716155228" });
+			smsModel.setDestinations(new String[] { "94716155228" });
+			smsModel.setTransports(new String[] { "sms" });
+			Map<String, String> content = new HashMap<String, String>();
+			content.put("sms", "This Is Test From Teleios");
+			smsModel.setContent(content);
+
+			String jsonInsString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(smsModel);
+
+			LOGGER.info("Maper JSON {}", jsonInsString);
+
+			// RestTemplate restTemplate = new RestTemplate();
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.add("Authorization", TeleiosPosConstant.SMS_API_KEY);
+
+			HttpEntity<String> request = new HttpEntity<String>(jsonInsString, headers);
+
+			ResponseEntity<String> response = this.restTemplate.exchange(TeleiosPosConstant.SMS_BASE_URL,
+					HttpMethod.POST, request, String.class);
+
+			String json = response.getBody();
+
+			LOGGER.info("sms responce----> {}", json);
+
+		} catch (Exception e) {
+			LOGGER.error("Mapper Error---> ", e);
+		}
+	}
 
 }
