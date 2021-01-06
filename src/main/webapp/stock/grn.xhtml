@@ -23,36 +23,38 @@
 								<!-- GRN Header - Start -->
 								<p:tab id="tabOne" title="GRN Details">
 									<p:panel header="Main Details">
-										<h:panelGrid columns="2" columnClasses="label, value">
 
-											<h:outputText value="Firstname: *" />
-											<p:selectOneMenu id="console" label="Firstname:"
-												value="#{selectOneMenuView.console}" style="width:125px">
-												<f:selectItem itemLabel="Select One" itemValue="" />
-												<f:selectItem itemLabel="Xbox One" itemValue="Xbox One" />
-												<f:selectItem itemLabel="PS4" itemValue="PS4" />
-												<f:selectItem itemLabel="Wii U" itemValue="Wii U" />
-												<f:facet name="footer">
-													<p:separator />
-													<h:outputText value="3 consoles" style="font-weight:bold;" />
-												</f:facet>
-											</p:selectOneMenu>
+									
+											<div class="p-col-12">
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="GRN No" />
+													<br />
+													<p:inputText value="#{userWizard.user.age}"  required="true"/>
+												</div>
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Supplier *" />
+													<br />
+													<p:selectOneMenu id="supName"
+														value="#{selectOneMenuView.console}" style="width:25%">
+														<f:selectItem itemLabel="Select One" />
+													</p:selectOneMenu>
+												</div>
+
+
+
+
+
 
 
 
 
 											
 
-											<h:outputText value="Lastname: *" />
-											<p:inputText value="#{userWizard.user.lastname}"
-												required="true" label="Lastname" />
+											
+										</div>
 
-											<h:outputText value="Age: " />
-											<p:inputText value="#{userWizard.user.age}" />
-
-											<h:outputText value="Skip to last: " />
-											<h:selectBooleanCheckbox value="#{userWizard.skip}" />
-										</h:panelGrid>
 									</p:panel>
 								</p:tab>
 								<!-- GRN Header - End -->
