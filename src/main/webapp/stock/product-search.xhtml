@@ -208,7 +208,7 @@
 							update=":proSrhFrm,:proSrhFrm:growl,:frmAllPrd:psrhTable"
 							action="#{productController.updateProduct}" style="width:25%"
 							onstart="PF('prdupdBlock').block()"
-							oncomplete="if(!args.validationFailed){PF('proSrh').hide();PF('btnUpd').unblock();}"
+							oncomplete="if(!args.validationFailed){PF('proSrh').hide();}"
 							styleClass="orange-btn">
 							<p:confirm header="Update Product"
 								message="Are You Sure Update Product?" icon="pi pi-refresh" />
