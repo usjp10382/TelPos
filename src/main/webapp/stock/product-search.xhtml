@@ -14,11 +14,15 @@
 		<ui:define name="content">
 
 			<!-- Product Details Table - Start -->
-			<h:form>
+			<h:form id="frmAllPrd">
 				<div class="p-grid">
 					<div class="p-col-12">
 						<p:fieldset legend="Product Details" style="margin-bottom:20px"
 							id="proSrhFld">
+
+							<p:growl id="delGrowl" sticky="false" life="5000"
+								showDetail="true" showSummary="true"
+								skipDetailIfEqualsSummary="true" />
 
 							<p:dataTable var="prd" id="psrhTable" widgetVar="psrhTable"
 								emptyMessage="No Data found with given criteria"
@@ -82,7 +86,13 @@
 								<p:column style="width:32px;text-align: center">
 									<p:commandButton icon="pi pi-trash" title="Delete"
 										style="width:20px;height:20px" process="psrhTable"
+										update=":frmAllPrd:delGrowl,:frmAllPrd:psrhTable"
 										styleClass="red-button">
+										<f:setPropertyActionListener value="#{prd}"
+											target="#{productController.havDeleteProduct}" />
+										<p:confirm header="Delete Product"
+											message="Are You Sure Delete Selected Product?"
+											icon="pi pi-trash" />
 									</p:commandButton>
 								</p:column>
 
@@ -112,12 +122,16 @@
 				style="position: absolute;z-index: -1">
 				<h:form id="proSrhFrm">
 
+					<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+						showSummary="true" skipDetailIfEqualsSummary="true" />
+
 					<div class="p-col-12">
 						<p:outputLabel for="itemCode" value="Item Code" />
 						<br />
 						<p:inputText id="itemCode" styleClass="inputTexts" required="true"
 							requiredMessage="The Product Code Is Required!"
 							value="#{productController.havUpdateProduct.prdCode}" />
+						<p:message for="itemCode" />
 					</div>
 
 					<div class="p-col-12">
@@ -126,6 +140,7 @@
 						<p:inputText id="proName" styleClass="inputTexts" required="true"
 							value="#{productController.havUpdateProduct.prdName}"
 							requiredMessage="The Product Name Is Required!" />
+						<p:message for="proName" />
 					</div>
 
 					<div class="p-col-12">
@@ -139,6 +154,7 @@
 							<f:selectItems value="#{productController.allActiveBrand}"
 								var="brand" itemValue="#{brand}" itemLabel="#{brand.brandName}" />
 						</p:selectOneMenu>
+						<p:message for="brnd" />
 					</div>
 
 					<div class="p-col-12">
@@ -152,6 +168,7 @@
 							<f:selectItems value="#{productController.allActiveCategories}"
 								var="catg" itemValue="#{catg}" itemLabel="#{catg.categoryName}" />
 						</p:selectOneMenu>
+						<p:message for="category" />
 					</div>
 
 					<div class="p-col-12">
@@ -165,6 +182,7 @@
 								var="uom" itemValue="#{uom}"
 								itemLabel="#{uom.uomChar}-#{uom.uomName}" />
 						</p:selectOneMenu>
+						<p:message for="uom" />
 					</div>
 
 					<div class="p-col-12">
@@ -174,6 +192,7 @@
 							requiredMessage="The Minimumm Quantity Is Required!"
 							value="#{productController.havUpdateProduct.minQtyLevel}"
 							type="number" required="true" />
+						<p:message for="minQuantity" />
 					</div>
 
 					<div class="p-col-12">
@@ -184,15 +203,37 @@
 					</div>
 
 					<div class="p-col-12" align="right">
-						<p:commandButton icon="pi pi-refresh" value="Update"
-							style="width:25%" styleClass="orange-btn" />
+						<p:commandButton icon="pi pi-refresh" value="Update" id="btnUpd"
+							process="@this,proSrhFrm"
+							update=":proSrhFrm,:proSrhFrm:growl,:frmAllPrd:psrhTable"
+							action="#{productController.updateProduct}" style="width:25%"
+							onstart="PF('prdupdBlock').block()"
+							oncomplete="if(!args.validationFailed){PF('proSrh').hide();PF('btnUpd').unblock();}"
+							styleClass="orange-btn">
+							<p:confirm header="Update Product"
+								message="Are You Sure Update Product?" icon="pi pi-refresh" />
+						</p:commandButton>
 					</div>
+
+					<pe:blockUI target="btnUpd" widgetVar="prdupdBlock">
+						<h:panelGrid columns="2">
+							<p:graphicImage value="../resources/img/ajax-loader.gif"
+								style="margin-right: 12px; vertical-align: middle;" />
+							<h:outputText value="Creating New Bulk Of Product..."
+								style="white-space: nowrap;" />
+						</h:panelGrid>
+					</pe:blockUI>
 
 				</h:form>
 			</p:dialog>
 			<!-- Product Details Update - End -->
 
-
+			<p:confirmDialog global="true" showEffect="explode" hideEffect="puff">
+				<p:commandButton value="YES" type="button"
+					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="NO" type="button"
+					styleClass="red-button ui-confirmdialog-no" icon="pi pi-times" />
+			</p:confirmDialog>
 
 		</ui:define>
 	</ui:composition>

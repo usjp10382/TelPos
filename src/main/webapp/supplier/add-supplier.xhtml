@@ -30,7 +30,8 @@
 					<div style="display: inline;">
 
 						<p:commandButton icon="pi pi-file-excel" style="margin-right:5px;"
-							title="Icon Only" id="exlSheet" type="button">
+							title="Icon Only" id="exlSheet" type="button"
+							onclick="PF('impExcel').show();">
 							<pe:tooltip for="exlSheet" value="Import Excel Sheet"
 								showEffect="slideToggle" hideEffect="slideToggle" showDelay="0"
 								myPosition="top center" atPosition="bottom center" />
@@ -117,8 +118,7 @@
 							<p:column style="width:32px;text-align: center">
 								<p:commandButton icon="pi pi-trash" title="Delete"
 									style="width:20px;height:20px" process="supTable"
-									update=":supMainTble"
-									styleClass="red-button">
+									update=":supMainTble" styleClass="red-button">
 									<f:setPropertyActionListener value="#{supl}"
 										target="#{suppController.havDeleteSuppliyer}" />
 									<p:confirm header="Delete Suppliyer"
@@ -263,6 +263,40 @@
 							styleClass="red-btn">
 							<p:confirm header="Update Suppliyer"
 								message="Are You Sure Update Suppliyer?" icon="fa fa-floppy-o" />
+						</p:commandButton>
+					</div>
+
+				</h:form>
+			</p:dialog>
+
+			<p:dialog header="Uload Excel File" widgetVar="impExcel"
+				appendTo="@(supTable)" showEffect="clip" hideEffect="clip"
+				height="100%" width="50%">
+				<h:form id="importXcel">
+
+					<p:growl id="impExcelGrowl" sticky="false" life="5000"
+						showDetail="true" showSummary="true"
+						skipDetailIfEqualsSummary="true" />
+
+					<p:fileUpload id="fileUpload" uploadLabel="Upload"
+						cancelLabel="Cancel" label="Upload Excel Sheet"
+						update="impExcelGrowl,btngenAll"
+						listener="#{suppController.handleFileUpload}"
+						value="#{suppController.uploadedFile}" mode="advanced"
+						allowTypes="/(\.|\/)(xls|xlsx)$/" />
+
+
+					<div class="p-col-12" align="right">
+						<p:commandButton icon="pi pi-check-square" value="Generate All"
+							id="btngenAll" disabled="#{!suppController.succUpd}"
+							process="@this,importXcel"
+							update=":newSuppFrmUpdate,:supMainTble:supTable,:importXcel:impExcelGrowl"
+							oncomplete="if(!args.validationFailed){PF('impExcel').hide();}"
+							action="#{suppController.createImportSuppliyers}"
+							style="width:25%" styleClass="red-btn">
+							<p:confirm header="Import Suppliyer From Excel"
+								message="Are You Sure Import  Suppliyer From Excel?"
+								icon="fa fa-floppy-o" />
 						</p:commandButton>
 					</div>
 

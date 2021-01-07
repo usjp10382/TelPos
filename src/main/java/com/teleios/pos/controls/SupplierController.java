@@ -1,9 +1,15 @@
 package com.teleios.pos.controls;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.nio.file.AccessDeniedException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -13,6 +19,15 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.file.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +57,11 @@ public class SupplierController implements Serializable {
 	private Supplier newSupplier = new Supplier();
 	private Supplier havUpdateSuppliyer;
 	private Supplier havDeleteSuppliyer;
+
+	// Import Suppliyer From Exccel
+	private transient UploadedFile uploadedFile;
+	private boolean succUpd = false;
+	private String updFileName;
 
 	@PostConstruct
 	public void init() {
@@ -188,6 +208,113 @@ public class SupplierController implements Serializable {
 		}
 	}
 
+	// Suppliyer Create Using Excel Sheet
+	public void handleFileUpload(FileUploadEvent event) {
+		LOGGER.info("<----- Suppliyer Excel Sheet Upload Execute ------>");
+		UploadedFile uploadedFile = event.getFile();
+		// String fileName = uploadedFile.getFileName();
+		// String contentType = uploadedFile.getContentType();
+
+		try {
+			String dir = "/resources/supps_heet";
+			String path = FacesContext.getCurrentInstance().getExternalContext().getRealPath(dir);
+			File updDirectory = new File(path);
+			if (!updDirectory.exists()) {
+				updDirectory.mkdir();
+			}
+			InputStream initialStream = uploadedFile.getInputStream();
+			FileUtils.copyInputStreamToFile(initialStream, new File(updDirectory, uploadedFile.getFileName()));
+			setUpdFileName(uploadedFile.getFileName());
+			addMessage("Upload Suppliyer Excel Sheet", "Upload Suppliyer File Success!");
+			setSuccUpd(true);
+		} catch (IOException ioe) {
+			LOGGER.error("Upload Suppliyer Excel Sheet Error", ioe);
+			addErrorMessage("Upload Suppliyer Excel Sheet",
+					"Upload Suppliyer Excel Sheet IO Excepption\n" + ioe.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Upload Suppliyer Excel Sheet Error", e);
+			addErrorMessage("Upload Suppliyer Excel Sheet",
+					"Upload Suppliyer Excel Sheet Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public void createImportSuppliyers() {
+		LOGGER.info("<------- Execute Import Suppliyer In Suppliyer Controller -------->");
+		Workbook workbook = null;
+		FileInputStream excelFile = null;
+		String createBy;
+		Date createDate = new Date();
+		try {
+			if (getUpdFileName() != null) {
+
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth != null) {
+					getNewSupplier().setCreateBy(auth.getName());
+				} else {
+					throw new AccessDeniedException("Un Authorized Access !");
+				}
+				createBy = auth.getName();
+
+				String dir = "/resources/supps_heet";
+				String path = FacesContext.getCurrentInstance().getExternalContext()
+						.getRealPath(dir + File.separator + getUpdFileName());
+
+				excelFile = new FileInputStream(new File(path));
+
+				workbook = new XSSFWorkbook(excelFile);
+				Sheet datatypeSheet = workbook.getSheetAt(0);
+				Iterator<Row> iterator = datatypeSheet.iterator();
+
+				while (iterator.hasNext()) {
+
+					Row currentRow = iterator.next();
+					Iterator<Cell> cellIterator = currentRow.iterator();
+					LOGGER.info("Cel Value--->{}", currentRow.getCell(0).getStringCellValue()
+							+ currentRow.getCell(1).getStringCellValue() + currentRow.getCell(0).getStringCellValue()
+							+ currentRow.getCell(1).getStringCellValue() + currentRow.getCell(4).getStringCellValue());
+					while (cellIterator.hasNext()) {
+						Cell currentCell = cellIterator.next();
+						// getCellTypeEnum shown as deprecated for version 3.15
+						// getCellTypeEnum ill be renamed to getCellType starting from version 4.0
+						/*
+						 * if (currentCell.getCellTypeEnum() == CellType.STRING) {
+						 * System.out.print(currentCell.getStringCellValue() + "--"); } else if
+						 * (currentCell.getCellTypeEnum() == CellType.NUMERIC) {
+						 * System.out.print(currentCell.getNumericCellValue() + "--"); }
+						 */
+
+					}
+
+				}
+
+			}
+		} catch (FileNotFoundException fne) {
+			LOGGER.error("import Suppliyer Read Excel Sheet File Not Found...", fne);
+			addErrorMessage("Import Suppliyer", "Suppliyer File Not Found!\n" + fne.getLocalizedMessage());
+		} catch (IOException ioe) {
+			LOGGER.error("import Suppliyer Read Excel Sheet File Not Found...", ioe);
+			addErrorMessage("Import Suppliyer", "Suppliyer File IO Exception\n" + ioe.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Import Suppliyers From Excel System Error", e);
+			addErrorMessage("Import Suppliyer", "Suppliyer System Error\n" + e.getLocalizedMessage());
+		} finally {
+			if (workbook != null) {
+				try {
+					workbook.close();
+				} catch (IOException ioe1) {
+					LOGGER.error("Work Book Close Error---->", ioe1);
+				}
+			}
+			if (excelFile != null) {
+				try {
+					excelFile.close();
+				} catch (IOException ioe2) {
+					LOGGER.error("Close File Io Exception Error-->", ioe2);
+				}
+			}
+		}
+	}
+
 	private void addMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, summery, details);
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
@@ -258,6 +385,30 @@ public class SupplierController implements Serializable {
 	public void setHavDeleteSuppliyer(Supplier havDeleteSuppliyer) {
 		this.havDeleteSuppliyer = havDeleteSuppliyer;
 		deleteSuppliyer();
+	}
+
+	public UploadedFile getUploadedFile() {
+		return uploadedFile;
+	}
+
+	public void setUploadedFile(UploadedFile uploadedFile) {
+		this.uploadedFile = uploadedFile;
+	}
+
+	public boolean isSuccUpd() {
+		return succUpd;
+	}
+
+	public void setSuccUpd(boolean succUpd) {
+		this.succUpd = succUpd;
+	}
+
+	public String getUpdFileName() {
+		return updFileName;
+	}
+
+	public void setUpdFileName(String updFileName) {
+		this.updFileName = updFileName;
 	}
 
 }

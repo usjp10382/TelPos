@@ -16,7 +16,7 @@ public interface ProductDao {
 
 	int updateProduct(Product product) throws SocketTimeoutException, DuplicateKeyException, Exception;
 
-	int deleteProduct(Integer prdNumber) throws SocketTimeoutException, Exception;
+	int deleteProduct(Product product) throws SocketTimeoutException, Exception;
 
 	List<Product> getAllActiveProducts()
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception;

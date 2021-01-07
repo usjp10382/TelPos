@@ -36,6 +36,12 @@ public class ProductService {
 		LOGGER.info("<----- Execute Update Product Name:{} Execute In Service --->", product.getPrdName());
 		return this.productDaoImpl.updateProduct(product);
 	}
+	
+	public int deleteProduct(Product product) throws SocketTimeoutException, Exception {
+		LOGGER.info("<---- Execute Delete Product: {} in Service ---->",
+				product.getPrdCode() + " " + product.getPrdName());
+		return this.productDaoImpl.deleteProduct(product);
+	}
 
 	public List<Product> getAllActiveProducts()
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {

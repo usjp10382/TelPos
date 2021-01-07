@@ -34,7 +34,10 @@ public class ProductDaoImpl implements ProductDao {
 
 	// Define Product Update SQL
 	private static final String UPD_PRD_SQL = "UPDATE inv_schema.product SET code=:code,prd_name=:prd_name,brand=:brand,category=:category,uom=:uom,"
-			+ "create_by=:create_by,create_date=:create_date,prd_state=:prd_state,min_qty_lev=:min_qty_lev,min_qty_lev=:min_qty_lev WHERE prd_id=:prd_id";
+			+ "create_by=:create_by,create_date=:create_date,prd_state=:prd_state,min_qty_lev=:min_qty_lev,rack_no=:rack_no WHERE prd_id=:prd_id";
+
+	// Define Product Delete SQL
+	private static final String DEL_PRD_SQL = "DELETE FROM inv_schema.product WHERE prd_id=?";
 
 	// Define Product Search SQL
 	private static final String ALL_ACTIVE_PRD_SQL = "SELECT p.prd_id,p.code,p.prd_name,p.create_by,p.create_date,p.prd_state,p.min_qty_lev,p.rack_no,"
@@ -121,7 +124,7 @@ public class ProductDaoImpl implements ProductDao {
 		paraMap.put("prd_state", (short) 1);
 		paraMap.put("min_qty_lev", product.getMinQtyLevel());
 		paraMap.put("rack_no", product.getRackDet());
-		paraMap.put("prd_id", product.getPrdName());
+		paraMap.put("prd_id", product.getPrdId());
 
 		updState = this.namedParameterJdbcTemplate.update(UPD_PRD_SQL, paraMap);
 
@@ -129,9 +132,11 @@ public class ProductDaoImpl implements ProductDao {
 	}
 
 	@Override
-	public int deleteProduct(Integer prdNumber) throws SocketTimeoutException, Exception {
-		// TODO Auto-generated method stub
-		return 0;
+	public int deleteProduct(Product product) throws SocketTimeoutException, Exception {
+		LOGGER.info("<---- Execute Delete Product: {} in Repository ---->",
+				product.getPrdCode() + " " + product.getPrdName());
+
+		return this.jdbcTemplate.update(DEL_PRD_SQL, product.getPrdId());
 	}
 
 	@Override

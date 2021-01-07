@@ -344,6 +344,90 @@ public class ProductController implements Serializable {
 		}
 	}
 
+	public void updateProduct() {
+		LOGGER.info("<------ Execute Update Product in Product Controller ------>");
+		int updState = 0;
+		try {
+			if (getHavUpdateProduct() != null) {
+				if (getSelectedBrand() == null) {
+					addErrorMessage("Update Product", "Select Product Brand Is Required!");
+					return;
+				}
+				if (getSelectedCategory() == null) {
+					addErrorMessage("Update Product", "Select Product Category Is Required!");
+					return;
+				}
+				if (getSelectedUom() == null) {
+					addErrorMessage("Update Product", "Select Product UOM Is Required!");
+					return;
+				}
+
+				if (getHavUpdateProduct().getMinQtyLevel() == null) {
+					addErrorMessage("Update Product", "Minimumm Quantity Level Is Required!");
+					return;
+				}
+
+				if (getHavUpdateProduct().getMinQtyLevel() < 0.0) {
+					addErrorMessage("Update Product", "Minimumm Quantity Level Canot'be Minus!");
+					return;
+				}
+
+				if (getHavUpdateProduct().getRackDet().isEmpty()) {
+					getHavUpdateProduct().setRackDet("N/A");
+				}
+
+				getHavUpdateProduct().setBrand(getSelectedBrand());
+				getHavUpdateProduct().setCategory(getSelectedCategory());
+				getHavUpdateProduct().setUom(getSelectedUom());
+
+				updState = this.productService.updateProduct(getHavUpdateProduct());
+				if (updState > 0) {
+					addMessage("Update Product", "Succesfuly Update Prodcut!");
+					clearFiled(0);
+					loadAllActiveProducts();
+				} else {
+					addErrorMessage("Update Product", "Update Product Failed !");
+				}
+			} else {
+				addErrorMessage("Update Product", "Select Update Prodcut Is Required!");
+			}
+		} catch (SocketTimeoutException ste) {
+			LOGGER.error("Couldnt Connect Database", ste);
+			addErrorMessage("Update Product", "Couldn't Connect To Database\n" + ste.getLocalizedMessage());
+		} catch (DuplicateKeyException dke) {
+			LOGGER.error("Entered Prodcut Key Duplicate", dke);
+			addErrorMessage("Update Product", "Entered Product Code Allready Exist!\n" + dke.getMessage());
+		} catch (Exception e) {
+			LOGGER.error("Update Prodcut Error", e);
+			addErrorMessage("Update Product", "Update Product Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	private void deleteProduct() {
+		LOGGER.info("<---- Execute Delete Product in controller ------>");
+		int deleState = 0;
+		try {
+			if (getHavDeleteProduct() != null) {
+				deleState = this.productService.deleteProduct(getHavDeleteProduct());
+				if (deleState > 0) {
+					addMessage("Delete Product", "Successfuly Delete Product!");
+					this.havDeleteProduct = null;
+					loadAllActiveProducts();
+				} else {
+					addErrorMessage("Delete Product", "Product Delete Failed !");
+				}
+			} else {
+				addMessage("Delete Product", "Select Delete Product Is Required!");
+			}
+		} catch (SocketTimeoutException ste) {
+			LOGGER.error("Delete Product Couldn't Connect TO Database", ste);
+			addMessage("Delete Product", "Couldn't Connect To Database !\n" + ste.getMessage());
+		} catch (Exception e) {
+			LOGGER.error("Delete Product Error--->", e);
+			addMessage("Delete Product", "Delete Product Error !\n" + e.getLocalizedMessage());
+		}
+	}
+
 	private void addMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, summery, details);
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
@@ -583,6 +667,7 @@ public class ProductController implements Serializable {
 
 	public void setHavDeleteProduct(Product havDeleteProduct) {
 		this.havDeleteProduct = havDeleteProduct;
+		deleteProduct();
 	}
 
 	private void testSmS() {
@@ -593,8 +678,8 @@ public class ProductController implements Serializable {
 			SmsModel smsModel = new SmsModel();
 
 			smsModel.setSource("Teleios");
-			//smsModel.setDestinations(new String[] { "94717624597", "94716155228" });
-			 smsModel.setDestinations(new String[] { "94716155228" });
+			// smsModel.setDestinations(new String[] { "94717624597", "94716155228" });
+			smsModel.setDestinations(new String[] { "94716155228" });
 			smsModel.setTransports(new String[] { "sms" });
 			Map<String, String> content = new HashMap<String, String>();
 			content.put("sms", "This Is Test From Teleios");

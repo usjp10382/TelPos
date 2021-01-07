@@ -34,8 +34,8 @@ public class SupplierService implements Serializable {
 
 	public int[] createNewSuppliyer(List<Supplier> supplier)
 			throws SocketTimeoutException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("Execute Create New Bulk Suppliyer Supp_Name: In Service ------>");
+		return this.supplierDaoImpl.createNewSuppliyer(supplier);
 	}
 
 	public int updateSuppliyer(Supplier supplier) throws SocketTimeoutException, DataAccessException, Exception {
