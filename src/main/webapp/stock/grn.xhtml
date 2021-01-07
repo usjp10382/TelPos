@@ -268,8 +268,7 @@
 											<!-- Payment Details - End -->
 
 											<!-- GRN Printing Version - Start -->
-											<div class="p-col-9"
-												style="border: 2px solid #74C0F3; margin-top: 5px">
+											<div class="p-col-9" style="border: 2px solid #74C0F3; margin-top: 5px" id="print-area">
 
 												<div align="center">
 													<h1>Good Recive Note</h1>
@@ -377,36 +376,30 @@
 														</tr>
 													</table>
 												</div>
-
-												<div class="p-grid">
-													<div class="p-col-12">
-														<p style="width: 100%" align="justify">
-															<span style="color: red">*</span> This is a comment bla b
-														</p>
-
-													</div>
-												</div>
-
-
 												<!-- GRN Footer - Printing - End -->
 
 											</div>
 											<!-- GRN Printing Version - End -->
 
-
-
-
-
-
-
-
-
-
+											<!-- Payment type and comment - Start -->
+											<div class="p-grid">
+												<div class="p-col-12">
+													<h4>
+														Payment Type : <span> Cash </span>
+													</h4>
+													<p>
+														<span style="color: red">*</span>This is a comment sampal
+													</p>
+												</div>
+											</div>
+											<!-- Payment type and comment - End -->
 
 										</div>
-										<!-- <p:commandButton value="
-												Submit" process="@this" />
-											-->
+										<div align="right">
+										<p:commandButton style="width:15%" value="Create GRN" id="createGrn" styleClass="green-button" icon="fa fa-check"/>
+										<p:commandButton style="width:15%" value="Print This" id="printThis" styleClass="orange-btn" icon="fa fa-print"/>
+										<p:commandButton style="width:15%" value="Send This" id="sendThis" icon="fa fa-envelope"/>
+										</div>
 									</p:panel>
 								</p:tab>
 								<!-- Payment Details (3rd Tab) - End -->

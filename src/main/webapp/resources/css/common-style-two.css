@@ -8,3 +8,21 @@
 	background: white !important;
 	border: none !important;
 }
+
+@media print {
+	#print-area {
+		display: block;
+		border: none !important;
+		width: 100%;
+	}
+	.non-print-area {
+		display: none!important;
+	}
+	#template-content {
+		position: relative;
+		top: 0px !important;
+	}
+	.tblePrint {
+		height: 50px !important;
+	}
+}
