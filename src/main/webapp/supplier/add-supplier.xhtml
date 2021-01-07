@@ -13,6 +13,10 @@
 	<ui:composition template="/template/common/commonLayout.xhtml">
 
 		<ui:define name="content">
+			<f:metadata>
+				<f:event type="postRenderView"
+					listener="#{suppController.initialized}" />
+			</f:metadata>
 
 			<!-- Top Icon Button - Start -->
 			<div class="p-grid">

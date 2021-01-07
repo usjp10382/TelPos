@@ -65,11 +65,18 @@
 													</div>
 
 													<div class="p-col-12">
-														<h:panelGrid columns="2" width="100%">
-															<p:outputLabel for="@next" value="Supplier *" />
+														<h:panelGrid columns="2" width="90%">
+															<p:outputLabel for="@next" value="Supplier" />
 															<br />
-															<p:selectOneMenu id="supName" style="width:100%">
-																<f:selectItem itemLabel="Select One" />
+															<p:selectOneMenu style="width:100%" id="supName"
+																effect="fold" required="true"
+																requiredMessage="Select Suppliyer Is Required"
+																filter="true" editable="true" converter="suppConvertor"
+																placeholder="- Select Suppliyer -"
+																value="#{grnController.selSuppliyer}">
+																<f:selectItems
+																	value="#{grnController.allActiveSuppliyers}" var="supp"
+																	itemValue="#{supp}" itemLabel="#{supp.supplierName}" />
 															</p:selectOneMenu>
 
 															<p:commandButton icon="fa fa-info-circle"
@@ -79,10 +86,17 @@
 													</div>
 
 													<div class="p-col-12">
-														<p:outputLabel for="@next" value="Payment Type *" />
+														<p:outputLabel for="@next" value="Payment Type" />
 														<br />
-														<p:selectOneMenu id="pType" style="width:76%">
-															<f:selectItem itemLabel="Select One" />
+														<p:selectOneMenu style="width:77%" id="pType"
+															effect="fold" required="true"
+															requiredMessage="Select Payment Type Is Required"
+															filter="true" editable="true" converter="payConvertor"
+															placeholder="- Select Payment Type -"
+															value="#{grnController.selPayType}">
+															<f:selectItems value="#{grnController.paymentTypes}"
+																var="paytyp" itemValue="#{paytyp}"
+																itemLabel="#{paytyp.desc}" />
 														</p:selectOneMenu>
 													</div>
 
@@ -268,7 +282,9 @@
 											<!-- Payment Details - End -->
 
 											<!-- GRN Printing Version - Start -->
-											<div class="p-col-9" style="border: 2px solid #74C0F3; margin-top: 5px" id="print-area">
+											<div class="p-col-9"
+												style="border: 2px solid #74C0F3; margin-top: 5px"
+												id="print-area">
 
 												<div align="center">
 													<h1>Good Recive Note</h1>
@@ -396,9 +412,12 @@
 
 										</div>
 										<div align="right">
-										<p:commandButton style="width:15%" value="Create GRN" id="createGrn" styleClass="green-button" icon="fa fa-check"/>
-										<p:commandButton style="width:15%" value="Print This" id="printThis" styleClass="orange-btn" icon="fa fa-print"/>
-										<p:commandButton style="width:15%" value="Send This" id="sendThis" icon="fa fa-envelope"/>
+											<p:commandButton style="width:15%" value="Create GRN"
+												id="createGrn" styleClass="green-button" icon="fa fa-check" />
+											<p:commandButton style="width:15%" value="Print This"
+												id="printThis" styleClass="orange-btn" icon="fa fa-print" />
+											<p:commandButton style="width:15%" value="Send This"
+												id="sendThis" icon="fa fa-envelope" />
 										</div>
 									</p:panel>
 								</p:tab>

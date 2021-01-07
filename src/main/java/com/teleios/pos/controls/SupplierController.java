@@ -17,6 +17,7 @@ import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PostRenderViewEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -26,6 +27,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.slf4j.Logger;
@@ -67,6 +69,12 @@ public class SupplierController implements Serializable {
 	public void init() {
 		LOGGER.info("Execute Supplier Controller Init -------->");
 		loadAllActiveSuppliyers();
+	}
+
+	public void initialized(PostRenderViewEvent e) {
+		LOGGER.info("Executing PostRenderViewEvent.....");
+		// loadAllActiveSuppliyers();
+
 	}
 
 	private void loadAllActiveSuppliyers() {
@@ -392,6 +400,7 @@ public class SupplierController implements Serializable {
 
 	public void setAllActiveSuppliyers(List<Supplier> allActiveSuppliyers) {
 		this.allActiveSuppliyers = allActiveSuppliyers;
+		// PrimeFaces.current().ajax().update("supMainTble:supTable");
 	}
 
 	public List<Supplier> getAllActiveSuppFiltered() {
