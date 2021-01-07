@@ -137,31 +137,22 @@
 												<!-- Item Details Text Fields - Start -->
 												<div class="p-grid">
 
-													<div class="p-col-4">
+													<div class="p-col-2">
 														<p:outputLabel for="@next" value="Quantity" />
 														<br />
 														<p:inputText id="qty" style="width:100%" />
 													</div>
 
-													<div class="p-col-4">
+													<div class="p-col-2">
 														<p:outputLabel for="@next" value="Unit Price" />
 														<br />
 														<p:inputText id="uniPrice" style="width:100%" />
 													</div>
 
-													<div class="p-col-4">
+													<div class="p-col-2">
 														<p:outputLabel for="@next" value="Selling Price" />
 														<br />
 														<p:inputText id="sellPrice" style="width:100%" />
-													</div>
-
-													<div class="p-col-2">
-														<p:outputLabel for="@next" value="Discount Type" />
-														<br />
-														<p:selectOneMenu id="disType" style="width:100%">
-															<f:selectItem itemLabel="Cash" itemValue="" />
-															<f:selectItem itemLabel="Precentage" itemValue="Xbox One" />
-														</p:selectOneMenu>
 													</div>
 
 													<div class="p-col-2">
@@ -170,8 +161,16 @@
 														<p:inputText id="dis" style="width:100%" />
 													</div>
 
-													<div class="p-col-12" align="left">
-														<p:commandButton value="Add to Table" style="width:32%">
+													<div class="p-col-2">
+														<p:outputLabel for="@next" value="Expire Date" />
+														<br />
+														<p:datePicker id="expDate" style="width:100%" />
+													</div>
+
+													<div class="p-col-6"></div>
+
+													<div class="p-col-4" align="right">
+														<p:commandButton value="Add to Table" style="width:105%">
 														</p:commandButton>
 													</div>
 
@@ -203,6 +202,10 @@
 													</p:column>
 
 													<p:column headerText="Qty">
+														<h:outputText value="#{car.color}" />
+													</p:column>
+
+													<p:column headerText="Expire Date">
 														<h:outputText value="#{car.color}" />
 													</p:column>
 
@@ -243,7 +246,7 @@
 
 											<!-- Payment Details - Start -->
 											<div class="p-col-3" align="center"
-												style="border: 2px solid #74C0F3; padding: 5px; margin: 5px;">
+												style="border: 2px solid #74C0F3; margin-top: 5px">
 
 												<h2>Total Amount</h2>
 												<h3>1000.00</h3>
@@ -254,14 +257,141 @@
 												<h2>Paybale Amount</h2>
 												<h3>1000.00</h3>
 												<p:separator />
-												<h2>Paid Amount</h2>
-												<p:inputText id="paidAmount" />
+												<h2>Cash Amount</h2>
+												<p:inputText id="paidAmountCash" />
+												<h2>Cheque Amount</h2>
+												<p:inputText id="paidAmountCheque" />
 												<p:separator />
 												<h2>Balance</h2>
 												<h3>1000.00</h3>
 											</div>
 											<!-- Payment Details - End -->
 
+											<!-- GRN Printing Version - Start -->
+											<div class="p-col-9"
+												style="border: 2px solid #74C0F3; margin-top: 5px">
+
+												<div align="center">
+													<h1>Good Recive Note</h1>
+												</div>
+												<p:separator />
+												<div class="p-grid">
+													<div class="p-col-6" style="line-height: 0">
+														<div class="p-grid">
+															<!-- Grn Header Details - Printing - Start -->
+															<div class="p-col-4">
+																<h4>GRN ID</h4>
+																<h4>Badge</h4>
+																<br />
+																<h4>Date</h4>
+																<h4>Supplier</h4>
+															</div>
+															<div class="p-col-1">
+																<h4>:</h4>
+																<h4>:</h4>
+																<br />
+																<h4>:</h4>
+																<h4>:</h4>
+															</div>
+															<div class="p-col-7">
+																<h4>0012</h4>
+																<h4>111</h4>
+																<br />
+																<h4>2021.01.10</h4>
+																<h4>Dilan Tharaka</h4>
+															</div>
+															<!-- Grn Header Details - Printing - End -->
+														</div>
+													</div>
+												</div>
+												<!-- Grn Table - Printing - Start -->
+												<div class="p-col-12">
+													<p:dataTable var="itemDetailsTwo"
+														value="#{dtBasicView.cars}" id="itemDetailsTableTwo">
+														<p:column headerText="Item No">
+															<h:outputText value="#{car.id}" />
+														</p:column>
+
+														<p:column headerText="Item Code">
+															<h:outputText value="#{car.year}" />
+														</p:column>
+
+														<p:column headerText="Description">
+															<h:outputText value="#{car.brand}" />
+														</p:column>
+
+														<p:column headerText="Qty">
+															<h:outputText value="#{car.color}" />
+														</p:column>
+
+														<p:column headerText="Expire Date">
+															<h:outputText value="#{car.color}" />
+														</p:column>
+
+														<p:column headerText="unit price">
+															<h:outputText value="#{car.color}" />
+														</p:column>
+
+														<p:column headerText="Selling price">
+															<h:outputText value="#{car.color}" />
+														</p:column>
+
+														<p:column headerText="discount">
+															<h:outputText value="#{car.color}" />
+														</p:column>
+
+														<p:column headerText="Total">
+															<h:outputText value="#{car.color}" />
+														</p:column>
+													</p:dataTable>
+												</div>
+												<!-- Grn Table - Printing - End -->
+
+												<!-- GRN Footer - Printing - Start -->
+												<div class="p-col-12">
+													<table align="right" style="font-weight: bold; width: 30%">
+														<tr>
+															<td>Total Amount</td>
+															<td>-</td>
+															<td align="right">1000.00</td>
+														</tr>
+														<tr>
+															<td>Discount</td>
+															<td>-</td>
+															<td align="right">10<span>%</span></td>
+														</tr>
+														<tr>
+															<td>Payble Amount</td>
+															<td>-</td>
+															<td align="right">1000.00</td>
+														</tr>
+														<tr>
+															<td>Paid Amount</td>
+															<td>-</td>
+															<td align="right">1000.00</td>
+														</tr>
+														<tr>
+															<td>Balance</td>
+															<td>-</td>
+															<td align="right">1000.00</td>
+														</tr>
+													</table>
+												</div>
+
+												<div class="p-grid">
+													<div class="p-col-12">
+														<p style="width: 100%" align="justify">
+															<span style="color: red">*</span> This is a comment bla b
+														</p>
+
+													</div>
+												</div>
+
+
+												<!-- GRN Footer - Printing - End -->
+
+											</div>
+											<!-- GRN Printing Version - End -->
 
 
 
@@ -274,13 +404,12 @@
 
 
 										</div>
-										<!-- <p:commandButton value="Submit" process="@this" /> -->
+										<!-- <p:commandButton value="
+												Submit" process="@this" />
+											-->
 									</p:panel>
 								</p:tab>
 								<!-- Payment Details (3rd Tab) - End -->
-
-
-
 
 							</p:wizard>
 
