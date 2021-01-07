@@ -2,6 +2,9 @@ package com.teleios.pos.dao.impl;
 
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,6 +31,8 @@ public class SupplierDaoImpl implements Serializable, SupplierDao {
 	// Define Supplier Create SQL
 	private static final String CRET_SUPP_SQL = "INSERT INTO supplier_schema.supplier (supp_name,address,contact_number,create_by,create_date,spu_state,fix_contact,email)"
 			+ " VALUES(:supp_name,:address,:contact_number,:create_by,:create_date,:spu_state,:fix_contact,:email)";
+	private static final String CRE_BAT_SUPP_SQL = "INSERT INTO supplier_schema.supplier (supp_name,address,contact_number,create_by,create_date,spu_state,fix_contact,email) "
+			+ "VALUES (?,?,?,?,?,?,?,?)";
 
 	// Define Supplier Update SQL
 	private static final String UPD_SUPP_SQL = "UPDATE supplier_schema.supplier SET supp_name=:supp_name,address=:address,contact_number=:contact_number,fix_contact=:fix_contact,email=:email "
@@ -71,8 +77,29 @@ public class SupplierDaoImpl implements Serializable, SupplierDao {
 	@Override
 	public int[] createNewSuppliyer(List<Supplier> supplier)
 			throws SocketTimeoutException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("<----------- Execute Create Batch Of Supppliyer In Repository batch Size{} ---------->",
+				supplier.size());
+		return this.jdbcTemplate.batchUpdate(CRE_BAT_SUPP_SQL, new BatchPreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setString(1, supplier.get(i).getSupplierName());
+				ps.setString(2, supplier.get(i).getAddress());
+				ps.setString(3, supplier.get(i).getContactNumber());
+				ps.setString(4, supplier.get(i).getCreateBy());
+				ps.setDate(5, new java.sql.Date(supplier.get(i).getCreateDate().getTime()));
+				ps.setShort(6, supplier.get(1).getSuppState());
+				ps.setString(7, supplier.get(i).getFixedNumber());
+				ps.setString(8, supplier.get(i).getEmail());
+
+			}
+
+			@Override
+			public int getBatchSize() {
+				return supplier.size();
+			}
+		});
+
 	}
 
 	@Override

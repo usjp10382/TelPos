@@ -69,7 +69,7 @@
 							filteredValue="#{suppController.allActiveSuppFiltered}"
 							globalFilterFunction="#{suppController.globalFilterFunction}"
 							value="#{suppController.allActiveSuppliyers}" paginator="true"
-							rows="50"
+							rows="100"
 							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 							currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
 							rowsPerPageTemplate="25,50,100" paginatorPosition="bottom">
@@ -290,7 +290,7 @@
 						<p:commandButton icon="pi pi-check-square" value="Generate All"
 							id="btngenAll" disabled="#{!suppController.succUpd}"
 							process="@this,importXcel"
-							update=":newSuppFrmUpdate,:supMainTble:supTable,:importXcel:impExcelGrowl"
+							update=":supMainTble:supTable,:importXcel:impExcelGrowl"
 							oncomplete="if(!args.validationFailed){PF('impExcel').hide();}"
 							action="#{suppController.createImportSuppliyers}"
 							style="width:25%" styleClass="red-btn">

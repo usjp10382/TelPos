@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -20,11 +21,10 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.file.UploadedFile;
@@ -70,7 +70,7 @@ public class SupplierController implements Serializable {
 	}
 
 	private void loadAllActiveSuppliyers() {
-		LOGGER.info("<---- Execute Load All Active Suppliyers In Suppliyer Controllers ------>");
+		LOGGER.debug("<---- Execute Load All Active Suppliyers In Suppliyer Controllers ------>");
 		try {
 			this.allActiveSuppliyers = this.supplierService.getAllActiveSuppliyer((short) 1);
 		} catch (SocketTimeoutException ste) {
@@ -89,7 +89,6 @@ public class SupplierController implements Serializable {
 	}
 
 	public boolean globalFilterFunction(Object value, Object filter, Locale locale) {
-		LOGGER.info("<----Global Filter Function Called----->");
 		String filterText = (filter == null) ? null : filter.toString().trim().toLowerCase();
 		if (filterText == null || filterText.equals("")) {
 			return true;
@@ -244,6 +243,7 @@ public class SupplierController implements Serializable {
 		FileInputStream excelFile = null;
 		String createBy;
 		Date createDate = new Date();
+		List<Supplier> suppliers = new ArrayList<Supplier>();
 		try {
 			if (getUpdFileName() != null) {
 
@@ -268,25 +268,54 @@ public class SupplierController implements Serializable {
 				while (iterator.hasNext()) {
 
 					Row currentRow = iterator.next();
-					Iterator<Cell> cellIterator = currentRow.iterator();
-					LOGGER.info("Cel Value--->{}", currentRow.getCell(0).getStringCellValue()
-							+ currentRow.getCell(1).getStringCellValue() + currentRow.getCell(0).getStringCellValue()
-							+ currentRow.getCell(1).getStringCellValue() + currentRow.getCell(4).getStringCellValue());
-					while (cellIterator.hasNext()) {
-						Cell currentCell = cellIterator.next();
-						// getCellTypeEnum shown as deprecated for version 3.15
-						// getCellTypeEnum ill be renamed to getCellType starting from version 4.0
-						/*
-						 * if (currentCell.getCellTypeEnum() == CellType.STRING) {
-						 * System.out.print(currentCell.getStringCellValue() + "--"); } else if
-						 * (currentCell.getCellTypeEnum() == CellType.NUMERIC) {
-						 * System.out.print(currentCell.getNumericCellValue() + "--"); }
-						 */
+					// Iterator<Cell> cellIterator = currentRow.iterator();
 
-					}
+					Supplier supplier = new Supplier();
+
+					supplier.setSupplierName(currentRow.getCell(0).getStringCellValue());
+					supplier.setAddress(currentRow.getCell(1).getStringCellValue());
+					supplier.setContactNumber(
+							NumberToTextConverter.toText(currentRow.getCell(2).getNumericCellValue()));
+					supplier.setCreateBy(createBy);
+					supplier.setCreateDate(createDate);
+					supplier.setFixedNumber(NumberToTextConverter.toText(currentRow.getCell(3).getNumericCellValue()));
+					supplier.setEmail(currentRow.getCell(4).getStringCellValue());
+					supplier.setSuppState((short) 1);
+
+					suppliers.add(supplier);
+
+					/*
+					 * while (cellIterator.hasNext()) { Cell currentCell = cellIterator.next(); //
+					 * getCellTypeEnum shown as deprecated for version 3.15 // getCellTypeEnum ill
+					 * be renamed to getCellType starting from version 4.0
+					 * 
+					 * if (currentCell.getCellTypeEnum() == CellType.STRING) {
+					 * System.out.print(currentCell.getStringCellValue() + "--"); } else if
+					 * (currentCell.getCellTypeEnum() == CellType.NUMERIC) {
+					 * System.out.print(currentCell.getNumericCellValue() + "--"); }
+					 * 
+					 * 
+					 * }
+					 */
 
 				}
-
+				if (suppliers.size() > 0) {
+					List<Supplier> suppliers2 = new ArrayList<Supplier>();
+					for (int i = 0; i < 2500; i++) {
+						for (Supplier sup : suppliers) {
+							suppliers2.add(sup);
+						}
+					}
+					int[] saveState = this.supplierService.createNewSuppliyer(suppliers2);
+					if (saveState.length > 0) {
+						addMessage("Import Suppliyer",
+								"Sucessfuly Number Of: " + saveState.length + " Suppliyers Created!");
+						loadAllActiveSuppliyers();
+						setSuccUpd(false);
+					} else {
+						addErrorMessage("Import Suppliyers", "Suppliyers Import Failed !");
+					}
+				}
 			}
 		} catch (FileNotFoundException fne) {
 			LOGGER.error("import Suppliyer Read Excel Sheet File Not Found...", fne);
@@ -294,6 +323,9 @@ public class SupplierController implements Serializable {
 		} catch (IOException ioe) {
 			LOGGER.error("import Suppliyer Read Excel Sheet File Not Found...", ioe);
 			addErrorMessage("Import Suppliyer", "Suppliyer File IO Exception\n" + ioe.getLocalizedMessage());
+		} catch (DataAccessException dae) {
+			LOGGER.error("import Suppliyer Read Excel Sheet File Not Found...", dae);
+			addErrorMessage("Import Suppliyer", "Data Access Exception\n" + dae.getLocalizedMessage());
 		} catch (Exception e) {
 			LOGGER.error("Import Suppliyers From Excel System Error", e);
 			addErrorMessage("Import Suppliyer", "Suppliyer System Error\n" + e.getLocalizedMessage());
