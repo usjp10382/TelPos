@@ -210,7 +210,8 @@
 													<div class="p-col-2">
 														<p:outputLabel for="@next" value="Discount %" />
 														<br />
-														<h:inputText type="number" id="dis" style="width:100%"
+														<h:inputText type="number" id="dis"
+															style="width:100%; height:60%"
 															value="#{grnController.discount}" maxlength="2" />
 													</div>
 													<p:remoteCommand name="addCrt"
@@ -319,34 +320,52 @@
 
 								<p:tab id="payDet" title="Payment Details">
 									<p:panel header="Payment And Adjust Total Discount">
-										<div class="p-col-3" align="center"
-											style="border: 2px solid #74C0F3; margin-top: 5px">
 
-											<h2>Total Amount</h2>
-											<h3>
-												<p:outputLabel value="#{grnController.grnHdr.totalValue}">
-													<f:convertNumber type="currency" currencySymbol="LKR " />
-												</p:outputLabel>
-											</h3>
-											<p:separator />
-											<h2>Discount</h2>
-											<p:inputText id="disFull"
-												value="#{grnController.grnHdr.grnValDiscount}" />
-											<p:separator />
-											<h2>Paybale Amount</h2>
-											<h3>
-												<p:outputLabel value="#{grnController.grnHdr.paybleAmount}">
-													<f:convertNumber type="currency" currencySymbol="LKR " />
-												</p:outputLabel>
-											</h3>
-											<p:separator />
-											<h2>Cash Amount</h2>
-											<p:inputText id="paidAmountCash" />
-											<h2>Cheque Amount</h2>
-											<p:inputText id="paidAmountCheque" />
-											<p:separator />
-											<h2>Balance</h2>
-											<h3>1000.00</h3>
+										<div class="p-grid" style="margin-top: 10px">
+											<div class="p-col-3" style="border-right: solid blue 1px;">
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Discount (%)" />
+													<br />
+													<p:inputText id="disFull" required="true"
+														value="#{grnController.grnHdr.grnValDiscount}" />
+												</div>
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Cash Amount" />
+													<br />
+													<p:inputText id="paidAmountCash" required="true" />
+												</div>
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Cheque Amount" />
+													<br />
+													<p:inputText id="paidAmountCheque" required="true" />
+												</div>
+
+											</div>
+
+											<div class="p-col-2" style="border-left: solid blue 1px;"></div>
+
+											<div class="p-col-3" align="center">
+
+												<h2>Total Amount</h2>
+												<h3>
+													<p:outputLabel value="#{grnController.grnHdr.totalValue}">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:outputLabel>
+												</h3>
+												<p:separator />
+												<h2>Paybale Amount</h2>
+												<h3>
+													<p:outputLabel value="#{grnController.grnHdr.paybleAmount}">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:outputLabel>
+												</h3>
+												<p:separator />
+												<h2>Balance</h2>
+												<h3>1000.00</h3>
+											</div>
 										</div>
 									</p:panel>
 								</p:tab>
@@ -536,7 +555,7 @@
 						type="button" styleClass="green-button ui-confirmdialog-no"
 						icon="pi pi-times" />
 				</p:confirmDialog>
-
+<!-- This is a test -->
 			</h:form>
 		</ui:define>
 	</ui:composition>
