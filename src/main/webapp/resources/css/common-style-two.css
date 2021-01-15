@@ -16,7 +16,7 @@
 		width: 100%;
 	}
 	.non-print-area {
-		display: none!important;
+		display: none !important;
 	}
 	#template-content {
 		position: relative;
@@ -26,3 +26,15 @@
 		height: 50px !important;
 	}
 }
+
+.read-only-btn {
+	background-color: #FFEBCD !important;
+}
+
+.ui-panelgrid > tr td, .ui-panelgrid > tr{
+   border-style: none !important
+ }
+ 
+ .ui-analog-clock {
+        width: 120px;
+    }
