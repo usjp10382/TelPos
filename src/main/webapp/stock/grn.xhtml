@@ -106,18 +106,10 @@
 													</div>
 
 													<div class="p-col-12">
-														<p:outputLabel for="@next" value="Payment Type" />
+														<p:outputLabel for="@next" value="Create By" />
 														<br />
-														<p:selectOneMenu style="width:77%" id="pType"
-															effect="fold" required="true"
-															requiredMessage="Select Payment Type Is Required"
-															filter="true" editable="true" converter="payConvertor"
-															placeholder="- Select Payment Type -"
-															value="#{grnController.selPayType}">
-															<f:selectItems value="#{grnController.paymentTypes}"
-																var="paytyp" itemValue="#{paytyp}"
-																itemLabel="#{paytyp.desc}" />
-														</p:selectOneMenu>
+														<p:inputText id="cBy" readonly="true" required="false"
+															style="width:76%" />
 													</div>
 
 												</div>
@@ -322,32 +314,9 @@
 									<p:panel header="Payment And Adjust Total Discount">
 
 										<div class="p-grid" style="margin-top: 10px">
-											<div class="p-col-3" style="border-right: solid blue 1px;">
 
-												<div class="p-col-12">
-													<p:outputLabel for="@next" value="Discount (%)" />
-													<br />
-													<p:inputText id="disFull" required="true"
-														value="#{grnController.grnHdr.grnValDiscount}" />
-												</div>
-
-												<div class="p-col-12">
-													<p:outputLabel for="@next" value="Cash Amount" />
-													<br />
-													<p:inputText id="paidAmountCash" required="true" />
-												</div>
-
-												<div class="p-col-12">
-													<p:outputLabel for="@next" value="Cheque Amount" />
-													<br />
-													<p:inputText id="paidAmountCheque" required="true" />
-												</div>
-
-											</div>
-
-											<div class="p-col-2" style="border-left: solid blue 1px;"></div>
-
-											<div class="p-col-3" align="center">
+											<div class="p-col-3" align="center"
+												style="border-right: solid blue 1px;">
 
 												<h2>Total Amount</h2>
 												<h3>
@@ -366,6 +335,46 @@
 												<h2>Balance</h2>
 												<h3>1000.00</h3>
 											</div>
+
+											<div class="p-col-5">
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Discount (%)" />
+													<br />
+													<p:inputText id="disFull" required="true"
+														value="#{grnController.grnHdr.grnValDiscount}"
+														style="width:77%" />
+												</div>
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Payment Type" />
+													<br />
+													<p:selectOneMenu style="width:77%" id="pType" effect="fold"
+														required="true"
+														requiredMessage="Select Payment Type Is Required"
+														filter="true" editable="true" converter="payConvertor"
+														placeholder="- Select Payment Type -"
+														value="#{grnController.selPayType}">
+														<f:selectItems value="#{grnController.paymentTypes}"
+															var="paytyp" itemValue="#{paytyp}"
+															itemLabel="#{paytyp.desc}" />
+													</p:selectOneMenu>
+												</div>
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Cash Amount" />
+													<br />
+													<p:inputText id="paidAmountCash" style="width:77%" />
+												</div>
+
+												<div class="p-col-12">
+													<p:outputLabel for="@next" value="Cheque Amount" />
+													<br />
+													<p:inputText id="paidAmountCheque" style="width:77%" />
+												</div>
+
+											</div>
+
 										</div>
 									</p:panel>
 								</p:tab>
@@ -377,7 +386,7 @@
 										<div class="p-grid">
 
 											<!-- GRN Printing Version - Start -->
-											<div class="p-col-9"
+											<div class="p-col-12"
 												style="border: 2px solid #74C0F3; margin-top: 5px"
 												id="print-area">
 
@@ -555,7 +564,6 @@
 						type="button" styleClass="green-button ui-confirmdialog-no"
 						icon="pi pi-times" />
 				</p:confirmDialog>
-<!-- This is a test -->
 			</h:form>
 		</ui:define>
 	</ui:composition>
