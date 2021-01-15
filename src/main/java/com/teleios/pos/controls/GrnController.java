@@ -1,16 +1,22 @@
 package com.teleios.pos.controls;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.primefaces.event.FlowEvent;
+import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +24,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import com.teleios.pos.model.CheqType;
+import com.teleios.pos.model.GrnDet;
+import com.teleios.pos.model.GrnHdr;
 import com.teleios.pos.model.PaymentType;
 import com.teleios.pos.model.Product;
 import com.teleios.pos.model.Supplier;
+import com.teleios.pos.service.GrnService;
 import com.teleios.pos.service.ProductService;
+import com.teleios.pos.service.ReportService;
 import com.teleios.pos.service.SupplierService;
 
 @Named("grnController")
@@ -35,15 +45,35 @@ public class GrnController implements Serializable {
 	private ProductService productService;
 	@Autowired
 	private SupplierService supplierService;
+	@Autowired
+	private GrnService grnService;
+	@Autowired
+	private ReportService reportService;
 
 	// Utility Object
 	private List<PaymentType> paymentTypes;
 	private List<CheqType> cheqTypes;
+	private Date minExpDate = new Date();
 
 	// Grn Header Related Selected Objects
+	private GrnHdr grnHdr;
+	private Integer nextGrnNumber;
+	private Integer nextBatchNumber;
+	private Date grnDate;
 	private Supplier selSuppliyer;
 	private PaymentType selPayType;
 	private CheqType selChequType;
+
+	// Grn Details Related Selected Object
+	private List<GrnDet> grnDets;
+	private Product selProduct;
+	private BigDecimal qty;
+	private BigDecimal untiPrice;
+	private BigDecimal discount;
+	private BigDecimal mrp;
+	private Date expDate;
+	private int subNumber = 1;
+	private GrnDet remGrnDet;
 
 	// Required Helper List Of Objects
 	private List<Product> allActiveProducts;
@@ -53,23 +83,27 @@ public class GrnController implements Serializable {
 	public void init() {
 		LOGGER.info("<--- Inizilalising Grn Controller ........");
 
+		this.grnHdr = new GrnHdr();
+		this.grnDets = new LinkedList<GrnDet>();
 		this.paymentTypes = new ArrayList<PaymentType>();
 
 		PaymentType chequType = new PaymentType((short) 1, "Cheque", "Teleios", new Date(), (short) 1);
 		paymentTypes.add(chequType);
 
-		PaymentType creditType = new PaymentType((short) 2, "Credit", "Teleios", new Date(), (short) 1);
+		PaymentType creditType = new PaymentType((short) 2, "Credit Purchase", "Teleios", new Date(), (short) 1);
 		paymentTypes.add(creditType);
 
-		PaymentType cashType = new PaymentType((short) 3, "Cash", "Teleios", new Date(), (short) 1);
+		PaymentType cashType = new PaymentType((short) 3, "Cash Purchase", "Teleios", new Date(), (short) 1);
 		paymentTypes.add(cashType);
 
 		PaymentType fullType = new PaymentType((short) 4, "Full", "Teleios", new Date(), (short) 1);
 		paymentTypes.add(fullType);
 
-		PaymentType harlfType = new PaymentType((short) 5, "Half", "Teleios", new Date(), (short) 1);
+		PaymentType harlfType = new PaymentType((short) 5, "Cash & Credit Purchase", "Teleios", new Date(), (short) 1);
 		paymentTypes.add(harlfType);
+		this.grnDate = new Date();
 
+		loadNextBatchAndGrnNumbers();
 		loadAllActiveProducts();
 		loadAllActiveSuppliyers();
 	}
@@ -112,6 +146,212 @@ public class GrnController implements Serializable {
 		}
 	}
 
+	private void loadNextBatchAndGrnNumbers() {
+		LOGGER.debug("<---- Execute Load All Load Next Batch And GRN Numbers Controllers ------>");
+		try {
+			this.nextGrnNumber = this.grnService.getNextGrnNumber();
+			this.nextBatchNumber = this.grnService.getNextBatchNumber();
+		} catch (SocketTimeoutException ste) {
+			LOGGER.error("Load All Active Suppliyers Couldnt Connect to Database--> ", ste);
+			addErrorMessage("Fetch All Suppliyers", "Couldnt Connect to Database\n" + ste.getLocalizedMessage());
+		} catch (EmptyResultDataAccessException ere) {
+			LOGGER.error("Load All Active Suppliyers Empty Suppliyer ", ere);
+			addErrorMessage("Fetch All Suppliyers", "Couldnt Find Any Suppliyers\n" + ere.getLocalizedMessage());
+		} catch (DataAccessException dae) {
+			LOGGER.error("Load All Active Suppliyers Data access Error--> ", dae);
+			addErrorMessage("Fetch All Suppliyers", "Data access Error\n" + dae.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Load All Active Suppliyers System Error--> ", e);
+			addErrorMessage("Fetch All Suppliyers", "System Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public List<Product> completeProductsContains(String query) {
+		String queryLowerCase = query.toLowerCase();
+		return getAllActiveProducts().stream().filter(p -> p.getPrdCode().toLowerCase().contains(queryLowerCase)
+				|| p.getPrdName().toLowerCase().contains(queryLowerCase)).collect(Collectors.toList());
+	}
+
+	public void onItemSelect(SelectEvent<Product> event) {
+		LOGGER.info("On Selected Prd----> {}", event.getObject().getPrdName());
+	}
+
+	public String handleFlow(FlowEvent event) {
+		String currentStepId = event.getOldStep();
+		String nextStepId = event.getNewStep();
+		if (currentStepId.equalsIgnoreCase("tabTwo")) {
+			if (getGrnDets().size() <= 0) {
+				addErrorMessage("Create New GRN", "Add Grn Items Is Required!");
+				return currentStepId;
+			}
+		}
+		if (nextStepId.equalsIgnoreCase("payDet")) {
+			setonfirmDetails();
+		}
+		return event.getNewStep();
+	}
+
+	public void addToCart() {
+		LOGGER.info("<------- Execute Add To Cart Grn Details ----->");
+		BigDecimal unPriceafterAdjustDisc = new BigDecimal(0.0);
+		BigDecimal discValue = new BigDecimal(0.0);
+		boolean isDiscount = false;
+		if (getSelProduct() == null) {
+			addErrorMessage("Create New GRN", "The Item Select Is Required!");
+			return;
+		}
+
+		if (getQty() == null) {
+			addErrorMessage("Create New GRN", "The Quantity Is Required!");
+			return;
+		}
+		if (getQty().compareTo(BigDecimal.ZERO) <= 0) {
+			addErrorMessage("Create New GRN", "The Quantity Cant Zero Or Minus!");
+			return;
+		}
+		if (getUntiPrice() == null) {
+			addErrorMessage("Create New GRN", "The Unit Price Is Required!");
+			return;
+		}
+		if (getUntiPrice().compareTo(BigDecimal.ZERO) == 0 || getUntiPrice().compareTo(BigDecimal.ZERO) == -1) {
+			addErrorMessage("Create New GRN", "The Unit Price Canot be Zero Or Minus!");
+			return;
+		}
+		if (getDiscount() != null) {
+			if (getDiscount().compareTo(BigDecimal.ZERO) == 0 || getDiscount().compareTo(BigDecimal.ZERO) == -1) {
+				addErrorMessage("Create New GRN", "The Discount Canot be Zero Or Minus!");
+				return;
+			}
+		}
+
+		if (getMrp() == null) {
+			addErrorMessage("Create New GRN", "The MRP Is Required!");
+			return;
+		}
+
+		if (getMrp().compareTo(BigDecimal.ZERO) == 0 || getMrp().compareTo(BigDecimal.ZERO) == -1) {
+			addErrorMessage("Create New GRN", "The MRP Canot be Zero Or Minus!");
+			return;
+		}
+
+		try {
+			if (getDiscount() != null) {
+				isDiscount = true;
+				unPriceafterAdjustDisc = getUntiPrice()
+						.subtract(getUntiPrice().multiply(getDiscount().divide(BigDecimal.valueOf(100))));
+				discValue = getUntiPrice().subtract(unPriceafterAdjustDisc);
+
+				if (getUntiPrice().subtract(unPriceafterAdjustDisc).compareTo(getMrp()) == 1) {
+					addErrorMessage("Create New GRN", "The MRP Is Less Thaana Unit Price!");
+					return;
+				}
+
+			} else {
+				if (getUntiPrice().compareTo(getMrp()) == 1) {
+					addErrorMessage("Create New GRN", "The MRP Is Less Thaana Unit Price!");
+					return;
+				} else if (getUntiPrice().compareTo(getMrp()) == 0) {
+					addWarMessage("Create New GRN", "WARNING !The Unit Price And MRP Are Same!");
+				}
+			}
+			GrnHdr grnHdr = new GrnHdr();
+			grnHdr.setGrnNumber(nextGrnNumber);
+			GrnDet grnDet = new GrnDet(new Integer(subNumber), getSelProduct(), getQty(), getUntiPrice(), isDiscount,
+					getDiscount(), getUntiPrice().subtract(discValue), getMrp(),
+					getQty().multiply(getUntiPrice().subtract(discValue)), getExpDate(), (short) 1, grnHdr);
+
+			if (isCartDuplicate(grnDet)) {
+				addErrorMessage("Create New Grn", "Duplicate Item Details");
+				return;
+			}
+
+			if (this.grnDets.add(grnDet)) {
+				addMessage("Create New GRN", "New Grn Item Added Success!");
+				this.subNumber++;
+				clearFiled();
+			}
+
+		} catch (ArithmeticException ae) {
+			LOGGER.error("Calculation Error..", ae);
+			addErrorMessage("Create New Grn", "Error Occured,,Incorrect Detail\n" + ae.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Add New GRN Item Error..", e);
+			addErrorMessage("Create New Grn", "Error Occured,\n" + e.getLocalizedMessage());
+		}
+
+	}
+
+	public void printGrn() {
+		LOGGER.info("Execute Print Grn In Controller ------>");
+		try {
+			this.reportService.printAllItemsReport();
+		} catch (Exception e) {
+			LOGGER.error("Error Occured-->", e);
+		}
+	}
+
+	private boolean isCartDuplicate(final GrnDet grnDet) {
+		LOGGER.info("Execute Is Duplicate Product");
+		boolean isDuplicate = false;
+		Iterator<GrnDet> iterator;
+		if (getGrnDets().size() <= 0) {
+			return isDuplicate;
+		}
+		try {
+			iterator = getGrnDets().iterator();
+			while (iterator.hasNext()) {
+				GrnDet havCheckGrnDet = iterator.next();
+				if (grnDet.getUnitPrice().equals(havCheckGrnDet.getUnitPrice())
+						& grnDet.getProduct().getPrdId().equals(havCheckGrnDet.getProduct().getPrdId())) {
+					isDuplicate = true;
+					break;
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("Check Is Duplicate Product Error", e);
+			addErrorMessage("Create New Grn", "Check Is Duplicate Product Error\n" + e.getLocalizedMessage());
+		}
+		return isDuplicate;
+	}
+
+	private void removeFromCart() {
+		LOGGER.info("Execute Reomve Grn Det From Cart ----->");
+		try {
+			if (getGrnDets().remove(getRemGrnDet())) {
+				addMessage("Create New Grn.. Remove GRN Item From Cart", "Succsesfuly Remove GRN Item");
+			}
+		} catch (Exception e) {
+			LOGGER.error("Remove GRN Item From Cart Error", e);
+			addErrorMessage("Create New Grn", "Remove GRN Item Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	private void setonfirmDetails() {
+		LOGGER.info("<------- Execute Set Confirm Details-------->");
+		try {
+			BigDecimal grnTotal = BigDecimal.ZERO;
+			BigDecimal paybAmount = BigDecimal.ZERO;
+			BigDecimal totDiscount = BigDecimal.ZERO;
+
+			this.grnHdr.setGrnNumber(getNextGrnNumber());
+			this.grnHdr.setBatchNumber(getNextBatchNumber());
+
+			for (GrnDet det : getGrnDets()) {
+				grnTotal = grnTotal.add(det.getUnitPrice().multiply(det.getQty()));
+				paybAmount = paybAmount.add(det.getNetPrice().multiply(det.getQty()));
+			}
+			totDiscount = grnTotal.subtract(paybAmount);
+			grnHdr.setTotalValue(grnTotal);
+			grnHdr.setGrnValDiscount(totDiscount);
+			grnHdr.setPaybleAmount(paybAmount);
+
+		} catch (Exception e) {
+			LOGGER.error("Create New GRN Set Confirm Error..", e);
+			addErrorMessage("Create New GRN", "Set Confirm Page Error\n" + e.getLocalizedMessage());
+		}
+
+	}
+
 	private void addMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, summery, details);
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
@@ -125,6 +365,21 @@ public class GrnController implements Serializable {
 	private void addErrorMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summery, details);
 		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
+	}
+
+	private void clearFiled() {
+		LOGGER.info("Execute Clear Grn Filed -----");
+		try {
+			this.selProduct = null;
+			this.qty = null;
+			this.expDate = null;
+			this.discount = null;
+			this.untiPrice = null;
+			this.mrp = null;
+		} catch (Exception e) {
+			LOGGER.error("Clear Filed Error--", e);
+			addMessage("Create New Grn", "Flied Clear Error Ocuured!\n" + e.getLocalizedMessage());
+		}
 	}
 
 	public List<Product> getAllActiveProducts() {
@@ -163,6 +418,14 @@ public class GrnController implements Serializable {
 		return selSuppliyer;
 	}
 
+	public GrnHdr getGrnHdr() {
+		return grnHdr;
+	}
+
+	public void setGrnHdr(GrnHdr grnHdr) {
+		this.grnHdr = grnHdr;
+	}
+
 	public void setSelSuppliyer(Supplier selSuppliyer) {
 		this.selSuppliyer = selSuppliyer;
 	}
@@ -181,6 +444,135 @@ public class GrnController implements Serializable {
 
 	public void setSelChequType(CheqType selChequType) {
 		this.selChequType = selChequType;
+	}
+
+	public Integer getNextGrnNumber() {
+		return nextGrnNumber;
+	}
+
+	public void setNextGrnNumber(Integer nextGrnNumber) {
+		this.nextGrnNumber = nextGrnNumber;
+	}
+
+	public Integer getNextBatchNumber() {
+		return nextBatchNumber;
+	}
+
+	public void setNextBatchNumber(Integer nextBatchNumber) {
+		this.nextBatchNumber = nextBatchNumber;
+	}
+
+	public Date getGrnDate() {
+		return grnDate;
+	}
+
+	public void setGrnDate(Date grnDate) {
+		this.grnDate = grnDate;
+	}
+
+	// Getters And Setters For Grn Details
+
+	public Product getSelProduct() {
+		return selProduct;
+	}
+
+	public void setSelProduct(Product selProduct) {
+		this.selProduct = selProduct;
+	}
+
+	/**
+	 * @return the qty
+	 */
+	public BigDecimal getQty() {
+		return qty;
+	}
+
+	/**
+	 * @param qty the qty to set
+	 */
+	public void setQty(BigDecimal qty) {
+		this.qty = qty;
+	}
+
+	/**
+	 * @return the untiPrice
+	 */
+	public BigDecimal getUntiPrice() {
+		return untiPrice;
+	}
+
+	/**
+	 * @param untiPrice the untiPrice to set
+	 */
+	public void setUntiPrice(BigDecimal untiPrice) {
+		this.untiPrice = untiPrice;
+	}
+
+	/**
+	 * @return the discount
+	 */
+	public BigDecimal getDiscount() {
+		return discount;
+	}
+
+	/**
+	 * @param discount the discount to set
+	 */
+	public void setDiscount(BigDecimal discount) {
+		this.discount = discount;
+	}
+
+	/**
+	 * @return the mrp
+	 */
+	public BigDecimal getMrp() {
+		return mrp;
+	}
+
+	/**
+	 * @param mrp the mrp to set
+	 */
+	public void setMrp(BigDecimal mrp) {
+		this.mrp = mrp;
+	}
+
+	/**
+	 * @return the expDate
+	 */
+	public Date getExpDate() {
+		return expDate;
+	}
+
+	/**
+	 * @param expDate the expDate to set
+	 */
+	public void setExpDate(Date expDate) {
+		this.expDate = expDate;
+	}
+
+	public Date getMinExpDate() {
+		return minExpDate;
+	}
+
+	public void setMinExpDate(Date minExpDate) {
+		this.minExpDate = minExpDate;
+	}
+
+	public List<GrnDet> getGrnDets() {
+		return grnDets;
+	}
+
+	public void setGrnDets(List<GrnDet> grnDets) {
+		this.grnDets = grnDets;
+	}
+
+	public GrnDet getRemGrnDet() {
+		return remGrnDet;
+	}
+
+	public void setRemGrnDet(GrnDet remGrnDet) {
+		this.remGrnDet = remGrnDet;
+		removeFromCart();
 	}
 
 }

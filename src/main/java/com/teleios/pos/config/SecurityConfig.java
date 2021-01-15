@@ -18,7 +18,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
 		http.authorizeRequests().antMatchers("/javax.faces.resource/**", "/resources/**", "/error/403_err.xhtml/**")
 				.permitAll().antMatchers("/settings/**").hasRole("ADMIN").anyRequest().authenticated().and()
 				.exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and().formLogin()
@@ -27,6 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.clearAuthentication(true).logoutSuccessUrl("/login.xhtml").deleteCookies("JSESSIONID").permitAll();
 
 		http.csrf().disable();
+
 	}
 
 	@Bean

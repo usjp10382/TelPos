@@ -2,7 +2,7 @@ package com.teleios.pos.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 public class GrnDet implements Serializable {
 	private static final long serialVersionUID = -8022084412826718448L;
@@ -10,10 +10,12 @@ public class GrnDet implements Serializable {
 	private Integer grnDetNumber;
 	private Product product;
 	private BigDecimal qty;
-	private Double unitPrice;
+	private BigDecimal unitPrice;
 	private boolean IsDiscount;
-	private Float discount;
-	private Double sellingPrice;
+	private BigDecimal discount;
+	private BigDecimal netPrice;
+	private BigDecimal sellingPrice;
+	private BigDecimal subTotal;
 	private Date expireDate;
 	private short state;
 	private GrnHdr grnHdr;
@@ -22,8 +24,9 @@ public class GrnDet implements Serializable {
 		super();
 	}
 
-	public GrnDet(Integer grnDetNumber, Product product, BigDecimal qty, Double unitPrice, boolean isDiscount,
-			Float discount, Double sellingPrice, Date expireDate, short state, GrnHdr grnHdr) {
+	public GrnDet(Integer grnDetNumber, Product product, BigDecimal qty, BigDecimal unitPrice, boolean isDiscount,
+			BigDecimal discount, BigDecimal netPrice, BigDecimal sellingPrice, BigDecimal subTotal, Date expireDate,
+			short state, GrnHdr grnHdr) {
 		super();
 		this.grnDetNumber = grnDetNumber;
 		this.product = product;
@@ -32,6 +35,8 @@ public class GrnDet implements Serializable {
 		IsDiscount = isDiscount;
 		this.discount = discount;
 		this.sellingPrice = sellingPrice;
+		this.netPrice = netPrice;
+		this.subTotal = subTotal;
 		this.expireDate = expireDate;
 		this.state = state;
 		this.grnHdr = grnHdr;
@@ -61,11 +66,11 @@ public class GrnDet implements Serializable {
 		this.qty = qty;
 	}
 
-	public Double getUnitPrice() {
+	public BigDecimal getUnitPrice() {
 		return unitPrice;
 	}
 
-	public void setUnitPrice(Double unitPrice) {
+	public void setUnitPrice(BigDecimal unitPrice) {
 		this.unitPrice = unitPrice;
 	}
 
@@ -77,20 +82,28 @@ public class GrnDet implements Serializable {
 		IsDiscount = isDiscount;
 	}
 
-	public Float getDiscount() {
+	public BigDecimal getDiscount() {
 		return discount;
 	}
 
-	public void setDiscount(Float discount) {
+	public void setDiscount(BigDecimal discount) {
 		this.discount = discount;
 	}
 
-	public Double getSellingPrice() {
+	public BigDecimal getSellingPrice() {
 		return sellingPrice;
 	}
 
-	public void setSellingPrice(Double sellingPrice) {
+	public void setSellingPrice(BigDecimal sellingPrice) {
 		this.sellingPrice = sellingPrice;
+	}
+
+	public BigDecimal getSubTotal() {
+		return subTotal;
+	}
+
+	public void setSubTotal(BigDecimal subTotal) {
+		this.subTotal = subTotal;
 	}
 
 	public Date getExpireDate() {
@@ -115,6 +128,14 @@ public class GrnDet implements Serializable {
 
 	public void setGrnHdr(GrnHdr grnHdr) {
 		this.grnHdr = grnHdr;
+	}
+
+	public BigDecimal getNetPrice() {
+		return netPrice;
+	}
+
+	public void setNetPrice(BigDecimal netPrice) {
+		this.netPrice = netPrice;
 	}
 
 }

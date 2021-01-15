@@ -3,6 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
@@ -11,18 +12,28 @@
 
 	<ui:composition template="/template/common/commonLayout.xhtml">
 		<ui:define name="content">
-			<h:form id="grnFrm">
+			<!-- <p:ajaxStatus onstart="PF('statusDialog').show()"
+				onsuccess="PF('statusDialog').hide()" />
 
+			<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+				closable="false" resizable="false" showHeader="false">
+				<p:graphicImage value="../resources/img/ajax-loader.gif" />
+			</p:dialog> -->
+			<h:form id="grnFrm" prependId="false"
+				onkeypress="if (event.keyCode == 13) { return false; }">
+				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+					showSummary="false" />
 				<!-- GRN Main - Start -->
 				<div class="p-grid">
 					<div class="p-col-12">
 						<p:fieldset legend="Good Received Note" style="margin-bottom:20px">
 
-							<p:wizard>
+							<p:wizard flowListener="#{grnController.handleFlow}">
 
 								<!-- GRN Details (1st Tab) - Start -->
 								<p:tab id="tabOne" title="GRN Details">
 									<p:panel header="Main Details">
+										<p:focus for="comment" id="commentFocus" />
 										<p:messages />
 
 										<div class="p-grid">
@@ -34,21 +45,29 @@
 													<div class="p-col-12">
 														<p:outputLabel for="@next" value="GRN No" />
 														<br />
-														<p:inputText id="grnNo" required="false" style="width:76%" />
+														<p:inputText id="grnNo" readonly="true" required="false"
+															value="#{grnController.nextGrnNumber}" style="width:76%">
+															<f:convertNumber pattern="0000" />
+														</p:inputText>
 													</div>
 
 													<div class="p-col-12">
 														<p:outputLabel for="@next" value="Badge No" />
 														<br />
-														<p:inputText id="badgeNo" required="false"
-															style="width:76%" />
+														<p:inputText id="badgeNo" readonly="true" required="false"
+															value="#{grnController.nextBatchNumber}"
+															style="width:76%">
+															<f:convertNumber pattern="0000" />
+														</p:inputText>
 													</div>
 
 													<div class="p-col-12">
 														<p:outputLabel for="@next" value="Date" />
 														<br />
 														<p:inputText id="dateId" required="true" readonly="true"
-															style="width:76%" />
+															value="#{grnController.grnDate}" style="width:76%">
+															<f:convertDateTime pattern="yyyy-MMM-dd" />
+														</p:inputText>
 													</div>
 
 												</div>
@@ -61,7 +80,8 @@
 													<div class="p-col-12">
 														<p:outputLabel for="@next" value="Comment" />
 														<br />
-														<p:inputText id="comment" style="width:76%" />
+														<p:inputText id="comment" style="width:76%"
+															value="#{grnController.grnHdr.remark}" />
 													</div>
 
 													<div class="p-col-12">
@@ -111,8 +131,8 @@
 
 								<!-- Item Details (2nd Tab) - Start -->
 								<p:tab id="tabTwo" title="Item Details">
-									<p:panel header="Add Items">
-
+									<p:panel header="Add Items" id="pnlGrnDet">
+										<p:focus for="itemSelect" id="prdFocus" />
 										<!-- Top Icon Button - Start -->
 										<div class="p-grid">
 											<div class="p-col-12" align="right">
@@ -127,7 +147,8 @@
 										</div>
 										<!-- Top Icon Button - End -->
 
-										<p:messages />
+										<p:messages showDetail="true" showSummary="true"
+											skipDetailIfEqualsSummary="true" closable="true" />
 
 										<div class="p-grid">
 
@@ -136,9 +157,19 @@
 												<!-- Item Details Item Select - Start -->
 												<div>
 													<h:panelGrid columns="2">
-														<p:outputLabel for="@next" value="Item *" />
+														<p:outputLabel for="@next" value="Item" />
 														<br />
-														<p:autoComplete id="itemSelect" dropdown="true" size="40" />
+														<p:autoComplete id="itemSelect" dropdown="true" size="40"
+															value="#{grnController.selProduct}" var="prd"
+															forceSelection="true" queryDelay="700"
+															widgetVar="autocomplete" itemLabel="#{prd.prdName}"
+															minQueryLength="2" itemValue="#{prd}"
+															completeMethod="#{grnController.completeProductsContains}"
+															onkeypress="if (event.keyCode == 13) {PF('qtyFil').jq.focus(); return false; }"
+															converter="prdConvertor">
+															<p:ajax event="itemSelect"
+																listener="#{grnController.onItemSelect}" />
+														</p:autoComplete>
 
 														<p:commandButton icon="fa fa-info-circle"
 															title="View Item Details" styleClass="info-btn">
@@ -154,38 +185,56 @@
 													<div class="p-col-2">
 														<p:outputLabel for="@next" value="Quantity" />
 														<br />
-														<p:inputText id="qty" style="width:100%" />
-													</div>
-
-													<div class="p-col-2">
-														<p:outputLabel for="@next" value="Unit Price" />
-														<br />
-														<p:inputText id="uniPrice" style="width:100%" />
-													</div>
-
-													<div class="p-col-2">
-														<p:outputLabel for="@next" value="Selling Price" />
-														<br />
-														<p:inputText id="sellPrice" style="width:100%" />
-													</div>
-
-													<div class="p-col-2">
-														<p:outputLabel for="@next" value="Discount" />
-														<br />
-														<p:inputText id="dis" style="width:100%" />
+														<p:inputText id="qty" value="#{grnController.qty}"
+															onkeypress="if (event.keyCode == 13) {PF('expPick').jq.focus(); return false; }"
+															widgetVar="qtyFil" style="width:100%" type="number" />
 													</div>
 
 													<div class="p-col-2">
 														<p:outputLabel for="@next" value="Expire Date" />
 														<br />
-														<p:datePicker id="expDate" style="width:100%" />
+														<p:datePicker id="expDate" style="width:100%"
+															widgetVar="expPick" value="#{grnController.expDate}"
+															onselect="PF('uniPriFil').jq.focus();"
+															mindate="#{grnController.minExpDate}" />
 													</div>
+
+													<div class="p-col-2">
+														<p:outputLabel for="@next" value="Unit Price" />
+														<br />
+														<p:inputText id="uniPrice" type="number"
+															widgetVar="uniPriFil" value="#{grnController.untiPrice}"
+															style="width:100%" />
+													</div>
+
+													<div class="p-col-2">
+														<p:outputLabel for="@next" value="Discount %" />
+														<br />
+														<h:inputText type="number" id="dis" style="width:100%"
+															value="#{grnController.discount}" maxlength="2" />
+													</div>
+													<p:remoteCommand name="addCrt"
+														action="#{grnController.addToCart}"
+														process="@this pnlGrnDet" update=":grnFrm:pnlGrnDet" />
+
+													<div class="p-col-2">
+														<p:outputLabel for="@next" value="MRP" />
+														<br />
+														<p:inputText id="sellPrice" style="width:100%"
+															type="number" value="#{grnController.mrp}"
+															onkeypress="if (event.keyCode === 13) { addCrt(); return false; }" />
+													</div>
+
+
 
 													<div class="p-col-6"></div>
 
 													<div class="p-col-4" align="right">
-														<p:commandButton value="Add to Table" style="width:105%">
-														</p:commandButton>
+														<p:commandButton value="Add to Table"
+															action="#{grnController.addToCart}"
+															process="@this pnlGrnDet" update=":grnFrm:pnlGrnDet"
+															style="width:105%" />
+
 													</div>
 
 												</div>
@@ -201,47 +250,62 @@
 										<div class="p-grid">
 											<div class="p-col-12">
 
-												<p:dataTable resizableColumns="true" var="itemDetails"
-													value="#{dtBasicView.cars}" id="itemDetailsTable">
+												<p:dataTable resizableColumns="true" var="grnDet"
+													value="#{grnController.grnDets}" id="grnDet">
 													<p:column headerText="Item No">
-														<h:outputText value="#{car.id}" />
+														<h:outputText value="#{grnDet.grnDetNumber}" />
 													</p:column>
 
 													<p:column headerText="Item Code">
-														<h:outputText value="#{car.year}" />
+														<h:outputText value="#{grnDet.product.prdCode}" />
 													</p:column>
 
 													<p:column headerText="Description">
-														<h:outputText value="#{car.brand}" />
+														<h:outputText value="#{grnDet.product.prdName}" />
 													</p:column>
 
 													<p:column headerText="Qty">
-														<h:outputText value="#{car.color}" />
+														<h:outputText value="#{grnDet.qty}" />
 													</p:column>
 
 													<p:column headerText="Expire Date">
-														<h:outputText value="#{car.color}" />
+														<h:outputText
+															value="#{empty grnDet.expireDate?'N/A':grnDet.expireDate}">
+															<f:convertDateTime type="date" pattern="YYYY-MM-dd" />
+														</h:outputText>
 													</p:column>
 
 													<p:column headerText="unit price">
-														<h:outputText value="#{car.color}" />
-													</p:column>
-
-													<p:column headerText="Selling price">
-														<h:outputText value="#{car.color}" />
+														<h:outputText value="#{grnDet.unitPrice}" />
 													</p:column>
 
 													<p:column headerText="discount">
-														<h:outputText value="#{car.color}" />
+														<h:outputText
+															value="#{empty grnDet.discount?'N/A':grnDet.discount}" />
 													</p:column>
 
+													<p:column headerText="Net Price">
+														<h:outputText value="#{grnDet.netPrice}" />
+													</p:column>
+
+													<p:column headerText="Selling price">
+														<h:outputText value="#{grnDet.sellingPrice}" />
+													</p:column>
+
+
 													<p:column headerText="Total">
-														<h:outputText value="#{car.color}" />
+														<h:outputText value="#{grnDet.subTotal}" />
 													</p:column>
 
 													<p:column style="width:32px;text-align: center">
 														<p:commandButton icon="pi pi-trash" title="Delete"
+															process="grnDet" update="growl,grnDet"
 															style="width:20px;height:20px" styleClass="red-button">
+															<f:setPropertyActionListener value="#{grnDet}"
+																target="#{grnController.remGrnDet}" />
+															<p:confirm header="Remove GRN Item"
+																message="Are You Sure GRN Item From Cart?"
+																icon="pi pi-trash" />
 														</p:commandButton>
 													</p:column>
 												</p:dataTable>
@@ -253,33 +317,45 @@
 								</p:tab>
 								<!-- Item Details (2nd Tab) - End -->
 
+								<p:tab id="payDet" title="Payment Details">
+									<p:panel header="Payment And Adjust Total Discount">
+										<div class="p-col-3" align="center"
+											style="border: 2px solid #74C0F3; margin-top: 5px">
+
+											<h2>Total Amount</h2>
+											<h3>
+												<p:outputLabel value="#{grnController.grnHdr.totalValue}">
+													<f:convertNumber type="currency" currencySymbol="LKR " />
+												</p:outputLabel>
+											</h3>
+											<p:separator />
+											<h2>Discount</h2>
+											<p:inputText id="disFull"
+												value="#{grnController.grnHdr.grnValDiscount}" />
+											<p:separator />
+											<h2>Paybale Amount</h2>
+											<h3>
+												<p:outputLabel value="#{grnController.grnHdr.paybleAmount}">
+													<f:convertNumber type="currency" currencySymbol="LKR " />
+												</p:outputLabel>
+											</h3>
+											<p:separator />
+											<h2>Cash Amount</h2>
+											<p:inputText id="paidAmountCash" />
+											<h2>Cheque Amount</h2>
+											<p:inputText id="paidAmountCheque" />
+											<p:separator />
+											<h2>Balance</h2>
+											<h3>1000.00</h3>
+										</div>
+									</p:panel>
+								</p:tab>
+
 								<!-- Payment Details (3rd Tab) - Start -->
 								<p:tab id="confirm" title="Confirmation">
-									<p:panel header="Biling Details and Confirmation">
+									<p:panel header="Biling Details and Confirmation"
+										id="pnlConfirm">
 										<div class="p-grid">
-
-											<!-- Payment Details - Start -->
-											<div class="p-col-3" align="center"
-												style="border: 2px solid #74C0F3; margin-top: 5px">
-
-												<h2>Total Amount</h2>
-												<h3>1000.00</h3>
-												<p:separator />
-												<h2>Discount</h2>
-												<p:inputText id="disFull" />
-												<p:separator />
-												<h2>Paybale Amount</h2>
-												<h3>1000.00</h3>
-												<p:separator />
-												<h2>Cash Amount</h2>
-												<p:inputText id="paidAmountCash" />
-												<h2>Cheque Amount</h2>
-												<p:inputText id="paidAmountCheque" />
-												<p:separator />
-												<h2>Balance</h2>
-												<h3>1000.00</h3>
-											</div>
-											<!-- Payment Details - End -->
 
 											<!-- GRN Printing Version - Start -->
 											<div class="p-col-9"
@@ -309,11 +385,26 @@
 																<h4>:</h4>
 															</div>
 															<div class="p-col-7">
-																<h4>0012</h4>
-																<h4>111</h4>
+																<h4>
+																	<p:outputLabel value="#{grnController.nextGrnNumber}">
+																		<f:convertNumber pattern="0000" />
+																	</p:outputLabel>
+																</h4>
+																<h4>
+																	<p:outputLabel value="#{grnController.nextBatchNumber}">
+																		<f:convertNumber pattern="0000" />
+																	</p:outputLabel>
+																</h4>
 																<br />
-																<h4>2021.01.10</h4>
-																<h4>Dilan Tharaka</h4>
+																<h4>
+																	<p:outputLabel value="#{grnController.grnDate}">
+																		<f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+																	</p:outputLabel>
+																</h4>
+																<h4>
+																	<p:outputLabel
+																		value="#{grnController.selSuppliyer.supplierName}" />
+																</h4>
 															</div>
 															<!-- Grn Header Details - Printing - End -->
 														</div>
@@ -401,10 +492,12 @@
 											<div class="p-grid">
 												<div class="p-col-12">
 													<h4>
-														Payment Type : <span> Cash </span>
+														Payment Type : <span>
+															#{grnController.selPayType.desc} </span>
 													</h4>
 													<p>
-														<span style="color: red">*</span>This is a comment sampal
+														<span style="color: red">*</span>#{empty
+														grnController.grnHdr.remark?'N/A':grnController.grnHdr.remark}
 													</p>
 												</div>
 											</div>
@@ -415,7 +508,9 @@
 											<p:commandButton style="width:15%" value="Create GRN"
 												id="createGrn" styleClass="green-button" icon="fa fa-check" />
 											<p:commandButton style="width:15%" value="Print This"
-												id="printThis" styleClass="orange-btn" icon="fa fa-print" />
+												action="#{grnController.printGrn}" id="printThis"
+												ajax="false" onclick="this.form.target='_blank'"
+												styleClass="orange-btn" icon="fa fa-print" />
 											<p:commandButton style="width:15%" value="Send This"
 												id="sendThis" icon="fa fa-envelope" />
 										</div>
@@ -425,71 +520,20 @@
 
 							</p:wizard>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 						</p:fieldset>
 					</div>
 				</div>
 				<!-- GRN Main - End -->
+
+				<p:confirmDialog global="true" showEffect="expLode"
+					hideEffect="fade">
+					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
+						type="button" styleClass="red-button ui-confirmdialog-yes"
+						icon="pi pi-check" />
+					<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
+						type="button" styleClass="green-button ui-confirmdialog-no"
+						icon="pi pi-times" />
+				</p:confirmDialog>
 
 			</h:form>
 		</ui:define>

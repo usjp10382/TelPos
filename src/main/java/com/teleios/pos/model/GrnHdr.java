@@ -25,6 +25,7 @@ public class GrnHdr implements Serializable {
 	private BigDecimal balance;
 	private Integer itemCount;
 	private String createBy;
+	private Date createDate;
 	private short grnState;
 
 	private List<GrnDet> grnDets = new ArrayList<GrnDet>();
@@ -36,7 +37,7 @@ public class GrnHdr implements Serializable {
 	public GrnHdr(Integer grnNumber, String remark, Integer batchNumber, Supplier supplier, Date grnDate,
 			CheqDetails cheqDetails, PaymentType paymentType, boolean isTotValDiscount, BigDecimal grnValDiscount,
 			Float discPrecentage, BigDecimal totalValue, BigDecimal paybleAmount, BigDecimal paidAmount,
-			BigDecimal balance, Integer itemCount, String createBy, short grnState) {
+			BigDecimal balance, Integer itemCount, Date createDate, String createBy, short grnState) {
 		super();
 		this.grnNumber = grnNumber;
 		this.remark = remark;
@@ -53,6 +54,7 @@ public class GrnHdr implements Serializable {
 		this.paidAmount = paidAmount;
 		this.balance = balance;
 		this.itemCount = itemCount;
+		this.createDate = createDate;
 		this.createBy = createBy;
 		this.grnState = grnState;
 	}
@@ -175,6 +177,14 @@ public class GrnHdr implements Serializable {
 
 	public void setItemCount(Integer itemCount) {
 		this.itemCount = itemCount;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public String getCreateBy() {
