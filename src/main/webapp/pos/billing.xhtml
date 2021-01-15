@@ -1,46 +1,146 @@
-<ui:composition template="/template/common/commonLayout.xhtml"
-	xmlns="http://www.w3.org/1999/xhtml"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pe="http://primefaces.org/ui/extensions"
 	xmlns:p="http://primefaces.org/ui">
-	<ui:define name="head"></ui:define>
-	<ui:define name="content">
 
+<h:body>
 
-		<p:ajaxStatus onstart="PF('statusDialog').show()"
-			onsuccess="PF('statusDialog').hide()" />
+	<ui:composition template="/template/common/commonLayout.xhtml">
+		<ui:define name="content">
 
-		<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
-			closable="false" resizable="false" showHeader="false">
-			<p:graphicImage value="../resources/img/ajax-loader.gif" />
-		</p:dialog>
+			<!-- Invoice - Start -->
+			<p:fieldset legend="Invoice">
 
-		<h:form>
-			<p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true" />
+				<!-- Body - Start -->
+				<div class="p-grid">
+					<div class="p-col-12">
 
-			<p:fieldset legend="Create New Invoice" style="margin-bottom:20px">
+						<!-- Header Details - Start -->
+						<div class="p-grid">
+							<div class="p-col-12">
 
-				<p:fieldset legend="Select Customer" toggleable="true"
-					toggleSpeed="500">
+								<div>
+									<h4>
+										Invoice ID : <span>001</span>
+									</h4>
+								</div>
 
-					<h:panelGrid columns="2" cellpadding="5">
-						<p:outputLabel value="Pojo:" for="themePojo" />
-						<p:autoComplete id="themePojo" value="#{autoCompleteView.theme1}"
-							completeMethod="#{autoCompleteView.completeTheme}" var="theme"
-							itemLabel="#{theme.displayName}" itemValue="#{theme}"
-							forceSelection="true" />
-					</h:panelGrid>
-				</p:fieldset>
+								<div>
+									<p:outputLabel value="Customer Name" for="@next" />
+									<br />
+									<p:autoComplete id="cusName" dropdown="true" />
 
+									<p:commandButton icon="fa fa-info-circle"
+										title="View Customer Details" styleClass="info-btn">
+									</p:commandButton>
+								</div>
 
+								<p:separator />
+
+							</div>
+						</div>
+						<!-- Header Details - End -->
+
+						<!-- Item Details - Start -->
+						<div class="p-grid">
+
+							<div class="p-col-4">
+								<p:outputLabel value="Item" for="@next" />
+								<br />
+								<p:autoComplete id="itemDetails" dropdown="true"
+									style="width: 80%" inputStyle="width: 90%" />
+
+								<p:commandButton icon="fa fa-info-circle"
+									title="View Itemf Details" styleClass="info-btn">
+								</p:commandButton>
+							</div>
+
+							<div class="p-col-2">
+								<p:outputLabel value="Quantity" for="@next" />
+								<br />
+								<p:inputText id="qty" style="width:100%" />
+							</div>
+							
+							<div class="p-col-2">
+								<p:outputLabel value="Quantity" for="@next" />
+								<br />
+								<p:inputText id="qty" style="width:100%" />
+							</div>
+
+							<div class="p-col-2">
+								<p:outputLabel value="Unit Price" for="@next" />
+								<br />
+								<p:inputText id="uPrice" style="width:100%" />
+							</div>
+
+							<div class="p-col-2">
+								<p:outputLabel value="Discount" for="@next" />
+								<br />
+								<p:inputText id="discount" style="width:100%" />
+							</div>
+
+						</div>
+						<!-- Item Details - End -->
+
+						<!-- Item Table - Start -->
+						<p:dataTable resizableColumns="true" var="invoTable"
+							id="invoItemTable">
+							<p:column headerText="Item No">
+								<h:outputText value="#{grnDet.grnDetNumber}" />
+							</p:column>
+
+							<p:column headerText="Item Code">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column headerText="Item Name">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column headerText="Brand">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column headerText="Qty">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column headerText="Unit Price">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column headerText="Discount">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column headerText="Total">
+								<h:outputText value="#{grnDet.product.prdCode}" />
+							</p:column>
+
+							<p:column style="width:32px;text-align: center">
+								<p:commandButton icon="pi pi-trash" title="Delete"
+									style="width:20px;height:20px" styleClass="red-button">
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+						<!-- Item Table - End -->
+
+					</div>
+				</div>
+				<!-- Body - End -->
 
 			</p:fieldset>
+			<!-- Invoice - End -->
 
+		</ui:define>
+	</ui:composition>
 
-		</h:form>
+</h:body>
+</html>
 
-
-	</ui:define>
-</ui:composition>
 
