@@ -13,127 +13,214 @@
 	<ui:composition template="/template/common/commonLayout.xhtml">
 		<ui:define name="content">
 
+			<!-- Top Icon Button - Start -->
+			<div class="p-grid">
+				<div class="p-col-12" align="right">
+
+					<div style="display: inline;">
+						<p:commandButton icon="fa fa-calculator" style="margin-right:5px;"
+							type="button" id="cal" />
+					</div>
+
+				</div>
+			</div>
+			<!-- Top Icon Button - End -->
+
 			<!-- Invoice - Start -->
 			<p:fieldset legend="Invoice">
+				<h:form id="invoceForm">
 
-				<!-- Body - Start -->
-				<div class="p-grid">
-					<div class="p-col-12">
+					<!-- Body - Start -->
+					<div class="p-grid">
+						<div class="p-col-12">
 
-						<!-- Header Details - Start -->
-						<div class="p-grid">
-							<div class="p-col-12">
+							<!-- Header Details - Start -->
+							<div class="p-grid">
+								<div class="p-col-6">
 
-								<div>
-									<h4>
-										Invoice ID : <span>001</span>
-									</h4>
+									<div>
+										<h4>
+											Invoice ID : <span>001</span>
+										</h4>
+									</div>
+
+									<div>
+										<p:outputLabel value="Customer Name" for="@next" />
+										<br />
+										<p:autoComplete id="cusName" dropdown="true" />
+
+										<p:commandButton icon="fa fa-info-circle"
+											title="View Customer Details" styleClass="info-btn">
+										</p:commandButton>
+									</div>
+
 								</div>
 
-								<div>
-									<p:outputLabel value="Customer Name" for="@next" />
+								<div class="p-col-6" align="right">
+									<p:clock displayMode="analog" />
+								</div>
+								<div class="p-col-12">
+									<p:separator />
+								</div>
+							</div>
+							<!-- Header Details - End -->
+
+							<!-- Item Details - Start -->
+							<div class="p-grid">
+								<div class="p-col-5">
+									<p:outputLabel value="Item" for="@next" />
 									<br />
-									<p:autoComplete id="cusName" dropdown="true" />
+									<p:autoComplete id="itemDetails" dropdown="true"
+										style="width: 80%" inputStyle="width: 90%" />
 
 									<p:commandButton icon="fa fa-info-circle"
-										title="View Customer Details" styleClass="info-btn">
+										title="View Itemf Details" styleClass="info-btn">
 									</p:commandButton>
 								</div>
 
-								<p:separator />
+								<div class="p-col-2">
+									<p:outputLabel value="Quantity" for="@next" />
+									<br />
+									<p:inputText id="qty" style="width:100%" />
+								</div>
 
+								<div class="p-col-1">
+									<p:outputLabel value="UOM" for="@next" />
+									<br />
+									<p:inputText id="uom" style="width:100%" readonly="true" />
+								</div>
+
+								<div class="p-col-2">
+									<p:outputLabel value="Unit Price" for="@next" />
+									<br />
+									<p:inputText id="uPrice" style="width:100%" />
+								</div>
+
+								<div class="p-col-2">
+									<p:outputLabel value="Discount" for="@next" />
+									<br />
+									<p:inputText id="discount" style="width:100%" />
+								</div>
+
+								<div class="p-col-12">
+									<p:separator />
+								</div>
 							</div>
+							<!-- Item Details - End -->
+
+							<!-- Item Table - Start -->
+							<div class="p-grid">
+								<div class="p-col-8">
+									<p:dataTable resizableColumns="true" var="invoTable"
+										id="invoItemTable">
+										<p:column headerText="Item No">
+											<h:outputText value="#{grnDet.grnDetNumber}" />
+										</p:column>
+
+										<p:column headerText="Item Code">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column headerText="Item Name">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column headerText="Brand">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column headerText="Qty">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column headerText="Unit Price">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column headerText="Discount">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column headerText="Total">
+											<h:outputText value="#{grnDet.product.prdCode}" />
+										</p:column>
+
+										<p:column style="width:32px;text-align: center">
+											<p:commandButton icon="pi pi-trash" title="Delete"
+												style="width:20px;height:20px" styleClass="red-button">
+											</p:commandButton>
+										</p:column>
+									</p:dataTable>
+								</div>
+								<!-- Item Table - End -->
+
+								<!-- Item Payment Details - Start -->
+								<div class="p-col-4" align="center"
+									style="display: block; border: solid 1px #1387C4; margin-top: 10px">
+									<table>
+										<tr>
+											<td><h4>Total Amount</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="totAmount"
+													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Discount (%)</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="dis" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Payble Amount</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="paybleAmount"
+													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Cash Payment</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="cPay" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Cheque Payment</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="cheqPay" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Total Paid Amount</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="paidAmount"
+													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+
+
+										<tr>
+											<td><h4>Balance Amount</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="balanceAmount"
+													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+									</table>
+
+									<p:commandButton value="Create Invoice"
+										icon="pi pi-check-circle"
+										style="margin-right:20px;margin-top:10px;width:100%"
+										widgetVar="btnSave">
+									</p:commandButton>
+
+								</div>
+								<!-- Item Payment Details - End -->
+							</div>
+
 						</div>
-						<!-- Header Details - End -->
-
-						<!-- Item Details - Start -->
-						<div class="p-grid">
-
-							<div class="p-col-4">
-								<p:outputLabel value="Item" for="@next" />
-								<br />
-								<p:autoComplete id="itemDetails" dropdown="true"
-									style="width: 80%" inputStyle="width: 90%" />
-
-								<p:commandButton icon="fa fa-info-circle"
-									title="View Itemf Details" styleClass="info-btn">
-								</p:commandButton>
-							</div>
-
-							<div class="p-col-2">
-								<p:outputLabel value="Quantity" for="@next" />
-								<br />
-								<p:inputText id="qty" style="width:100%" />
-							</div>
-							
-							<div class="p-col-2">
-								<p:outputLabel value="Quantity" for="@next" />
-								<br />
-								<p:inputText id="qty" style="width:100%" />
-							</div>
-
-							<div class="p-col-2">
-								<p:outputLabel value="Unit Price" for="@next" />
-								<br />
-								<p:inputText id="uPrice" style="width:100%" />
-							</div>
-
-							<div class="p-col-2">
-								<p:outputLabel value="Discount" for="@next" />
-								<br />
-								<p:inputText id="discount" style="width:100%" />
-							</div>
-
-						</div>
-						<!-- Item Details - End -->
-
-						<!-- Item Table - Start -->
-						<p:dataTable resizableColumns="true" var="invoTable"
-							id="invoItemTable">
-							<p:column headerText="Item No">
-								<h:outputText value="#{grnDet.grnDetNumber}" />
-							</p:column>
-
-							<p:column headerText="Item Code">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column headerText="Item Name">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column headerText="Brand">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column headerText="Qty">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column headerText="Unit Price">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column headerText="Discount">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column headerText="Total">
-								<h:outputText value="#{grnDet.product.prdCode}" />
-							</p:column>
-
-							<p:column style="width:32px;text-align: center">
-								<p:commandButton icon="pi pi-trash" title="Delete"
-									style="width:20px;height:20px" styleClass="red-button">
-								</p:commandButton>
-							</p:column>
-						</p:dataTable>
-						<!-- Item Table - End -->
-
 					</div>
-				</div>
-				<!-- Body - End -->
+					<!-- Body - End -->
 
+				</h:form>
 			</p:fieldset>
 			<!-- Invoice - End -->
 
