@@ -314,7 +314,8 @@
 
 								<p:tab id="payDet" title="Payment Details">
 									<p:panel header="Payment And Adjust Total Discount">
-										<p:messages closable="true" />
+										<p:messages showDetail="true" showSummary="true"
+											skipDetailIfEqualsSummary="true" closable="true" />
 										<div class="p-grid" style="margin-top: 10px">
 
 											<div class="p-col-3" align="center"
@@ -337,7 +338,8 @@
 												<p:separator />
 												<h2>Balance</h2>
 												<h3>
-													<p:outputLabel value="#{grnController.grnHdr.paybleAmount}">
+													<p:outputLabel value="#{grnController.grnHdr.balance}"
+														id="grnBal">
 														<f:convertNumber type="currency" currencySymbol="LKR " />
 													</p:outputLabel>
 												</h3>
@@ -348,10 +350,11 @@
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Discount (%)" />
 													<br />
-													<p:inputText id="disFull" required="true" type="number"
+													<p:inputText id="disFull" type="number"
 														value="#{grnController.grnHdr.grnValDiscount}"
 														style="width:77%">
-														<p:ajax event="keyup" update="payAmount" listener="#{grnController.handleDiscountKeyEvent}" />
+														<p:ajax event="keyup" update="payAmount,grnBal"
+															listener="#{grnController.handleDiscountKeyEvent}" />
 													</p:inputText>
 												</div>
 

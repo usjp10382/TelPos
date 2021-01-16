@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -366,12 +367,32 @@ public class GrnController implements Serializable {
 
 	}
 
-	public void handleDiscountKeyEvent() {
+	public void handleDiscountKeyEvent(AjaxBehaviorEvent evt) {
+		BigDecimal discounValue = BigDecimal.ZERO;
+		BigDecimal initTotal = new BigDecimal(getGrnHdr().getTotalValue().doubleValue());
+		BigDecimal initPayblVal = new BigDecimal(getGrnHdr().getPaybleAmount().doubleValue());
+		BigDecimal initBalance = new BigDecimal(getGrnHdr().getBalance().doubleValue());
 		try {
-			this.grnHdr.setPaybleAmount(grnHdr.getTotalValue()
-					.subtract(grnHdr.getPaybleAmount().multiply(grnHdr.getGrnValDiscount().divide(BigDecimal.valueOf(100.00)))));
-		} catch (NumberFormatException e) {
-			// TODO: handle exception
+			if (getGrnHdr().getGrnValDiscount() != null) {
+				LOGGER.info("Grn Discount Precentage :{}", getGrnHdr().getGrnValDiscount());
+				discounValue = initTotal.multiply(getGrnHdr().getGrnValDiscount().divide(BigDecimal.valueOf(100.00)));
+				LOGGER.info("Grn Discount Value:{}", discounValue);
+				getGrnHdr().setPaybleAmount(getGrnHdr().getPaybleAmount().subtract(discounValue));
+				getGrnHdr().setBalance(getGrnHdr().getBalance().subtract(discounValue));
+			} else {
+				LOGGER.info("Cut Zero Discount: {}", discounValue);
+				getGrnHdr().getPaybleAmount().add(initPayblVal);
+				getGrnHdr().getBalance().add(initBalance);
+			}
+		} catch (NumberFormatException nfe) {
+			LOGGER.error("Enter Discount Invalied Input", nfe);
+			addMessage("Enter Discount", "Invalied Input\n" + nfe.getLocalizedMessage());
+		} catch (ArithmeticException ame) {
+			LOGGER.error("Enter Discount Arithmetic Exception", ame);
+			addMessage("Enter Discount", "Arithmetic Exception\n" + ame.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("System Error Occured", e);
+			addMessage("Enter Discount", "System Error Occured\n" + e.getLocalizedMessage());
 		}
 	}
 
