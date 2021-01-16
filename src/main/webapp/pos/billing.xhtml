@@ -18,8 +18,26 @@
 				<div class="p-col-12" align="right">
 
 					<div style="display: inline;">
+						<p:commandButton icon="fa fa-user-plus" style="margin-right:5px;"
+							type="button" id="cusAdd" title="Add Customer"
+							onclick="PF('cusAdd').show();" />
+					</div>
+
+					<div style="display: inline;">
+						<p:commandButton icon="fa fa-male" style="margin-right:5px;"
+							type="button" id="lab" title="Labour Charges"
+							onclick="PF('labCost').show();" />
+					</div>
+
+					<div style="display: inline;">
+						<p:commandButton icon="fa fa-truck" style="margin-right:5px;"
+							type="button" id="transport" title="Transport Charges"
+							onclick="PF('transCost').show();" />
+					</div>
+
+					<div style="display: inline;">
 						<p:commandButton icon="fa fa-calculator" style="margin-right:5px;"
-							type="button" id="cal" />
+							type="button" id="cal" title="UOM Calculator" />
 					</div>
 
 				</div>
@@ -49,8 +67,9 @@
 										<br />
 										<p:autoComplete id="cusName" dropdown="true" />
 
-										<p:commandButton icon="fa fa-info-circle"
-											title="View Customer Details" styleClass="info-btn">
+										<p:commandButton type="button" icon="fa fa-info-circle"
+											title="View Customer Details" styleClass="info-btn"
+											onclick="PF('cusDetails').show();">
 										</p:commandButton>
 									</div>
 
@@ -73,8 +92,9 @@
 									<p:autoComplete id="itemDetails" dropdown="true"
 										style="width: 80%" inputStyle="width: 90%" />
 
-									<p:commandButton icon="fa fa-info-circle"
-										title="View Itemf Details" styleClass="info-btn">
+									<p:commandButton type="button" icon="fa fa-info-circle"
+										title="View Itemf Details" styleClass="info-btn"
+										onclick="PF('itemDet').show();">
 									</p:commandButton>
 								</div>
 
@@ -172,10 +192,33 @@
 										</tr>
 
 										<tr>
+											<td><h4>Labour Charges</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="laborCharges"
+													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Transport Charges</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:inputText id="transportCharges"
+													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+
+										<tr>
 											<td><h4>Payble Amount</h4></td>
 											<td><h4>:</h4></td>
 											<td><p:inputText id="paybleAmount"
 													styleClass="read-only-btn" readonly="true" /></td>
+										</tr>
+
+										<tr>
+											<td><h4>Payment Type</h4></td>
+											<td><h4>:</h4></td>
+											<td><p:selectOneMenu id="pType"
+													value="#{selectOneMenuView.rtl}" style="width:100%">
+													<f:selectItem itemLabel="Select One" itemValue="" />
+												</p:selectOneMenu></td>
 										</tr>
 
 										<tr>
@@ -223,6 +266,151 @@
 				</h:form>
 			</p:fieldset>
 			<!-- Invoice - End -->
+
+			<!-- Add Labour Cost - Start -->
+			<p:dialog header="Add Labour Cost" widgetVar="labCost"
+				showEffect="clip" hideEffect="clip" height="100%" width="25%">
+				<h:form id="labCostForm">
+
+					<div class="p-col-12" align="center">
+						<p:outputLabel value="Add the Cost" for="@next" />
+						<br />
+						<p:inputText id="labCost" style="width:100%" />
+					</div>
+
+				</h:form>
+			</p:dialog>
+			<!-- Add Labour Cost - End -->
+
+			<!-- Add Transport Cost - Start -->
+			<p:dialog header="Add Transport Cost" widgetVar="transCost"
+				showEffect="clip" hideEffect="clip" height="100%" width="25%">
+				<h:form id="transCostForm">
+
+					<div class="p-col-12" align="center">
+						<p:outputLabel value="Add the Cost" for="@next" />
+						<br />
+						<p:inputText id="transCost" style="width:100%" />
+					</div>
+
+				</h:form>
+			</p:dialog>
+			<!-- Add Transport Cost - End -->
+
+			<!-- Customer More Details - Start -->
+			<p:dialog header="Customer Details" widgetVar="cusDetails"
+				showEffect="clip" hideEffect="clip" height="100%" width="50%">
+				<h:form id="cusDetails">
+
+					<div class="p-col-12">
+						<p:outputLabel value="Customer Name" for="@next" />
+						<br />
+						<p:inputText id="cusName" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Customer Address" for="@next" />
+						<br />
+						<p:inputText id="cusaddress" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Mobile Number" for="@next" />
+						<br />
+						<p:inputText id="mobileNo" style="width:100%" readonly="true" />
+					</div>
+
+				</h:form>
+			</p:dialog>
+			<!-- Customer More Details - End -->
+
+			<!-- Customer Add - Start -->
+			<p:dialog header="New Customer" widgetVar="cusAdd" showEffect="clip"
+				hideEffect="clip" height="100%" width="40%">
+				<h:form id="cusNewAdd">
+
+					<div class="p-col-12">
+						<p:outputLabel value="First Name" for="@next" />
+						<br />
+						<p:inputText id="cusFirstAddName" style="width:100%" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Last Name" for="@next" />
+						<br />
+						<p:inputText id="cusLastAddName" style="width:100%" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Customer Address" for="@next" />
+						<br />
+						<p:inputText id="cusAddaddress" style="width:100%" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Mobile Number" for="@next" />
+						<br />
+						<p:inputText id="cusAddMobileNo" style="width:100%" />
+					</div>
+
+					<div class="p-col-12" align="right">
+						<p:commandButton value="Add Customer" icon="pi pi-check" />
+					</div>
+
+				</h:form>
+			</p:dialog>
+			<!-- Customer Add - End -->
+
+			<!-- Item Details - Start -->
+			<p:dialog header="Item Details" widgetVar="itemDet" showEffect="clip"
+				hideEffect="clip" height="100%" width="40%">
+				<h:form id="itemDetForm">
+
+					<div class="p-col-12">
+						<p:outputLabel value="Item Code" for="@next" />
+						<br />
+						<p:inputText id="itemCode" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Product Name" for="@next" />
+						<br />
+						<p:inputText id="pName" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Brand" for="@next" />
+						<br />
+						<p:inputText id="brand" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Caegory" for="@next" />
+						<br />
+						<p:inputText id="category" style="width:100%" readonly="true" />
+					</div>
+
+
+					<div class="p-col-12">
+						<p:outputLabel value="UOM" for="@next" />
+						<br />
+						<p:inputText id="uom" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Expire Date" for="@next" />
+						<br />
+						<p:inputText id="expDate" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Rack No" for="@next" />
+						<br />
+						<p:inputText id="rackNo" style="width:100%" readonly="true" />
+					</div>
+				</h:form>
+			</p:dialog>
+			<!-- Item Details - End -->
 
 		</ui:define>
 	</ui:composition>

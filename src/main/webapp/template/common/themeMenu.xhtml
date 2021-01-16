@@ -13,7 +13,7 @@
 
 				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.pos']}">
 
-					<p:menuitem value="Billing" icon="pi pi-shopping-cart"
+					<p:menuitem value="#{msg['tel.pos.mn.it.invoice']}" icon="fa fa-newspaper-o"
 						outcome="BillingView" ajax="false">
 						<f:param value="billing" name="test" />
 					</p:menuitem>
@@ -25,29 +25,29 @@
 
 				<p:submenu label="#{msg['tel.pos.mn.it.sp']}">
 
-					<p:menuitem value="#{msg['tel.pos.mn.mu.lbl.addproducts']}"
+					<p:menuitem value="#{msg['tel.pos.mn.it.addproducts']}"
 						icon="fa fa-cart-plus" outcome="StockView" ajax="false">
 						<f:param value="create" name="createPrd" />
 					</p:menuitem>
 
-					<p:menuitem value="View Products" icon="pi pi-search"
+					<p:menuitem value="#{msg['tel.pos.mn.it.viw-product']}" icon="pi pi-search"
 						outcome="productSearch" ajax="false" />
 
-					<p:menuitem value="GRN" icon="fa fa-file-text"
+					<p:menuitem value="#{msg['tel.pos.mn.it.grn']}" icon="fa fa-file-text"
 						outcome="grnView" ajax="false" />
 
 				</p:submenu>
 
-				<p:submenu label="Supplier Management">
+				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.supManagement']}">
 
-					<p:menuitem value="Create New Supplier" icon="fa fa-truck"
+					<p:menuitem value="#{msg['tel.pos.mn.it.newSup']}" icon="fa fa-truck"
 						outcome="newSupp" ajax="false" />
 
 				</p:submenu>
 
-				<p:submenu label="User Management">
+				<p:submenu label="#{msg['tel.pos.mn.mu.lbl.userManagement']}">
 
-					<p:menuitem value="Create New User" icon="fa fa-cart-plus"
+					<p:menuitem value="#{msg['tel.pos.mn.it.newUser']}" icon="fa fa-cart-plus"
 						outcome="NewUser" ajax="false">
 						<f:param value="create" name="createUser" />
 					</p:menuitem>
