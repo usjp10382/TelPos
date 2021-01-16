@@ -55,6 +55,7 @@ public class ReportService implements Serializable {
 				throw new AccessDeniedException("Un Authorized Access !");
 			}
 			para.put("BARCODE", "12345678984");
+			para.put("IMG_PATH", this.getClass().getResourceAsStream("/reports/teleios img.jpg"));
 
 			context = FacesContext.getCurrentInstance();
 			response = (HttpServletResponse) context.getExternalContext().getResponse();
