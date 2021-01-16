@@ -65,7 +65,8 @@
 														<p:outputLabel for="@next" value="Date" />
 														<br />
 														<p:inputText id="dateId" required="true" readonly="true"
-															value="#{grnController.grnDate}" style="width:76%">
+															value="#{grnController.grnHdr.createDate}"
+															style="width:76%">
 															<f:convertDateTime pattern="yyyy-MMM-dd" />
 														</p:inputText>
 													</div>
@@ -109,6 +110,7 @@
 														<p:outputLabel for="@next" value="Create By" />
 														<br />
 														<p:inputText id="cBy" readonly="true" required="false"
+															value="#{grnController.grnHdr.createBy}"
 															style="width:76%" />
 													</div>
 
@@ -312,7 +314,7 @@
 
 								<p:tab id="payDet" title="Payment Details">
 									<p:panel header="Payment And Adjust Total Discount">
-
+										<p:messages closable="true" />
 										<div class="p-grid" style="margin-top: 10px">
 
 											<div class="p-col-3" align="center"
@@ -327,13 +329,18 @@
 												<p:separator />
 												<h2>Paybale Amount</h2>
 												<h3>
-													<p:outputLabel value="#{grnController.grnHdr.paybleAmount}">
+													<p:outputLabel id="payAmount"
+														value="#{grnController.grnHdr.paybleAmount}">
 														<f:convertNumber type="currency" currencySymbol="LKR " />
 													</p:outputLabel>
 												</h3>
 												<p:separator />
 												<h2>Balance</h2>
-												<h3>1000.00</h3>
+												<h3>
+													<p:outputLabel value="#{grnController.grnHdr.paybleAmount}">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:outputLabel>
+												</h3>
 											</div>
 
 											<div class="p-col-5">
@@ -341,9 +348,11 @@
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Discount (%)" />
 													<br />
-													<p:inputText id="disFull" required="true"
+													<p:inputText id="disFull" required="true" type="number"
 														value="#{grnController.grnHdr.grnValDiscount}"
-														style="width:77%" />
+														style="width:77%">
+														<p:ajax event="keyup" update="payAmount" listener="#{grnController.handleDiscountKeyEvent}" />
+													</p:inputText>
 												</div>
 
 												<div class="p-col-12">
@@ -425,7 +434,8 @@
 																</h4>
 																<br />
 																<h4>
-																	<p:outputLabel value="#{grnController.grnDate}">
+																	<p:outputLabel
+																		value="#{grnController.grnHdr.createDate}">
 																		<f:convertDateTime type="date" pattern="yyyy-MM-dd" />
 																	</p:outputLabel>
 																</h4>

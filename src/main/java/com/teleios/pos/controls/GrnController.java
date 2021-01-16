@@ -3,13 +3,14 @@ package com.teleios.pos.controls;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
+import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -22,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.CheqType;
 import com.teleios.pos.model.GrnDet;
@@ -59,10 +62,10 @@ public class GrnController implements Serializable {
 	private GrnHdr grnHdr;
 	private Integer nextGrnNumber;
 	private Integer nextBatchNumber;
-	private Date grnDate;
 	private Supplier selSuppliyer;
 	private PaymentType selPayType;
 	private CheqType selChequType;
+	private BigDecimal grnValDiscount;
 
 	// Grn Details Related Selected Object
 	private List<GrnDet> grnDets;
@@ -79,33 +82,44 @@ public class GrnController implements Serializable {
 	private List<Product> allActiveProducts;
 	private List<Supplier> allActiveSuppliyers;
 
-	@Autowired
-	public void init() {
+	@PostConstruct
+	public void init() throws AccessDeniedException {
 		LOGGER.info("<--- Inizilalising Grn Controller ........");
 
 		this.grnHdr = new GrnHdr();
 		this.grnDets = new LinkedList<GrnDet>();
-		this.paymentTypes = new ArrayList<PaymentType>();
 
-		PaymentType chequType = new PaymentType((short) 1, "Cheque", "Teleios", new Date(), (short) 1);
-		paymentTypes.add(chequType);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			grnHdr.setCreateBy(auth.getName());
+		} else {
+			throw new AccessDeniedException("Un Authorized Access !");
+		}
 
-		PaymentType creditType = new PaymentType((short) 2, "Credit Purchase", "Teleios", new Date(), (short) 1);
-		paymentTypes.add(creditType);
+		this.grnHdr.setCreateDate(new Date());
 
-		PaymentType cashType = new PaymentType((short) 3, "Cash Purchase", "Teleios", new Date(), (short) 1);
-		paymentTypes.add(cashType);
-
-		PaymentType fullType = new PaymentType((short) 4, "Full", "Teleios", new Date(), (short) 1);
-		paymentTypes.add(fullType);
-
-		PaymentType harlfType = new PaymentType((short) 5, "Cash & Credit Purchase", "Teleios", new Date(), (short) 1);
-		paymentTypes.add(harlfType);
-		this.grnDate = new Date();
-
+		loadPaymentTypes();
 		loadNextBatchAndGrnNumbers();
 		loadAllActiveProducts();
 		loadAllActiveSuppliyers();
+	}
+
+	private void loadPaymentTypes() {
+		try {
+			this.paymentTypes = this.grnService.getPaymentTypes((short) 6);
+		} catch (SocketTimeoutException ste) {
+			LOGGER.error("Cant Connect To Database", ste);
+			addWarMessage("Load PaymentType", "Database Connection Failed");
+		} catch (EmptyResultDataAccessException empe) {
+			LOGGER.error("Init Load Error", empe);
+			addWarMessage("Init Load PaymentType", "Doesnt Contains Any PaymentTypes");
+		} catch (DataAccessException dae) {
+			LOGGER.error("Loead PaymentType Daa Acc Error", dae);
+			addErrorMessage("Init Load PaymentType Error", "Data AccesError Ocured-->" + dae.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Unexpected Error---", e);
+			addErrorMessage("Init Load PaymentType", "System Error Ocured-->" + e.getLocalizedMessage());
+		}
 	}
 
 	private void loadAllActiveProducts() {
@@ -331,25 +345,34 @@ public class GrnController implements Serializable {
 		try {
 			BigDecimal grnTotal = BigDecimal.ZERO;
 			BigDecimal paybAmount = BigDecimal.ZERO;
-			BigDecimal totDiscount = BigDecimal.ZERO;
+			this.grnValDiscount = BigDecimal.ZERO;
 
 			this.grnHdr.setGrnNumber(getNextGrnNumber());
 			this.grnHdr.setBatchNumber(getNextBatchNumber());
 
 			for (GrnDet det : getGrnDets()) {
-				grnTotal = grnTotal.add(det.getUnitPrice().multiply(det.getQty()));
+				grnTotal = paybAmount.add(det.getNetPrice().multiply(det.getQty()));
 				paybAmount = paybAmount.add(det.getNetPrice().multiply(det.getQty()));
 			}
-			totDiscount = grnTotal.subtract(paybAmount);
 			grnHdr.setTotalValue(grnTotal);
-			grnHdr.setGrnValDiscount(totDiscount);
+			grnHdr.setGrnValDiscount(getGrnValDiscount());
 			grnHdr.setPaybleAmount(paybAmount);
+			grnHdr.setBalance(paybAmount);
 
 		} catch (Exception e) {
 			LOGGER.error("Create New GRN Set Confirm Error..", e);
 			addErrorMessage("Create New GRN", "Set Confirm Page Error\n" + e.getLocalizedMessage());
 		}
 
+	}
+
+	public void handleDiscountKeyEvent() {
+		try {
+			this.grnHdr.setPaybleAmount(grnHdr.getTotalValue()
+					.subtract(grnHdr.getPaybleAmount().multiply(grnHdr.getGrnValDiscount().divide(BigDecimal.valueOf(100.00)))));
+		} catch (NumberFormatException e) {
+			// TODO: handle exception
+		}
 	}
 
 	private void addMessage(String summery, String details) {
@@ -462,14 +485,6 @@ public class GrnController implements Serializable {
 		this.nextBatchNumber = nextBatchNumber;
 	}
 
-	public Date getGrnDate() {
-		return grnDate;
-	}
-
-	public void setGrnDate(Date grnDate) {
-		this.grnDate = grnDate;
-	}
-
 	// Getters And Setters For Grn Details
 
 	public Product getSelProduct() {
@@ -573,6 +588,14 @@ public class GrnController implements Serializable {
 	public void setRemGrnDet(GrnDet remGrnDet) {
 		this.remGrnDet = remGrnDet;
 		removeFromCart();
+	}
+
+	public BigDecimal getGrnValDiscount() {
+		return grnValDiscount;
+	}
+
+	public void setGrnValDiscount(BigDecimal grnValDiscount) {
+		this.grnValDiscount = grnValDiscount;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.teleios.pos.service;
 
 import java.net.SocketTimeoutException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.teleios.pos.dao.impl.GrnDaoImpl;
+import com.teleios.pos.model.PaymentType;
 
 @Service
 public class GrnService {
@@ -20,6 +22,12 @@ public class GrnService {
 	@Autowired
 	public GrnService(GrnDaoImpl grnDaoImpl) {
 		this.grnDaoImpl = grnDaoImpl;
+	}
+
+	public List<PaymentType> getPaymentTypes(short maxRes)
+			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
+		LOGGER.info("<--- Execute Geting Payment Types For Max:{} In Service--->", maxRes);
+		return this.grnDaoImpl.getPaymentTypes(maxRes);
 	}
 
 	public Integer getNextBatchNumber()

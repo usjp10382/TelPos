@@ -3,7 +3,6 @@ package com.teleios.pos.controls;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.nio.file.AccessDeniedException;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
