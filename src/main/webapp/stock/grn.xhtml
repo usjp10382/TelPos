@@ -12,6 +12,29 @@
 
 	<ui:composition template="/template/common/commonLayout.xhtml">
 		<ui:define name="content">
+			<script type="text/javascript" language="javascript">
+				function updateDiscount(text) {
+					var totalVal = parseFloat(PrimeFaces.widgets.widTot.jq
+							.val());
+					var entDiscount = parseFloat(text.value);
+					var discountVal = totalVal * (entDiscount / 100);
+					var paybVal = (totalVal - discountVal).toFixed(2);
+					if (text !== null) {
+						PF('wgPayAmount').jq.val(paybVal);
+					} else {
+						PF('wgPayAmount').jq.val(totalVal);
+					}
+
+				}
+				function updateDiscountTwo(text) {
+					var totalVal = parseFloat(document.getElementById('totVal').value);
+					var entDiscount = parseFloat(text.value);
+					var discountVal = totalVal * (entDiscount / 100);
+					document.getElementById('totVal').value = discountVal;
+
+				}
+			</script>
+
 			<!-- <p:ajaxStatus onstart="PF('statusDialog').show()"
 				onsuccess="PF('statusDialog').hide()" />
 
@@ -28,7 +51,8 @@
 					<div class="p-col-12">
 						<p:fieldset legend="Good Received Note" style="margin-bottom:20px">
 
-							<p:wizard flowListener="#{grnController.handleFlow}">
+							<p:wizard flowListener="#{grnController.handleFlow}"
+								id="grnWizard">
 
 								<!-- GRN Details (1st Tab) - Start -->
 								<p:tab id="tabOne" title="GRN Details">
@@ -314,23 +338,26 @@
 
 								<p:tab id="payDet" title="Payment Details">
 									<p:panel header="Payment And Adjust Total Discount">
-										<p:messages showDetail="true" showSummary="true"
+										<p:messages showDetail="true" showSummary="true" id="payMsg"
 											skipDetailIfEqualsSummary="true" closable="true" />
+										<p:focus for="disFull" id="discFocus" />
 										<div class="p-grid" style="margin-top: 10px">
 
 											<div class="p-col-3" align="center"
 												style="border-right: solid blue 1px;">
 
-												<h2>Total Amount</h2>
+												<h2>Total Amount LKR</h2>
 												<h3>
-													<p:outputLabel value="#{grnController.grnHdr.totalValue}">
+													<p:outputLabel value="#{grnController.grnHdr.totalValue}"
+														id="totVal">
 														<f:convertNumber type="currency" currencySymbol="LKR " />
 													</p:outputLabel>
+
 												</h3>
 												<p:separator />
 												<h2>Paybale Amount</h2>
 												<h3>
-													<p:outputLabel id="payAmount"
+													<p:outputLabel id="payAmount" readonly="true"
 														value="#{grnController.grnHdr.paybleAmount}">
 														<f:convertNumber type="currency" currencySymbol="LKR " />
 													</p:outputLabel>
@@ -339,7 +366,7 @@
 												<h2>Balance</h2>
 												<h3>
 													<p:outputLabel value="#{grnController.grnHdr.balance}"
-														id="grnBal">
+														readonly="true" id="grnBal">
 														<f:convertNumber type="currency" currencySymbol="LKR " />
 													</p:outputLabel>
 												</h3>
@@ -350,12 +377,13 @@
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Discount (%)" />
 													<br />
-													<p:inputText id="disFull" type="number"
+													<h:inputText id="disFull" type="number" maxlength="2"
+														valueChangeListener="#{grnController.handleDiscountKeyEvent}"
 														value="#{grnController.grnHdr.grnValDiscount}"
 														style="width:77%">
-														<p:ajax event="keyup" update="payAmount,grnBal"
-															listener="#{grnController.handleDiscountKeyEvent}" />
-													</p:inputText>
+														<p:ajax event="keyup" update="payAmount,grnBal,payMsg" />
+													</h:inputText>
+
 												</div>
 
 												<div class="p-col-12">
@@ -370,19 +398,25 @@
 														<f:selectItems value="#{grnController.paymentTypes}"
 															var="paytyp" itemValue="#{paytyp}"
 															itemLabel="#{paytyp.desc}" />
+														<p:ajax listener="#{grnController.onPayTypeChange}"
+															update="paidAmountCash,grnBal,paidAmountCheque,payMsg" />
 													</p:selectOneMenu>
 												</div>
 
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Cash Amount" />
 													<br />
-													<p:inputText id="paidAmountCash" style="width:77%" />
+													<p:inputText widgetVar="eidPayVal" id="paidAmountCash"
+														disabled="#{grnController.txtCashPayLock}"
+														value="#{grnController.grnHdr.paidAmount}"
+														style="width:77%" type="number" />
 												</div>
 
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Cheque Amount" />
 													<br />
-													<p:inputText id="paidAmountCheque" style="width:77%" />
+													<p:inputText id="paidAmountCheque" style="width:77%"
+														disabled="#{grnController.txtCheckLock}" type="number" />
 												</div>
 
 											</div>
@@ -453,42 +487,50 @@
 												</div>
 												<!-- Grn Table - Printing - Start -->
 												<div class="p-col-12">
-													<p:dataTable var="itemDetailsTwo"
-														value="#{dtBasicView.cars}" id="itemDetailsTableTwo">
-														<p:column headerText="Item No">
-															<h:outputText value="#{car.id}" />
+													<p:dataTable var="grnDetTwo" resizableColumns="true"
+														value="#{grnController.grnDets}" id="itemDetailsTableTwo">
+														<p:column headerText="Ite:No">
+															<h:outputText value="#{grnDetTwo.grnDetNumber}" />
 														</p:column>
 
 														<p:column headerText="Item Code">
-															<h:outputText value="#{car.year}" />
+															<h:outputText value="#{grnDetTwo.product.prdCode}" />
 														</p:column>
 
 														<p:column headerText="Description">
-															<h:outputText value="#{car.brand}" />
+															<h:outputText value="#{grnDetTwo.product.prdName}" />
 														</p:column>
 
 														<p:column headerText="Qty">
-															<h:outputText value="#{car.color}" />
+															<h:outputText value="#{grnDetTwo.qty}" />
 														</p:column>
 
 														<p:column headerText="Expire Date">
-															<h:outputText value="#{car.color}" />
+															<h:outputText
+																value="#{empty grnDetTwo.expireDate?'N/A':grnDetTwo.expireDate}">
+																<f:convertDateTime type="date" pattern="YYYY-MM-dd" />
+															</h:outputText>
 														</p:column>
 
 														<p:column headerText="unit price">
-															<h:outputText value="#{car.color}" />
-														</p:column>
-
-														<p:column headerText="Selling price">
-															<h:outputText value="#{car.color}" />
+															<h:outputText value="#{grnDetTwo.unitPrice}" />
 														</p:column>
 
 														<p:column headerText="discount">
-															<h:outputText value="#{car.color}" />
+															<h:outputText
+																value="#{empty grnDetTwo.discount?'N/A':grnDetTwo.discount}" />
+														</p:column>
+
+														<p:column headerText="Net Price">
+															<h:outputText value="#{grnDetTwo.netPrice}" />
+														</p:column>
+
+														<p:column headerText="Selling price">
+															<h:outputText value="#{grnDetTwo.sellingPrice}" />
 														</p:column>
 
 														<p:column headerText="Total">
-															<h:outputText value="#{car.color}" />
+															<h:outputText value="#{grnDetTwo.subTotal}" />
 														</p:column>
 													</p:dataTable>
 												</div>
@@ -498,29 +540,29 @@
 												<div class="p-col-12">
 													<table align="right" style="font-weight: bold; width: 30%">
 														<tr>
-															<td>Total Amount</td>
+															<td>Total Amount LKR</td>
 															<td>-</td>
-															<td align="right">1000.00</td>
+															<td align="right">#{grnController.grnHdr.totalValue}</td>
 														</tr>
 														<tr>
 															<td>Discount</td>
 															<td>-</td>
-															<td align="right">10<span>%</span></td>
+															<td align="right">#{grnController.grnHdr.grnValDiscount}<span>%</span></td>
 														</tr>
 														<tr>
-															<td>Payble Amount</td>
+															<td>Payble Amount LKR</td>
 															<td>-</td>
-															<td align="right">1000.00</td>
+															<td align="right">#{grnController.grnHdr.paybleAmount}</td>
 														</tr>
 														<tr>
-															<td>Paid Amount</td>
+															<td>Paid Amount LKR</td>
 															<td>-</td>
-															<td align="right">1000.00</td>
+															<td align="right">#{grnController.grnHdr.paidAmount}</td>
 														</tr>
 														<tr>
-															<td>Balance</td>
+															<td>Balance LKR</td>
 															<td>-</td>
-															<td align="right">1000.00</td>
+															<td align="right">#{grnController.grnHdr.balance}</td>
 														</tr>
 													</table>
 												</div>
@@ -547,13 +589,28 @@
 										</div>
 										<div align="right">
 											<p:commandButton style="width:15%" value="Create GRN"
-												id="createGrn" styleClass="green-button" icon="fa fa-check" />
+												action="#{grnController.createNewGrn}" id="createGrn"
+												process="@this" update="grnWizard,growl"
+												onstart="PF('createNewGrnBlock').block()"
+												oncomplete="PF('createNewGrnBlock').unblock()"
+												styleClass="green-button" icon="fa fa-check">
+												<p:confirm header="Confirm Create New GRN"
+													icon="pi pi-check-circle"
+													message="Are You Sure Create New GRN?\nPleae Double Check Again." />
+											</p:commandButton>
+
 											<p:commandButton style="width:15%" value="Print This"
+												disabled="#{grnController.btnPrintLock}" update="growl"
 												action="#{grnController.printGrn}" id="printThis"
 												ajax="false" onclick="this.form.target='_blank'"
 												styleClass="orange-btn" icon="fa fa-print" />
-											<p:commandButton style="width:15%" value="Send This"
-												id="sendThis" icon="fa fa-envelope" />
+
+											<p:commandButton style="width:15%" value="Send E-Mail"
+												action="#{grnController.sendEmail}" update="growl"
+												onstart="PF('sendEmailBlock').block()"
+												oncomplete="PF('sendEmailBlock').unblock()"
+												disabled="#{grnController.btnSendMailBlock}" id="sendThis"
+												icon="fa fa-envelope" />
 										</div>
 									</p:panel>
 								</p:tab>
@@ -567,15 +624,30 @@
 				<!-- GRN Main - End -->
 
 
+				<pe:blockUI target="grnWizard" widgetVar="createNewGrnBlock">
+					<h:panelGrid columns="2">
+						<p:graphicImage value="../resources/img/ajax-loader.gif"
+							style="margin-right: 12px; vertical-align: middle;" />
+						<h:outputText value="Creating New GRN"
+							style="white-space: nowrap;" />
+					</h:panelGrid>
+				</pe:blockUI>
 
-				<p:confirmDialog global="true" showEffect="expLode"
-					hideEffect="fade">
-					<p:commandButton value="#{msg['tel.pos.cwc.msg.yes.btn']}"
-						type="button" styleClass="red-button ui-confirmdialog-yes"
-						icon="pi pi-check" />
-					<p:commandButton value="#{msg['tel.pos.cwc.msg.no.btn']}"
-						type="button" styleClass="green-button ui-confirmdialog-no"
-						icon="pi pi-times" />
+				<pe:blockUI target="grnWizard" widgetVar="sendEmailBlock">
+					<h:panelGrid columns="2">
+						<p:graphicImage value="../resources/img/ajax-loader.gif"
+							style="margin-right: 12px; vertical-align: middle;" />
+						<h:outputText value="Sending  GRN Email......"
+							style="white-space: nowrap;" />
+					</h:panelGrid>
+				</pe:blockUI>
+
+				<p:confirmDialog global="true" showEffect="explode"
+					hideEffect="puff">
+					<p:commandButton value="YES" type="button"
+						styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+					<p:commandButton value="NO" type="button"
+						styleClass="red-button ui-confirmdialog-no" icon="pi pi-times" />
 				</p:confirmDialog>
 			</h:form>
 		</ui:define>

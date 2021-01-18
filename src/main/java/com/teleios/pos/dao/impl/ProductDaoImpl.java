@@ -27,7 +27,7 @@ public class ProductDaoImpl implements ProductDao {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductDaoImpl.class);
 
 	// Define Product Create SQL
-	private static final String CREATE_PRD_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,min_qty_lev)"
+	private static final String CREATE_PRD_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,rack_no)"
 			+ " VALUES(:code,:prd_name,:brand,:category,:uom,:create_by,:create_date,:prd_state,:min_qty_lev,:rack_no)";
 	static final String CREATE_BATCH_PRODUCTS_SQL = "INSERT INTO inv_schema.product(code,prd_name,brand,category,uom,create_by,create_date,prd_state,min_qty_lev,rack_no) "
 			+ "VALUES(?,?,?,?,?,?,?,?,?,?)";

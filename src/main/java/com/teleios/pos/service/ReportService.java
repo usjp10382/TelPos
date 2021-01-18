@@ -7,8 +7,9 @@ import java.io.Serializable;
 import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
+import javax.activation.DataSource;
 import javax.faces.context.FacesContext;
-
+import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.map.HashedMap;
@@ -99,6 +100,81 @@ public class ReportService implements Serializable {
 			this.jdbcTemplate.getDataSource().getConnection().close();
 		}
 
+	}
+
+	public void printGrnReportByNumber(Integer grnNumber) throws JRException, IOException, Exception {
+		LOGGER.info("<------Execute Print GRN By Number GRN Number: {}--------->", grnNumber);
+		HttpServletResponse response = null;
+		FacesContext context;
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		InputStream stream;
+		Map<String, Object> para = new HashedMap<String, Object>();
+
+		try {
+
+			para.put("GRN_NUMBER", grnNumber);
+			para.put("BARCODE", grnNumber + "4567898");
+			para.put("IMG_PATH", this.getClass().getResourceAsStream("/reports/teleios img.jpg"));
+
+			context = FacesContext.getCurrentInstance();
+			response = (HttpServletResponse) context.getExternalContext().getResponse();
+
+			stream = this.getClass().getResourceAsStream("/reports/grn_report_for_number.jasper");
+
+			JasperReport jasperReport = (JasperReport) JRLoader.loadObject(stream);
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, para,
+					this.jdbcTemplate.getDataSource().getConnection());
+
+			JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+			response.reset();
+			response.setContentType("application/pdf");
+			response.setContentLength(outputStream.size());
+			response.setHeader("Content-disposition", "inline; filename=Grn.pdf");
+			response.getOutputStream().write(outputStream.toByteArray());
+
+			response.getOutputStream().flush();
+			response.getOutputStream().close();
+
+			context.responseComplete();
+		} finally {
+			this.jdbcTemplate.getDataSource().getConnection().close();
+			// response.getOutputStream().close();
+
+		}
+
+	}
+
+	// <------------------------ Get Report Atachment Goes Hear
+	// ------------------------------>
+
+	public DataSource getGrnAtachment(Integer grnNumber) throws JRException, IOException, Exception {
+		LOGGER.info("Get GRN Atachmetn Execute In Report Service----------->");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		InputStream stream;
+		Map<String, Object> para = new HashedMap<String, Object>();
+		DataSource atachment = null;
+		try {
+
+			para.put("GRN_NUMBER", grnNumber);
+			para.put("BARCODE", grnNumber + "4567898");
+			para.put("IMG_PATH", this.getClass().getResourceAsStream("/reports/teleios img.jpg"));
+
+			stream = this.getClass().getResourceAsStream("/reports/grn_report_for_number.jasper");
+
+			JasperReport jasperReport = (JasperReport) JRLoader.loadObject(stream);
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, para,
+					this.jdbcTemplate.getDataSource().getConnection());
+
+			JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+
+			atachment = new ByteArrayDataSource(outputStream.toByteArray(), "application/pdf");
+
+		} finally {
+			this.jdbcTemplate.getDataSource().getConnection().close();
+			// response.getOutputStream().close();
+
+		}
+		return atachment;
 	}
 
 }

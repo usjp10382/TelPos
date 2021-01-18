@@ -14,8 +14,8 @@ public class TeleiosPosConstant implements Serializable {
 	public static final short CHEQUE = 1;
 	public static final short CREDICT = 2;
 	public static final short CASH = 3;
-	public static final short FULL = 4;
-	public static final short HALF = 5;
+	public static final short CASHANDCHEQUE = 4;
+	public static final short CASHANDCREDI = 5;
 
 	// Define Cheque State
 	public static final short CHEQUE_RETURN = 6;

@@ -1,5 +1,6 @@
 package com.teleios.pos.controls;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
@@ -13,9 +14,10 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.mail.MessagingException;
 
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.SelectEvent;
@@ -27,16 +29,21 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.teleios.pos.dao.utill.TeleiosPosConstant;
+import com.teleios.pos.model.CashPayment;
 import com.teleios.pos.model.CheqType;
 import com.teleios.pos.model.GrnDet;
 import com.teleios.pos.model.GrnHdr;
 import com.teleios.pos.model.PaymentType;
 import com.teleios.pos.model.Product;
 import com.teleios.pos.model.Supplier;
+import com.teleios.pos.service.EmailService;
 import com.teleios.pos.service.GrnService;
 import com.teleios.pos.service.ProductService;
 import com.teleios.pos.service.ReportService;
 import com.teleios.pos.service.SupplierService;
+
+import net.sf.jasperreports.engine.JRException;
 
 @Named("grnController")
 @ViewScoped
@@ -53,11 +60,18 @@ public class GrnController implements Serializable {
 	private GrnService grnService;
 	@Autowired
 	private ReportService reportService;
+	@Autowired
+	private EmailService emailService;
 
 	// Utility Object
 	private List<PaymentType> paymentTypes;
 	private List<CheqType> cheqTypes;
 	private Date minExpDate = new Date();
+	private boolean txtCashPayLock;
+	private boolean txtCheckLock;
+	private boolean btnPrintLock;
+	private boolean btnSendMailBlock;
+	private Integer oldGrnNumber;
 
 	// Grn Header Related Selected Objects
 	private GrnHdr grnHdr;
@@ -66,7 +80,6 @@ public class GrnController implements Serializable {
 	private Supplier selSuppliyer;
 	private PaymentType selPayType;
 	private CheqType selChequType;
-	private BigDecimal grnValDiscount;
 
 	// Grn Details Related Selected Object
 	private List<GrnDet> grnDets;
@@ -89,6 +102,10 @@ public class GrnController implements Serializable {
 
 		this.grnHdr = new GrnHdr();
 		this.grnDets = new LinkedList<GrnDet>();
+		this.txtCashPayLock = true;
+		this.txtCheckLock = true;
+		this.btnSendMailBlock = true;
+		this.btnPrintLock = true;
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
@@ -97,7 +114,7 @@ public class GrnController implements Serializable {
 			throw new AccessDeniedException("Un Authorized Access !");
 		}
 
-		this.grnHdr.setCreateDate(new Date());
+		this.grnHdr.setGrnDate(new Date());
 
 		loadPaymentTypes();
 		loadNextBatchAndGrnNumbers();
@@ -193,15 +210,11 @@ public class GrnController implements Serializable {
 
 	public String handleFlow(FlowEvent event) {
 		String currentStepId = event.getOldStep();
-		String nextStepId = event.getNewStep();
 		if (currentStepId.equalsIgnoreCase("tabTwo")) {
 			if (getGrnDets().size() <= 0) {
 				addErrorMessage("Create New GRN", "Add Grn Items Is Required!");
 				return currentStepId;
 			}
-		}
-		if (nextStepId.equalsIgnoreCase("payDet")) {
-			setonfirmDetails();
 		}
 		return event.getNewStep();
 	}
@@ -279,7 +292,7 @@ public class GrnController implements Serializable {
 				addErrorMessage("Create New Grn", "Duplicate Item Details");
 				return;
 			}
-
+			setGrnHeaderDetails(grnDet);
 			if (this.grnDets.add(grnDet)) {
 				addMessage("Create New GRN", "New Grn Item Added Success!");
 				this.subNumber++;
@@ -299,9 +312,49 @@ public class GrnController implements Serializable {
 	public void printGrn() {
 		LOGGER.info("Execute Print Grn In Controller ------>");
 		try {
-			this.reportService.printAllItemsReport();
+			if (getOldGrnNumber() != null) {
+				this.reportService.printGrnReportByNumber(getOldGrnNumber());
+			} else {
+				addErrorMessage("Print GRN Report", "Couldnt Find Old GRN ");
+			}
+		} catch (IOException ioe) {
+			LOGGER.error("Print Grn Report By Number IO Exception Error Occured-->", ioe);
+			addErrorMessage("Print GRN Report",
+					"Couldnt Find Report Call To System Admin\n" + ioe.getLocalizedMessage());
+		} catch (JRException jre) {
+			LOGGER.error("Print Grn Report By Number Error Occured-->", jre);
+			addErrorMessage("Print GRN Report",
+					"System Error Occured Call To System Admin\n" + jre.getLocalizedMessage());
 		} catch (Exception e) {
-			LOGGER.error("Error Occured-->", e);
+			LOGGER.error("Print Grn Report By Number Error Occured-->", e);
+			addErrorMessage("Print GRN Report",
+					"System Error Occured Call To System Admin\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public void sendEmail() {
+		LOGGER.info("<------Execute Send GRN As Email In Grn Controller -------->");
+		try {
+			if (getOldGrnNumber() != null) {
+				this.emailService.sendMail(getOldGrnNumber());
+				addMessage("Send GRN E-mail", "Successfuly Send Email!");
+			} else {
+				addErrorMessage("Send GRN E-mail", "Couldnt Find Old GRN ");
+			}
+		} catch (IOException ioe) {
+			LOGGER.error("Send Email Grn Report By Number IO Exception Error Occured-->", ioe);
+			addErrorMessage("Send GRN Report",
+					"Couldnt Find Report Call To System Admin\n" + ioe.getLocalizedMessage());
+		} catch (JRException jre) {
+			LOGGER.error("Send Grn Report By Number Error Occured-->", jre);
+			addErrorMessage("Send GRN Report",
+					"System Error Occured Call To System Admin\n" + jre.getLocalizedMessage());
+		} catch (MessagingException e) {
+			LOGGER.error("Send Grn Report By Number Error Occured-->", e);
+			addErrorMessage("Send GRN Report", "System Error Occured Call To System Admin\n" + e.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Send GRN As Email Error Occured ---->", e);
+			addErrorMessage("Send Grn Email", "Error Occured\n" + e.getLocalizedMessage());
 		}
 	}
 
@@ -333,6 +386,9 @@ public class GrnController implements Serializable {
 		LOGGER.info("Execute Reomve Grn Det From Cart ----->");
 		try {
 			if (getGrnDets().remove(getRemGrnDet())) {
+				getGrnHdr().setTotalValue(getGrnHdr().getTotalValue().subtract(getRemGrnDet().getSubTotal()));
+				getGrnHdr().setPaybleAmount(getGrnHdr().getPaybleAmount().subtract(getRemGrnDet().getSubTotal()));
+				getGrnHdr().setBalance(getGrnHdr().getBalance().subtract(getRemGrnDet().getSubTotal()));
 				addMessage("Create New Grn.. Remove GRN Item From Cart", "Succsesfuly Remove GRN Item");
 			}
 		} catch (Exception e) {
@@ -341,58 +397,192 @@ public class GrnController implements Serializable {
 		}
 	}
 
-	private void setonfirmDetails() {
-		LOGGER.info("<------- Execute Set Confirm Details-------->");
-		try {
-			BigDecimal grnTotal = BigDecimal.ZERO;
-			BigDecimal paybAmount = BigDecimal.ZERO;
-			this.grnValDiscount = BigDecimal.ZERO;
-
-			this.grnHdr.setGrnNumber(getNextGrnNumber());
-			this.grnHdr.setBatchNumber(getNextBatchNumber());
-
-			for (GrnDet det : getGrnDets()) {
-				grnTotal = paybAmount.add(det.getNetPrice().multiply(det.getQty()));
-				paybAmount = paybAmount.add(det.getNetPrice().multiply(det.getQty()));
-			}
-			grnHdr.setTotalValue(grnTotal);
-			grnHdr.setGrnValDiscount(getGrnValDiscount());
-			grnHdr.setPaybleAmount(paybAmount);
-			grnHdr.setBalance(paybAmount);
-
-		} catch (Exception e) {
-			LOGGER.error("Create New GRN Set Confirm Error..", e);
-			addErrorMessage("Create New GRN", "Set Confirm Page Error\n" + e.getLocalizedMessage());
+	private void setGrnHeaderDetails(final GrnDet newGrnDet) {
+		if (getGrnHdr().getTotalValue() == null) {
+			getGrnHdr().setTotalValue(newGrnDet.getSubTotal());
+		} else {
+			getGrnHdr().setTotalValue(getGrnHdr().getTotalValue().add(newGrnDet.getSubTotal()));
+		}
+		if (getGrnHdr().getPaybleAmount() != null) {
+			getGrnHdr().setPaybleAmount(getGrnHdr().getPaybleAmount().add(newGrnDet.getSubTotal()));
+		} else {
+			getGrnHdr().setPaybleAmount(newGrnDet.getSubTotal());
+		}
+		if (getGrnHdr().getBalance() != null) {
+			getGrnHdr().setBalance(getGrnHdr().getBalance().add(newGrnDet.getSubTotal()));
+		} else {
+			getGrnHdr().setBalance(newGrnDet.getSubTotal());
 		}
 
 	}
 
-	public void handleDiscountKeyEvent(AjaxBehaviorEvent evt) {
+	public void handleDiscountKeyEvent(ValueChangeEvent evt) {
 		BigDecimal discounValue = BigDecimal.ZERO;
 		BigDecimal initTotal = new BigDecimal(getGrnHdr().getTotalValue().doubleValue());
-		BigDecimal initPayblVal = new BigDecimal(getGrnHdr().getPaybleAmount().doubleValue());
-		BigDecimal initBalance = new BigDecimal(getGrnHdr().getBalance().doubleValue());
 		try {
+			LOGGER.info("DIscount Value Hash Code Test: initTotal---> " + initTotal + " Global Total ---> "
+					+ getGrnHdr().getTotalValue());
+			getGrnHdr().setGrnValDiscount((BigDecimal) evt.getNewValue());
+			if (getGrnHdr().getGrnValDiscount().compareTo(BigDecimal.ZERO) == 0) {
+				getGrnHdr().setPaybleAmount(initTotal);
+				getGrnHdr().setBalance(initTotal);
+				getGrnHdr().setTotalValue(initTotal);
+				getGrnHdr().setTotValDiscount(false);
+			}
 			if (getGrnHdr().getGrnValDiscount() != null) {
-				LOGGER.info("Grn Discount Precentage :{}", getGrnHdr().getGrnValDiscount());
-				discounValue = initTotal.multiply(getGrnHdr().getGrnValDiscount().divide(BigDecimal.valueOf(100.00)));
-				LOGGER.info("Grn Discount Value:{}", discounValue);
-				getGrnHdr().setPaybleAmount(getGrnHdr().getPaybleAmount().subtract(discounValue));
-				getGrnHdr().setBalance(getGrnHdr().getBalance().subtract(discounValue));
+				discounValue = grnHdr.getTotalValue()
+						.multiply(getGrnHdr().getGrnValDiscount().divide(BigDecimal.valueOf(100.00)));
+				getGrnHdr().setPaybleAmount(getGrnHdr().getTotalValue().subtract(discounValue));
+				getGrnHdr().setBalance(getGrnHdr().getTotalValue().subtract(discounValue));
+				getGrnHdr().setTotValDiscount(true);
 			} else {
 				LOGGER.info("Cut Zero Discount: {}", discounValue);
-				getGrnHdr().getPaybleAmount().add(initPayblVal);
-				getGrnHdr().getBalance().add(initBalance);
+				getGrnHdr().setPaybleAmount(initTotal);
+				getGrnHdr().setBalance(initTotal);
+				getGrnHdr().setTotalValue(initTotal);
+				getGrnHdr().setTotValDiscount(false);
 			}
+			LOGGER.info("Discount Value : {}", discounValue);
 		} catch (NumberFormatException nfe) {
 			LOGGER.error("Enter Discount Invalied Input", nfe);
 			addMessage("Enter Discount", "Invalied Input\n" + nfe.getLocalizedMessage());
 		} catch (ArithmeticException ame) {
 			LOGGER.error("Enter Discount Arithmetic Exception", ame);
 			addMessage("Enter Discount", "Arithmetic Exception\n" + ame.getLocalizedMessage());
+		} catch (NullPointerException npe) {
+			getGrnHdr().setPaybleAmount(initTotal);
+			getGrnHdr().setBalance(initTotal);
+			getGrnHdr().setTotalValue(initTotal);
+			getGrnHdr().setTotValDiscount(false);
 		} catch (Exception e) {
 			LOGGER.error("System Error Occured", e);
 			addMessage("Enter Discount", "System Error Occured\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public void onPayTypeChange() {
+		LOGGER.info("Execute Payment Type Change Ajax------->");
+		try {
+			if (getSelPayType() != null) {
+				switch (getSelPayType().getPayTypeId()) {
+				case TeleiosPosConstant.CHEQUE:
+					addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+					break;
+
+				case TeleiosPosConstant.CREDICT:
+					addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+					break;
+
+				case TeleiosPosConstant.CASH:
+					getGrnHdr().setPaidAmount(getGrnHdr().getPaybleAmount());
+					getGrnHdr().setBalance(BigDecimal.ZERO);
+					break;
+
+				case TeleiosPosConstant.CASHANDCHEQUE:
+					addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+					break;
+
+				case TeleiosPosConstant.CASHANDCREDI:
+					addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+					break;
+
+				default:
+					addErrorMessage("Select Payment Type", "Invalied Payment Type!");
+					break;
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("On CHange Payment Type Error--->", e);
+			addErrorMessage("Select Payment Type", "System Error Occured!\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public void createNewGrn() {
+		LOGGER.info("<------- Execute Create New Grn In Grn Controller --------->");
+
+		if (getSelSuppliyer() == null) {
+			addErrorMessage("Create New GRN", "The Select Suppliyer Is Required!");
+			return;
+		}
+
+		if (getGrnHdr() == null) {
+			addErrorMessage("Create New GRN", "Please Follow Step by Step To Create GRN!");
+			return;
+		}
+
+		if (getGrnDets().size() <= 0) {
+			addErrorMessage("Create New GRN", "The Grn Doesnt Contains Any Item!");
+			return;
+		}
+
+		if (getSelPayType() == null) {
+			addErrorMessage("Create New GRN", "The Select Payment Type Is Required!");
+			return;
+		}
+
+		switch (getSelPayType().getPayTypeId()) {
+		case TeleiosPosConstant.CHEQUE:
+			addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+			break;
+
+		case TeleiosPosConstant.CREDICT:
+			addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+			break;
+
+		case TeleiosPosConstant.CASH:
+			try {
+
+				getGrnHdr().setSupplier(getSelSuppliyer());
+				getGrnHdr().setGrnNumber(getNextGrnNumber());
+				getGrnHdr().setBatchNumber(getNextBatchNumber());
+				getGrnHdr().setItemCount(getGrnDets().size());
+				getGrnHdr().setGrnState((short) 1);
+				getGrnHdr().setCreateDate(new Date());
+				getGrnHdr().setGrnDets(getGrnDets());
+				getGrnHdr().setPaymentType(getSelPayType());
+
+				CashPayment cashPayment = new CashPayment();
+				cashPayment.setAmount(getGrnHdr().getPaidAmount());
+				cashPayment.setCashier(getGrnHdr().getPaidAmount());
+				cashPayment.setChange(BigDecimal.ZERO);
+				cashPayment.setCreateDate(new Date());
+				cashPayment.setPayeble(null);
+				cashPayment.setCreateBy(getGrnHdr().getCreateBy());
+				cashPayment.setState((short) 1);
+				cashPayment.setGrnHdr(getGrnHdr());
+				cashPayment.setExpenditureList(null);
+
+				this.grnService.createNewCashPayGrn(getGrnHdr(), cashPayment);
+				addMessage("Create New Grn", "Successfuly Create New GRN!");
+				clearAll();
+				loadNextBatchAndGrnNumbers();
+
+			} catch (SocketTimeoutException sce) {
+				LOGGER.error("Create New GRN Couldnt Connect TO Database", sce);
+				addErrorMessage("Create New GRN Confirm",
+						"Couldnt Connect To Database\nPlease Inform To System Admin !\n" + sce.getLocalizedMessage());
+			} catch (DataAccessException dae) {
+				LOGGER.error("Create New GRN Couldnt Connect TO Database", dae);
+				addErrorMessage("Create New GRN Confirm",
+						"Dataaccess Error Occured\nPlease Inform To System Admin !\n" + dae.getLocalizedMessage());
+			} catch (Exception e) {
+				LOGGER.error("Create New Grn Error Unexpced System Error", e);
+				addErrorMessage("Create New GRN Confirm",
+						"Unexpected System Error Please\nInform To System Admin!\n" + e.getLocalizedMessage());
+			}
+			break;
+
+		case TeleiosPosConstant.CASHANDCHEQUE:
+			addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+			break;
+
+		case TeleiosPosConstant.CASHANDCREDI:
+			addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+			break;
+
+		default:
+			addErrorMessage("Select Payment Type", "Invalied Payment Type!");
+			break;
 		}
 	}
 
@@ -426,7 +616,34 @@ public class GrnController implements Serializable {
 		}
 	}
 
-	public List<Product> getAllActiveProducts() {
+	private void clearAll() {
+		LOGGER.info("Execute Clear All In Grn Controller ------>");
+		try {
+			this.oldGrnNumber = new Integer(getNextGrnNumber());
+			this.grnHdr = null;
+			this.grnDets.clear();
+			this.txtCashPayLock = true;
+			this.txtCheckLock = true;
+			this.btnSendMailBlock = false;
+			this.btnPrintLock = false;
+			this.selPayType = null;
+			this.selSuppliyer = null;
+			this.grnHdr = new GrnHdr();
+			this.grnHdr.setGrnDate(new Date());
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null) {
+				grnHdr.setCreateBy(auth.getName());
+			} else {
+				throw new AccessDeniedException("Un Authorized Access !");
+			}
+			subNumber = 1;
+		} catch (Exception e) {
+			LOGGER.error("Grn Clear All Error", e);
+			addErrorMessage("Create New GRN", "Reset Created Grn Error\n" + e.getLocalizedMessage());
+		}
+	}
+
+	public List<Product> getAllActivePrloducts() {
 		return allActiveProducts;
 	}
 
@@ -611,12 +828,72 @@ public class GrnController implements Serializable {
 		removeFromCart();
 	}
 
-	public BigDecimal getGrnValDiscount() {
-		return grnValDiscount;
+	/**
+	 * @return the txtCashPayLock
+	 */
+	public boolean isTxtCashPayLock() {
+		return txtCashPayLock;
 	}
 
-	public void setGrnValDiscount(BigDecimal grnValDiscount) {
-		this.grnValDiscount = grnValDiscount;
+	/**
+	 * @param txtCashPayLock the txtCashPayLock to set
+	 */
+	public void setTxtCashPayLock(boolean txtCashPayLock) {
+		this.txtCashPayLock = txtCashPayLock;
+	}
+
+	/**
+	 * @return the txtCheckLock
+	 */
+	public boolean isTxtCheckLock() {
+		return txtCheckLock;
+	}
+
+	/**
+	 * @param txtCheckLock the txtCheckLock to set
+	 */
+	public void setTxtCheckLock(boolean txtCheckLock) {
+		this.txtCheckLock = txtCheckLock;
+	}
+
+	/**
+	 * @return the btnPrintLock
+	 */
+	public boolean isBtnPrintLock() {
+		return btnPrintLock;
+	}
+
+	/**
+	 * @param btnPrintLock the btnPrintLock to set
+	 */
+	public void setBtnPrintLock(boolean btnPrintLock) {
+		this.btnPrintLock = btnPrintLock;
+	}
+
+	/**
+	 * @return the btnSendMailBlock
+	 */
+	public boolean isBtnSendMailBlock() {
+		return btnSendMailBlock;
+	}
+
+	/**
+	 * @param btnSendMailBlock the btnSendMailBlock to set
+	 */
+	public void setBtnSendMailBlock(boolean btnSendMailBlock) {
+		this.btnSendMailBlock = btnSendMailBlock;
+	}
+
+	public List<Product> getAllActiveProducts() {
+		return allActiveProducts;
+	}
+
+	public Integer getOldGrnNumber() {
+		return oldGrnNumber;
+	}
+
+	public void setOldGrnNumber(Integer oldGrnNumber) {
+		this.oldGrnNumber = oldGrnNumber;
 	}
 
 }

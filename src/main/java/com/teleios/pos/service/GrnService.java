@@ -9,8 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.teleios.pos.dao.impl.GrnDaoImpl;
+import com.teleios.pos.dao.impl.PaymentDaoImpl;
+import com.teleios.pos.dao.impl.StockDaoImpl;
+import com.teleios.pos.model.CashPayment;
+import com.teleios.pos.model.GrnHdr;
 import com.teleios.pos.model.PaymentType;
 
 @Service
@@ -18,10 +24,30 @@ public class GrnService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GrnService.class);
 
 	private GrnDaoImpl grnDaoImpl;
+	private StockDaoImpl stockDaoImpl;
+	private PaymentDaoImpl paymentDaoImpl;
 
 	@Autowired
-	public GrnService(GrnDaoImpl grnDaoImpl) {
+	public GrnService(GrnDaoImpl grnDaoImpl, StockDaoImpl stockDaoImpl, PaymentDaoImpl paymentDaoImpl) {
+		super();
 		this.grnDaoImpl = grnDaoImpl;
+		this.stockDaoImpl = stockDaoImpl;
+		this.paymentDaoImpl = paymentDaoImpl;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class }, timeout = 100)
+	public int[] createNewCashPayGrn(GrnHdr grnHdr, CashPayment cashPayment)
+			throws SocketTimeoutException, DataAccessException, Exception {
+		LOGGER.info("******* Executing Create New Cash Payment Grn In Service **********");
+		int[] saveStates = null;
+
+		this.grnDaoImpl.createNewGrnHeder(grnHdr);
+		this.grnDaoImpl.createNewGrnDetails(grnHdr.getGrnDets());
+		this.paymentDaoImpl.createNewCashPaymment(cashPayment);
+		saveStates = this.stockDaoImpl.createNewStockItems(grnHdr.getGrnDets(), grnHdr.getBatchNumber());
+
+		return saveStates;
+
 	}
 
 	public List<PaymentType> getPaymentTypes(short maxRes)
