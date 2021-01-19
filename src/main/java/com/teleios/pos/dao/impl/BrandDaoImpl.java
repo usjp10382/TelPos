@@ -34,10 +34,15 @@ public class BrandDaoImpl implements BrandDao {
 	static final String ALL_BRAND_SQL = "SELECT brand_id,brand_name,create_by,create_date,brnd_state FROM inv_schema.brand";
 
 	
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	
+	@Autowired
+	public BrandDaoImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+		super();
+		this.jdbcTemplate = jdbcTemplate;
+		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+	}
 
 	@Override
 	public int createNewBrand(Brand brand) throws DuplicateKeyException {

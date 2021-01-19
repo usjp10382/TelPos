@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Customer implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+
 	private Integer customerId;
 	private String firstName;
 	private String lastName;
@@ -20,7 +17,6 @@ public class Customer implements Serializable {
 
 	public Customer() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Customer(Integer customerId, String firstName, String lastName, String address, String mobileNumber,
@@ -73,6 +69,13 @@ public class Customer implements Serializable {
 	}
 
 	public void setMobileNumber(String mobileNumber) {
+		/*
+		 * String[] mob = mobileNumber.split("-"); String correctNumber = null;
+		 * 
+		 * if (mob.length > 0) correctNumber = mobileNumber; else correctNumber = mob[0]
+		 * + mob[1];
+		 */
+
 		this.mobileNumber = mobileNumber;
 	}
 
@@ -98,6 +101,11 @@ public class Customer implements Serializable {
 
 	public void setCustomerState(Short customerState) {
 		this.customerState = customerState;
+	}
+
+	@Override
+	public String toString() {
+		return getFirstName() + " " + getLastName() + "-" + getMobileNumber();
 	}
 
 }

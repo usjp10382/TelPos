@@ -12,6 +12,9 @@
 
 	<ui:composition template="/template/common/commonLayout.xhtml">
 		<ui:define name="content">
+			<script type="text/javascript" language="javascript">
+				
+			</script>
 
 			<!-- Top Icon Button - Start -->
 			<div class="p-grid">
@@ -20,19 +23,25 @@
 					<div style="display: inline;">
 						<p:commandButton icon="fa fa-user-plus" style="margin-right:5px;"
 							type="button" id="cusAdd" title="Add Customer"
-							onclick="PF('cusAdd').show();" />
+							widgetVar="btnAddCus" onclick="PF('cusAdd').show();" />
+						<p:hotkey bind="shift+c" handler="PF('cusAdd').show();"
+							id="hotAddCus" />
 					</div>
 
 					<div style="display: inline;">
 						<p:commandButton icon="fa fa-male" style="margin-right:5px;"
 							type="button" id="lab" title="Labour Charges"
 							onclick="PF('labCost').show();" />
+						<p:hotkey bind="shift+l" handler="PF('labCost').show();"
+							id="hotAddLab" />
 					</div>
 
 					<div style="display: inline;">
 						<p:commandButton icon="fa fa-truck" style="margin-right:5px;"
 							type="button" id="transport" title="Transport Charges"
 							onclick="PF('transCost').show();" />
+						<p:hotkey bind="shift+t" handler="PF('transCost').show();"
+							id="hotAddTra" />
 					</div>
 
 					<div style="display: inline;">
@@ -45,9 +54,12 @@
 			<!-- Top Icon Button - End -->
 
 			<!-- Invoice - Start -->
-			<p:fieldset legend="Invoice">
-				<h:form id="invoceForm">
+			<p:fieldset legend="Invoice" id="fldInv">
+				<h:form id="invoceForm"
+					onkeypress="if (event.keyCode == 13) { return false; }">
 
+					<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+						showSummary="false" />
 					<!-- Body - Start -->
 					<div class="p-grid">
 						<div class="p-col-12">
@@ -65,7 +77,17 @@
 									<div>
 										<p:outputLabel value="Customer Name" for="@next" />
 										<br />
-										<p:autoComplete id="cusName" dropdown="true" />
+										<p:autoComplete id="cusName" dropdown="true" size="40"
+											value="#{invController.selectedCustomer}" var="cus"
+											forceSelection="true" queryDelay="700"
+											widgetVar="autocomplete" itemLabel="#{cus}"
+											minQueryLength="3" itemValue="#{cus}"
+											completeMethod="#{invController.completeCustomerContains}"
+											onkeypress="if (event.keyCode == 13) {PF('wgitemDetails').jq.focus(); return false; }"
+											converter="cusConvertor">
+											<p:ajax event="itemSelect" update=":cusDetails" />
+										</p:autoComplete>
+
 
 										<p:commandButton type="button" icon="fa fa-info-circle"
 											title="View Customer Details" styleClass="info-btn"
@@ -89,8 +111,9 @@
 								<div class="p-col-5">
 									<p:outputLabel value="Item" for="@next" />
 									<br />
-									<p:autoComplete id="itemDetails" dropdown="true"
-										style="width: 80%" inputStyle="width: 90%" />
+									<p:autoComplete id="itemDetails" dropdown="true" tabindex="0"
+										widgetVar="wgitemDetails" style="width: 80%"
+										inputStyle="width: 90%" />
 
 									<p:commandButton type="button" icon="fa fa-info-circle"
 										title="View Itemf Details" styleClass="info-btn"
@@ -215,9 +238,8 @@
 										<tr>
 											<td><h4>Payment Type</h4></td>
 											<td><h4>:</h4></td>
-											<td><p:selectOneMenu id="pType"
-													value="#{selectOneMenuView.rtl}" style="width:100%">
-													<f:selectItem itemLabel="Select One" itemValue="" />
+											<td><p:selectOneMenu id="pType" style="width:100%">
+
 												</p:selectOneMenu></td>
 										</tr>
 
@@ -299,25 +321,32 @@
 
 			<!-- Customer More Details - Start -->
 			<p:dialog header="Customer Details" widgetVar="cusDetails"
-				showEffect="clip" hideEffect="clip" height="100%" width="50%">
+				dynamic="true" showEffect="clip" hideEffect="clip" height="100%"
+				width="50%">
 				<h:form id="cusDetails">
 
 					<div class="p-col-12">
 						<p:outputLabel value="Customer Name" for="@next" />
 						<br />
-						<p:inputText id="cusName" style="width:100%" readonly="true" />
+						<p:inputText id="cusName"
+							value="#{invController.selectedCustomer.firstName} #{invController.selectedCustomer.lastName}"
+							style="width:100%" readonly="true" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Customer Address" for="@next" />
 						<br />
-						<p:inputText id="cusaddress" style="width:100%" readonly="true" />
+						<p:inputText id="cusaddress"
+							value="#{invController.selectedCustomer.address}"
+							style="width:100%" readonly="true" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Mobile Number" for="@next" />
 						<br />
-						<p:inputText id="mobileNo" style="width:100%" readonly="true" />
+						<p:inputText id="mobileNo"
+							value="#{invController.selectedCustomer.mobileNumber}"
+							style="width:100%" readonly="true" />
 					</div>
 
 				</h:form>
@@ -326,35 +355,59 @@
 
 			<!-- Customer Add - Start -->
 			<p:dialog header="New Customer" widgetVar="cusAdd" showEffect="clip"
-				hideEffect="clip" height="100%" width="40%">
+				appendTo="fldInv" hideEffect="clip" height="100%" width="40%">
 				<h:form id="cusNewAdd">
 
 					<div class="p-col-12">
 						<p:outputLabel value="First Name" for="@next" />
 						<br />
-						<p:inputText id="cusFirstAddName" style="width:100%" />
+						<p:inputText id="cusFirstAddName" style="width:100%"
+							value="#{invController.newCusFirstName}" required="true"
+							requiredMessage="First Name Is Required!" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Last Name" for="@next" />
 						<br />
-						<p:inputText id="cusLastAddName" style="width:100%" />
-					</div>
-
-					<div class="p-col-12">
-						<p:outputLabel value="Customer Address" for="@next" />
-						<br />
-						<p:inputText id="cusAddaddress" style="width:100%" />
+						<p:inputText id="cusLastAddName" style="width:100%"
+							required="true" requiredMessage="Last Name Is Required!"
+							value="#{invController.newCusLastName}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Mobile Number" for="@next" />
 						<br />
-						<p:inputText id="cusAddMobileNo" style="width:100%" />
+						<p:inputMask autoClear="true" maxlength="11" mask="+94-999999999"
+							required="true" requiredMessage="Mobile Number Is Required!"
+							value="#{invController.newMobile}" id="cusAddMobileNo"
+							style="width:100%" />
 					</div>
 
+					<div class="p-col-12">
+						<p:outputLabel value="Customer Address" for="@next" />
+						<br />
+						<p:inputText id="cusAddaddress" style="width:100%" required="true"
+							value="#{invController.newAddress}"
+							onkeypress="if (event.keyCode === 13) { addCus(); return false; }"
+							requiredMessage="Address Is Required !" />
+					</div>
+
+
+					<p:remoteCommand name="addCus"
+						action="#{invController.createNewCustomer}"
+						oncomplete="if(!args.validationFailed){PF('cusAdd').hide();}"
+						process="@form"
+						update="cusNewAdd,:invoceForm:growl,:invoceForm:cusName" />
+
 					<div class="p-col-12" align="right">
-						<p:commandButton value="Add Customer" icon="pi pi-check" />
+						<p:commandButton value="Add Customer" icon="pi pi-check"
+							action="#{invController.createNewCustomer}" process="@form"
+							update="cusNewAdd,:invoceForm:growl,:invoceForm:cusName"
+							oncomplete="if(!args.validationFailed){PF('cusAdd').hide();}">
+							<p:confirm header="Confirm Create New Customer"
+								icon="pi pi-check-circle"
+								message="Are You Sure Create New Customer?" />
+						</p:commandButton>
 					</div>
 
 				</h:form>
@@ -411,6 +464,25 @@
 				</h:form>
 			</p:dialog>
 			<!-- Item Details - End -->
+
+			<p:confirmDialog global="true" showEffect="explode" hideEffect="puff">
+				<p:commandButton value="YES" type="button"
+					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="NO" type="button"
+					styleClass="red-button ui-confirmdialog-no" icon="pi pi-times" />
+			</p:confirmDialog>
+
+			<!-- Start Block Page Extentions -->
+
+			<pe:blockUI target="fldInv" widgetVar="onLoadBlock" autoShow="true">
+				<h:panelGrid columns="2">
+					<p:graphicImage value="../resources/img/ajax-loader.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Sending  GRN Email......"
+						style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+
 
 		</ui:define>
 	</ui:composition>
