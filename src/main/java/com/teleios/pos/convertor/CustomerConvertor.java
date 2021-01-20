@@ -32,11 +32,11 @@ public class CustomerConvertor implements Converter<Customer> {
 			customer.setAddress(strArr[4]);
 			return customer;
 		} catch (NumberFormatException e) {
-			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unknown Product",
-					"This is not a Customer /name/mobile number!");
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unknown Customer",
+					"This is not a Customer Number!");
 			throw new ConverterException(message);
 		} catch (NullPointerException e) {
-			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unknown Suppliyer",
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unknown Custoemr",
 					"The Customer is unknown!");
 			throw new ConverterException(message);
 		}
@@ -51,11 +51,11 @@ public class CustomerConvertor implements Converter<Customer> {
 			throw new NullPointerException("component");
 
 		if (value != null) {
-			StringBuilder suppBuilder = new StringBuilder();
-			suppBuilder.append(value.getCustomerId()).append("_").append(value.getFirstName()).append("_")
+			StringBuilder cusBuilder = new StringBuilder();
+			cusBuilder.append(value.getCustomerId()).append("_").append(value.getFirstName()).append("_")
 					.append(value.getLastName()).append("_").append(value.getMobileNumber()).append("_")
 					.append(value.getAddress());
-			return suppBuilder.toString();
+			return cusBuilder.toString();
 		}
 
 		return null;

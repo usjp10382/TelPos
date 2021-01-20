@@ -7,10 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.teleios.pos.dao.impl.StockDaoImpl;
 import com.teleios.pos.model.GrnDet;
+import com.teleios.pos.model.Stock;
 
 @Service
 public class StockService {
@@ -27,6 +29,12 @@ public class StockService {
 			throws SocketTimeoutException, DataAccessException, Exception {
 		LOGGER.info("<------Execute Create New Stock Items In Service -------->");
 		return this.stockDaoImpl.createNewStockItems(grnDets, batchNumber);
+	}
+
+	public List<Stock> getStockForPOS()
+			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
+		LOGGER.info("<------ Execute Get Stock Sot POS In Stock Service ------->");
+		return this.stockDaoImpl.getStockForPOS();
 	}
 
 }

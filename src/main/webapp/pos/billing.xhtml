@@ -111,9 +111,17 @@
 								<div class="p-col-5">
 									<p:outputLabel value="Item" for="@next" />
 									<br />
-									<p:autoComplete id="itemDetails" dropdown="true" tabindex="0"
+									<p:autoComplete id="itemDetails" dropdown="true"
 										widgetVar="wgitemDetails" style="width: 80%"
-										inputStyle="width: 90%" />
+										completeMethod="#{invController.completeItemsContains}"
+										var="item" value="#{invController.selectedItem}"
+										forceSelection="true" queryDelay="700" itemLabel="#{item}"
+										minQueryLength="3" itemValue="#{item}"
+										onkeypress="if (event.keyCode == 13) {PF('wgqty').jq.focus(); return false; }"
+										converter="itemConvertor" inputStyle="width: 90%">
+										<p:ajax event="itemSelect"
+											listener="#{invController.onItemSelect}" update="uom,uPrice" />
+									</p:autoComplete>
 
 									<p:commandButton type="button" icon="fa fa-info-circle"
 										title="View Itemf Details" styleClass="info-btn"
@@ -121,28 +129,34 @@
 									</p:commandButton>
 								</div>
 
-								<div class="p-col-2">
-									<p:outputLabel value="Quantity" for="@next" />
-									<br />
-									<p:inputText id="qty" style="width:100%" />
-								</div>
-
 								<div class="p-col-1">
 									<p:outputLabel value="UOM" for="@next" />
 									<br />
-									<p:inputText id="uom" style="width:100%" readonly="true" />
+									<p:inputText id="uom" style="width:100%" readonly="true"
+										value="#{invController.selectedItem.product.uom.uomChar}" />
 								</div>
+
+								<div class="p-col-2">
+									<p:outputLabel value="Quantity" for="@next" />
+									<br />
+									<p:inputText id="qty" type="number" widgetVar="wgqty"
+										style="width:100%" />
+								</div>
+
 
 								<div class="p-col-2">
 									<p:outputLabel value="Unit Price" for="@next" />
 									<br />
-									<p:inputText id="uPrice" style="width:100%" />
+									<p:inputText type="number" widgetVar="wgprice" id="uPrice"
+										value="#{invController.selectedItem.sellingPrice}"
+										style="width:100%" />
 								</div>
 
 								<div class="p-col-2">
 									<p:outputLabel value="Discount" for="@next" />
 									<br />
-									<p:inputText id="discount" style="width:100%" />
+									<h:inputText type="number" id="discount" style="width:100%"
+										maxlength="2" />
 								</div>
 
 								<div class="p-col-12">
@@ -485,6 +499,15 @@
 
 
 		</ui:define>
+
+		<p:ajaxStatus onstart="PF('statusDialog').show()"
+			onsuccess="PF('statusDialog').hide()" />
+
+		<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:graphicImage value="../resources/img/ajax-loader.gif" />
+		</p:dialog>
+
 	</ui:composition>
 
 </h:body>

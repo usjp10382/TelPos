@@ -194,4 +194,9 @@ public class Stock implements Serializable {
 		this.state = state;
 	}
 
+	@Override
+	public String toString() {
+		return getBatchNumber() + "-" + getProduct().getPrdName() + "-" + getProduct().getBrand().getBrandName();
+	}
+
 }

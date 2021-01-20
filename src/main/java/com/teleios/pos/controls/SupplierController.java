@@ -70,11 +70,13 @@ public class SupplierController implements Serializable {
 		loadAllActiveSuppliyers();
 	}
 
-	public void initialized(PostRenderViewEvent e) {
-		LOGGER.info("Executing PostRenderViewEvent.....");
-		// loadAllActiveSuppliyers();
-
-	}
+	/*
+	 * public void initialized(PostRenderViewEvent e) {
+	 * LOGGER.info("Executing PostRenderViewEvent....."); //
+	 * loadAllActiveSuppliyers();
+	 * 
+	 * }
+	 */
 
 	private void loadAllActiveSuppliyers() {
 		LOGGER.debug("<---- Execute Load All Active Suppliyers In Suppliyer Controllers ------>");

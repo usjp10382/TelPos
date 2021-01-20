@@ -23,7 +23,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.teleios.pos.model.Customer;
+import com.teleios.pos.model.Stock;
 import com.teleios.pos.service.CustomerService;
+import com.teleios.pos.service.StockService;
 
 @Named("invController")
 @ViewScoped
@@ -34,9 +36,12 @@ public class InvoiceController implements Serializable {
 	// Injected OBJ
 	@Autowired
 	private CustomerService customerService;
+	@Autowired
+	private StockService stockService;
 
 	// Utility Object for invoice
 	private List<Customer> allActiveCustomers;
+	private List<Stock> stocks;
 
 	// New Customer Details
 	private String newCusFirstName;
@@ -47,10 +52,14 @@ public class InvoiceController implements Serializable {
 	// Invoice Header Objects
 	private Customer selectedCustomer;
 
+	// Invoice Details Obj
+	private Stock selectedItem;
+
 	@PostConstruct
 	public void init() {
 		LOGGER.info("Execute Invoice Controller Init --------->");
 		loadAllActiveCustomers();
+		loadAllStockForPOS();
 	}
 
 	private void loadAllActiveCustomers() {
@@ -78,6 +87,30 @@ public class InvoiceController implements Serializable {
 		}
 	}
 
+	private void loadAllStockForPOS() {
+		LOGGER.info("<-------- Execute load All Stock For POS In Invoice Controller ------>");
+		try {
+			this.stocks = this.stockService.getStockForPOS();
+
+		} catch (SocketTimeoutException ste) {
+			LOGGER.error("Load All Stock Items For POS Coldnt Connect to Database Server---", ste);
+			addErrorMessage("\"Load All Stock Items For POS",
+					"Couldnt Connect To Database\n" + ste.getLocalizedMessage());
+		} catch (EmptyResultDataAccessException ere) {
+			LOGGER.error("Load All Stock Items For POS Empty Customers---", ere);
+			addErrorMessage("Load All Stock Items For POS",
+					"Couldnt Find Any Stock Items On System Admin\n" + ere.getLocalizedMessage());
+		} catch (DataAccessException dae) {
+			LOGGER.error("Load All Stock Items For POS Internal Server Error Please Confirm To System Admin---", dae);
+			addErrorMessage("Load All Stock Items For POS",
+					"Internal Server Error Please Confirm To System Admin\n" + dae.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.error("Load All Stock Items For POS Internal Server Error Please Confirm To System Admin---", e);
+			addErrorMessage("Load All Stock Items For POS Customers",
+					"Internal Server Error Please Confirm To System Admin\n" + e.getLocalizedMessage());
+		}
+	}
+
 	public List<Customer> completeCustomerContains(String query) {
 		String queryLowerCase = query.toLowerCase();
 		return getAllActiveCustomers().stream()
@@ -87,9 +120,21 @@ public class InvoiceController implements Serializable {
 				.collect(Collectors.toList());
 	}
 
-	public void onItemSelect(SelectEvent<Customer> event) {
+	public void onCustomerSelect(SelectEvent<Customer> event) {
 		LOGGER.info("Selected Customer: " + event.getObject());
 		setSelectedCustomer(event.getObject());
+	}
+
+	public List<Stock> completeItemsContains(String query) {
+		String queryLowerCase = query.toLowerCase();
+		return getStocks().stream()
+				.filter(c -> c.getProduct().getPrdCode().toLowerCase().contains(queryLowerCase)
+						|| c.getProduct().getPrdName().toLowerCase().contains(queryLowerCase))
+				.collect(Collectors.toList());
+	}
+
+	public void onItemSelect(SelectEvent<Stock> event) {
+		LOGGER.info("Selected Customer: " + event.getObject());
 	}
 
 	public void createNewCustomer() {
@@ -201,15 +246,22 @@ public class InvoiceController implements Serializable {
 	}
 
 	public void setNewMobile(String newMobile) {
-		String[] mob = newMobile.split("-");
-		String correctNumber = null;
-
-		if (mob.length > 0)
-			correctNumber = newMobile;
-		else
-			correctNumber = mob[0] + mob[2];
-
-		this.newMobile = correctNumber;
+		this.newMobile = newMobile;
 	}
 
+	public List<Stock> getStocks() {
+		return stocks;
+	}
+
+	public void setStocks(List<Stock> stocks) {
+		this.stocks = stocks;
+	}
+
+	public Stock getSelectedItem() {
+		return selectedItem;
+	}
+
+	public void setSelectedItem(Stock selectedItem) {
+		this.selectedItem = selectedItem;
+	}
 }
