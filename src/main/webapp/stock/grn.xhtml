@@ -125,7 +125,8 @@
 															</p:selectOneMenu>
 
 															<p:commandButton type="button" icon="fa fa-info-circle"
-																title="View Supplier Details" styleClass="info-btn" onclick="PF('supDet').show();">
+																title="View Supplier Details" styleClass="info-btn"
+																onclick="PF('supDet').show();">
 															</p:commandButton>
 														</h:panelGrid>
 													</div>
@@ -378,12 +379,12 @@
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Discount (%)" />
 													<br />
-													<h:inputText id="disFull" type="number" maxlength="2" 
+													<p:inputText id="disFull" type="number" maxlength="2"
 														valueChangeListener="#{grnController.handleDiscountKeyEvent}"
 														value="#{grnController.grnHdr.grnValDiscount}"
 														style="width:77%">
 														<p:ajax event="keyup" update="payAmount,grnBal,payMsg" />
-													</h:inputText>
+													</p:inputText>
 
 												</div>
 
@@ -402,6 +403,11 @@
 														<p:ajax listener="#{grnController.onPayTypeChange}"
 															update="paidAmountCash,grnBal,paidAmountCheque,payMsg" />
 													</p:selectOneMenu>
+
+													<p:commandButton type="button" icon="fa fa-info-circle"
+														title="View Item Details" styleClass="info-btn"
+														onclick="PF('chequeDetailsPop').show();">
+													</p:commandButton>
 												</div>
 
 												<div class="p-col-12">
@@ -651,7 +657,7 @@
 						styleClass="red-button ui-confirmdialog-no" icon="pi pi-times" />
 				</p:confirmDialog>
 			</h:form>
-						
+
 			<!-- Supplier Details (popup) - Start -->
 			<p:dialog header="Supplier Details" widgetVar="supDet"
 				showEffect="clip" hideEffect="clip" height="100%" width="40%">
@@ -804,14 +810,67 @@
 					</div>
 
 					<div class="p-col-12" align="right">
-						<p:commandButton value="Add Item" icon="pi pi-check-circle" styleClass="blue-button"/>
+						<p:commandButton value="Add Item" icon="pi pi-check-circle"
+							styleClass="blue-button" />
 					</div>
 
 				</h:form>
 			</p:dialog>
 			<!-- New Product Add (popup) - End -->
-			
-			
+
+			<!-- Cheque Details Add (popup) - Start -->
+			<p:dialog header="Add Cheque Details" widgetVar="chequeDetailsPop"
+				showEffect="clip" hideEffect="clip" height="100%" width="50%">
+				<h:form id="newchequeFormPop">
+
+					<div class="p-grid">
+
+						<div class="p-col-6">
+							<div class="p-col-12">
+								<p:outputLabel value="Cheque No" for="@next" />
+								<br />
+								<p:inputText id="chequeNo" style="width:100%" required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel value="Bank" for="@next" />
+								<br />
+								<p:inputText id="bank" style="width:100%" required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel value="Branch" for="@next" />
+								<br />
+								<p:inputText id="branch" style="width:100%" required="true" />
+							</div>
+						</div>
+
+						<div class="p-col-6">
+							<div class="p-col-12">
+								<p:outputLabel value="Amount" for="@next" />
+								<br />
+								<p:inputText id="amount" style="width:100%" required="true" />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel value="Cheque Date" for="@next" />
+								<br />
+								<p:datePicker id="chequeDate" style="width:100%" required="true"  />
+							</div>
+
+							<div class="p-col-12">
+								<p:outputLabel value="Note" for="@next" />
+								<br />
+								<p:inputText id="note" style="width:100%" required="true" />
+							</div>
+						</div>
+
+					</div>
+
+				</h:form>
+			</p:dialog>
+			<!-- Cheque Details Add (popup) - End -->
+
 		</ui:define>
 	</ui:composition>
 
