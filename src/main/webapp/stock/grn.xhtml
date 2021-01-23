@@ -124,8 +124,8 @@
 																	itemValue="#{supp}" itemLabel="#{supp.supplierName}" />
 															</p:selectOneMenu>
 
-															<p:commandButton icon="fa fa-info-circle"
-																title="View Supplier Details" styleClass="info-btn">
+															<p:commandButton type="button" icon="fa fa-info-circle"
+																title="View Supplier Details" styleClass="info-btn" onclick="PF('supDet').show();">
 															</p:commandButton>
 														</h:panelGrid>
 													</div>
@@ -158,7 +158,7 @@
 													<p:commandButton icon="fa fa-shopping-cart"
 														style="margin-right:5px;background:#e02365;border:none"
 														type="button" id="newItem"
-														onclick="PF('pdfSheet').show();" title="Add New Item">
+														onclick="PF('newProductPop').show();" title="Add New Item">
 													</p:commandButton>
 												</div>
 											</div>
@@ -189,8 +189,9 @@
 																listener="#{grnController.onItemSelect}" />
 														</p:autoComplete>
 
-														<p:commandButton icon="fa fa-info-circle"
-															title="View Item Details" styleClass="info-btn">
+														<p:commandButton type="button" icon="fa fa-info-circle"
+															title="View Item Details" styleClass="info-btn"
+															onclick="PF('itemDetpop').show();">
 														</p:commandButton>
 														<br />
 													</h:panelGrid>
@@ -650,6 +651,166 @@
 						styleClass="red-button ui-confirmdialog-no" icon="pi pi-times" />
 				</p:confirmDialog>
 			</h:form>
+						
+			<!-- Supplier Details (popup) - Start -->
+			<p:dialog header="Supplier Details" widgetVar="supDet"
+				showEffect="clip" hideEffect="clip" height="100%" width="40%">
+				<h:form id="itemDetForm">
+
+					<div class="p-col-12">
+						<p:outputLabel value="Supplier Name" for="@next" />
+						<br />
+						<p:inputText id="supNamePop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Address" for="@next" />
+						<br />
+						<p:inputText id="addressPop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Mobile No" for="@next" />
+						<br />
+						<p:inputText id="mobileNoSup" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Fixed Line" for="@next" />
+						<br />
+						<p:inputText id="fixedPop" style="width:100%" readonly="true" />
+					</div>
+
+
+					<div class="p-col-12">
+						<p:outputLabel value="Email Address" for="@next" />
+						<br />
+						<p:inputText id="emailPop" style="width:100%" readonly="true" />
+					</div>
+				</h:form>
+			</p:dialog>
+			<!-- Supplier Details (popup) - End -->
+
+			<!-- Item Details (popup) - Start -->
+			<p:dialog header="Item Details" widgetVar="itemDetpop"
+				showEffect="clip" hideEffect="clip" height="100%" width="40%">
+				<h:form id="itemDetFormPop">
+
+					<div class="p-col-12">
+						<p:outputLabel value="Item Code" for="@next" />
+						<br />
+						<p:inputText id="itemCodePop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Product Name" for="@next" />
+						<br />
+						<p:inputText id="pNamePop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Brand" for="@next" />
+						<br />
+						<p:inputText id="brandPop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Caegory" for="@next" />
+						<br />
+						<p:inputText id="categoryPop" style="width:100%" readonly="true" />
+					</div>
+
+
+					<div class="p-col-12">
+						<p:outputLabel value="UOM" for="@next" />
+						<br />
+						<p:inputText id="uomPop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Expire Date" for="@next" />
+						<br />
+						<p:inputText id="expDatePop" style="width:100%" readonly="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Rack No" for="@next" />
+						<br />
+						<p:inputText id="rackNoPop" style="width:100%" readonly="true" />
+					</div>
+				</h:form>
+			</p:dialog>
+			<!-- Item Details (popup) - End -->
+
+			<!-- New Product Add (popup) - Start -->
+			<p:dialog header="Add a New Product" widgetVar="newProductPop"
+				showEffect="clip" hideEffect="clip" height="100%" width="40%">
+				<h:form id="newItemFormPop">
+
+					<div class="p-col-12">
+						<p:outputLabel value="Item Code" for="@next" />
+						<br />
+						<p:inputText id="addItemCodePop" style="width:100%"
+							required="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Product Name" for="@next" />
+						<br />
+						<p:inputText id="addPNamePop" style="width:100%" required="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Minimum quanitiy" for="@next" />
+						<br />
+						<p:inputText id="addMinQtyPop" style="width:100%" required="true" />
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Brand" for="@next" />
+						<br />
+						<p:selectOneMenu style="width:100%" id="addBrandPop" effect="fold"
+							required="true" requiredMessage="Select Brand Is Required"
+							filter="true" editable="true" placeholder="- Select Brand -">
+							<f:selectItems var="brandPop" />
+						</p:selectOneMenu>
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Category" for="@next" />
+						<br />
+						<p:selectOneMenu style="width:100%" id="addCategoryPop"
+							effect="fold" required="true"
+							requiredMessage="Select Category Is Required" filter="true"
+							editable="true" placeholder="- Select Category -">
+							<f:selectItems var="CategoryPop" />
+						</p:selectOneMenu>
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="UOM" for="@next" />
+						<br />
+						<p:selectOneMenu style="width:100%" id="addUomPop" effect="fold"
+							required="true" requiredMessage="Select UOM Is Required"
+							filter="true" editable="true" placeholder="- Select UOM -">
+							<f:selectItems var="UOMPop" />
+						</p:selectOneMenu>
+					</div>
+
+					<div class="p-col-12">
+						<p:outputLabel value="Rack Number" for="@next" />
+						<br />
+						<p:inputText id="rackPops" style="width:100%" required="true" />
+					</div>
+
+					<div class="p-col-12" align="right">
+						<p:commandButton value="Add Item" icon="pi pi-check-circle" styleClass="blue-button"/>
+					</div>
+
+				</h:form>
+			</p:dialog>
+			<!-- New Product Add (popup) - End -->
+			
 		</ui:define>
 	</ui:composition>
 
