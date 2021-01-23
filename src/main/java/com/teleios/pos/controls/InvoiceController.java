@@ -645,6 +645,7 @@ public class InvoiceController implements Serializable {
 						addErrorMessage("Confirm Invoice", "The Paid Amount Is Required!");
 						return;
 					}
+					
 					if (invHdr.getTotalPaid().compareTo(invHdr.getPayblAmount()) == -1) {
 						addErrorMessage("Couldnd Complite Cash Invoice",
 								"The Cash Payment Shuld Gretter thaan Or Equal to Invoice Payble Amount!");
