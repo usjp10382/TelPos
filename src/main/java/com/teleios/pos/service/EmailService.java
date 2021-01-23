@@ -23,16 +23,16 @@ public class EmailService implements Serializable {
 	private JavaMailSender mailSender;
 	private ReportService reportService;
 
-	@Autowired
-	public EmailService(JavaMailSender mailSender, ReportService reportService) {
-		super();
-		this.mailSender = mailSender;
-		this.reportService = reportService;
-	}
+	/*
+	 * @Autowired public EmailService(JavaMailSender mailSender, ReportService
+	 * reportService) { super(); this.mailSender = mailSender; this.reportService =
+	 * reportService; }
+	 */
 
 	public void sendMail(Integer grnNumber) throws JRException, IOException, MessagingException, Exception {
 		LOGGER.info("<-------- Execute Send Mail In Email Serice --------->");
 		String from = "ahangamaharith1@gmail.com";
+		
 		// String to = "teleioslk@gmail.com";
 		String[] recepiants = new String[] { "ahangamaharith1@gmail.com", "teleioslk@gmail.com" };
 

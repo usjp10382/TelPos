@@ -15,21 +15,24 @@ import java.util.List;
  *
  */
 public class InvHdr implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5385748129074158691L;
 
 	private Integer invNumber;
 	private Date createDate;
-	private BigDecimal totalDiscoount;
 	private BigDecimal totalAmount;
+	private BigDecimal labourCharge;
+	private BigDecimal transaCharge;
+	private BigDecimal totalDiscoount;
+	private BigDecimal payblAmount;
 	private BigDecimal cashValue;
+	private BigDecimal chequAmount;
+	private BigDecimal totalPaid;
 	private BigDecimal balance;
-	private PayType payType;
+	private PaymentType payType;
 	private Customer customer;
 	private String createBy;
+	private String barcode;
+	private CheqDetails cheqDetails;
 	private short state;
 	private List<InvDet> invDets;
 
@@ -37,20 +40,28 @@ public class InvHdr implements Serializable {
 		super();
 	}
 
-	public InvHdr(Integer invNumber, Date createDate, BigDecimal totalDiscoount, BigDecimal totalAmount,
-			BigDecimal cashValue, BigDecimal balance, PayType payType, Customer customer, String createBy,
-			short state) {
+	public InvHdr(Integer invNumber, Date createDate, BigDecimal totalAmount, BigDecimal labourCharge,
+			BigDecimal transaCharge, BigDecimal totalDiscoount, BigDecimal payblAmount, BigDecimal cashValue,
+			BigDecimal chequAmount, BigDecimal totalPaid, BigDecimal balance, PaymentType payType, Customer customer,
+			String createBy, String barcode, short state, List<InvDet> invDets) {
 		super();
 		this.invNumber = invNumber;
 		this.createDate = createDate;
-		this.totalDiscoount = totalDiscoount;
 		this.totalAmount = totalAmount;
+		this.labourCharge = labourCharge;
+		this.transaCharge = transaCharge;
+		this.totalDiscoount = totalDiscoount;
+		this.payblAmount = payblAmount;
 		this.cashValue = cashValue;
+		this.chequAmount = chequAmount;
+		this.totalPaid = totalPaid;
 		this.balance = balance;
 		this.payType = payType;
 		this.customer = customer;
 		this.createBy = createBy;
+		this.barcode = barcode;
 		this.state = state;
+		this.invDets = invDets;
 	}
 
 	public Integer getInvNumber() {
@@ -69,6 +80,30 @@ public class InvHdr implements Serializable {
 		this.createDate = createDate;
 	}
 
+	public BigDecimal getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(BigDecimal totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	public BigDecimal getLabourCharge() {
+		return labourCharge;
+	}
+
+	public void setLabourCharge(BigDecimal labourCharge) {
+		this.labourCharge = labourCharge;
+	}
+
+	public BigDecimal getTransaCharge() {
+		return transaCharge;
+	}
+
+	public void setTransaCharge(BigDecimal transaCharge) {
+		this.transaCharge = transaCharge;
+	}
+
 	public BigDecimal getTotalDiscoount() {
 		return totalDiscoount;
 	}
@@ -77,12 +112,12 @@ public class InvHdr implements Serializable {
 		this.totalDiscoount = totalDiscoount;
 	}
 
-	public BigDecimal getTotalAmount() {
-		return totalAmount;
+	public BigDecimal getPayblAmount() {
+		return payblAmount;
 	}
 
-	public void setTotalAmount(BigDecimal totalAmount) {
-		this.totalAmount = totalAmount;
+	public void setPayblAmount(BigDecimal payblAmount) {
+		this.payblAmount = payblAmount;
 	}
 
 	public BigDecimal getCashValue() {
@@ -93,6 +128,22 @@ public class InvHdr implements Serializable {
 		this.cashValue = cashValue;
 	}
 
+	public BigDecimal getChequAmount() {
+		return chequAmount;
+	}
+
+	public void setChequAmount(BigDecimal chequAmount) {
+		this.chequAmount = chequAmount;
+	}
+
+	public BigDecimal getTotalPaid() {
+		return totalPaid;
+	}
+
+	public void setTotalPaid(BigDecimal totalPaid) {
+		this.totalPaid = totalPaid;
+	}
+
 	public BigDecimal getBalance() {
 		return balance;
 	}
@@ -101,11 +152,11 @@ public class InvHdr implements Serializable {
 		this.balance = balance;
 	}
 
-	public PayType getPayType() {
+	public PaymentType getPayType() {
 		return payType;
 	}
 
-	public void setPayType(PayType payType) {
+	public void setPayType(PaymentType payType) {
 		this.payType = payType;
 	}
 
@@ -123,6 +174,22 @@ public class InvHdr implements Serializable {
 
 	public void setCreateBy(String createBy) {
 		this.createBy = createBy;
+	}
+
+	public String getBarcode() {
+		return barcode;
+	}
+
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+
+	public CheqDetails getCheqDetails() {
+		return cheqDetails;
+	}
+
+	public void setCheqDetails(CheqDetails cheqDetails) {
+		this.cheqDetails = cheqDetails;
 	}
 
 	public short getState() {

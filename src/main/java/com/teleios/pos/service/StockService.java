@@ -31,6 +31,11 @@ public class StockService {
 		return this.stockDaoImpl.createNewStockItems(grnDets, batchNumber);
 	}
 
+	public Stock getStockItemByNumber(Integer stockItem) throws SocketTimeoutException,EmptyResultDataAccessException, DataAccessException, Exception {
+		LOGGER.info("<------ Execute Get Stock Item By Number In Service ------>");
+		return this.stockDaoImpl.getStockItemByNumber(stockItem);
+	}
+
 	public List<Stock> getStockForPOS()
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
 		LOGGER.info("<------ Execute Get Stock Sot POS In Stock Service ------->");
