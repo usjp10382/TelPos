@@ -58,7 +58,7 @@
 				<h:form id="invoceForm"
 					onkeypress="if (event.keyCode == 13) { return false; }">
 
-					<p:growl id="growl" sticky="false" life="5000" showDetail="true"
+					<p:growl id="growl" sticky="false" life="3000" showDetail="true"
 						showSummary="false" />
 					<!-- Body - Start -->
 					<div class="p-grid">
@@ -85,7 +85,8 @@
 											completeMethod="#{invController.completeCustomerContains}"
 											onkeypress="if (event.keyCode == 13) {PF('wgitemDetails').jq.focus(); return false; }"
 											converter="cusConvertor">
-											<p:ajax event="itemSelect" update=":cusDetails" />
+											<p:ajax event="itemSelect"
+												update=":cusDetails,:invoceForm:pnlInvDet" />
 										</p:autoComplete>
 
 
@@ -107,104 +108,135 @@
 							<!-- Header Details - End -->
 
 							<!-- Item Details - Start -->
-							<div class="p-grid">
-								<div class="p-col-5">
-									<p:outputLabel value="Item" for="@next" />
-									<br />
-									<p:autoComplete id="itemDetails" dropdown="true"
-										widgetVar="wgitemDetails" style="width: 80%"
-										completeMethod="#{invController.completeItemsContains}"
-										var="item" value="#{invController.selectedItem}"
-										forceSelection="true" queryDelay="700" itemLabel="#{item}"
-										minQueryLength="3" itemValue="#{item}"
-										onkeypress="if (event.keyCode == 13) {PF('wgqty').jq.focus(); return false; }"
-										converter="itemConvertor" inputStyle="width: 90%">
-										<p:ajax event="itemSelect"
-											listener="#{invController.onItemSelect}" update="uom,uPrice" />
-									</p:autoComplete>
+							<p:panel header="Enter Invoice Items Details" id="pnlInvDet">
+								<p:focus for="itemDetails" id="prdFocus" />
+								<div class="p-grid">
+									<div class="p-col-5">
+										<p:outputLabel value="Item" for="@next" />
+										<br />
+										<p:autoComplete id="itemDetails" dropdown="true"
+											widgetVar="wgitemDetails" style="width: 80%"
+											completeMethod="#{invController.completeItemsContains}"
+											var="item" value="#{invController.selectedItem}"
+											required="true"
+											onkeypress="if (event.keyCode == 13) {PF('totDisc').jq.focus(); return false; }"
+											requiredMessage="The Select Item Is Required!"
+											forceSelection="true" queryDelay="700" itemLabel="#{item}"
+											minQueryLength="3" itemValue="#{item}"
+											converter="itemConvertor" inputStyle="width: 90%">
+											<p:ajax event="itemSelect"
+												listener="#{invController.onItemSelect}"
+												onsuccess="PF('wgqty').jq.focus();"
+												update="growl,uom,uPrice" />
+										</p:autoComplete>
 
-									<p:commandButton type="button" icon="fa fa-info-circle"
-										title="View Itemf Details" styleClass="info-btn"
-										onclick="PF('itemDet').show();">
-									</p:commandButton>
+										<p:commandButton icon="fa fa-info-circle"
+											title="View Itemf Details" styleClass="info-btn"
+											process="@this" update="growl,:itemDetForm"
+											action="#{invController.getStockItemByNumber}"
+											oncomplete="PF('itemDet').show();">
+										</p:commandButton>
+									</div>
+
+									<div class="p-col-1">
+										<p:outputLabel value="UOM" for="@next" />
+										<br />
+										<p:inputText id="uom" style="width:100%" readonly="true"
+											value="#{invController.selectedItem.product.uom.uomChar}" />
+									</div>
+
+									<div class="p-col-2">
+										<p:outputLabel value="Unit Price" for="@next" />
+										<br />
+										<p:inputText type="number" widgetVar="wgprice" id="uPrice"
+											readonly="true" required="true"
+											requiredMessage="The Unit Price Is Required!"
+											value="#{invController.selectedItem.sellingPrice}"
+											style="width:100%" />
+									</div>
+
+									<div class="p-col-2">
+										<p:outputLabel value="Quantity" for="@next" />
+										<br />
+										<p:inputText id="qty" type="number" widgetVar="wgqty"
+											required="true" requiredMessage="The Quantity Is Required?"
+											value="#{invController.qty}"
+											onkeypress="if (event.keyCode == 13) {PF('discount').jq.focus(); return false; }"
+											style="width:100%" />
+
+									</div>
+
+									<div class="p-col-2">
+										<p:outputLabel value="Discount (%)" for="@next" />
+										<p:remoteCommand name="addCrt"
+											action="#{invController.addTocart}" process="@this pnlInvDet"
+											update="growl,pnlInvDet,invoItemTable,totAmount,paybleAmount,dis,cPay" />
+										<br />
+										<p:inputText type="number" widgetVar="discount" id="discount"
+											onkeypress="if (event.keyCode === 13) { addCrt(); return false; }"
+											value="#{invController.discount}"
+											validatorMessage="The Discount Shuld Betwee 0.0 to 99.99"
+											style="width:100%">
+											<f:validateDoubleRange minimum="0.00" maximum="99.99" />
+										</p:inputText>
+										<p:message for="discount" showDetail="true" showSummary="true"
+											skipDetailIfEqualsSummary="true" />
+									</div>
+
+									<div class="p-col-12">
+										<p:separator />
+									</div>
 								</div>
-
-								<div class="p-col-1">
-									<p:outputLabel value="UOM" for="@next" />
-									<br />
-									<p:inputText id="uom" style="width:100%" readonly="true"
-										value="#{invController.selectedItem.product.uom.uomChar}" />
-								</div>
-
-								<div class="p-col-2">
-									<p:outputLabel value="Quantity" for="@next" />
-									<br />
-									<p:inputText id="qty" type="number" widgetVar="wgqty"
-										style="width:100%" />
-								</div>
-
-
-								<div class="p-col-2">
-									<p:outputLabel value="Unit Price" for="@next" />
-									<br />
-									<p:inputText type="number" widgetVar="wgprice" id="uPrice"
-										value="#{invController.selectedItem.sellingPrice}"
-										style="width:100%" />
-								</div>
-
-								<div class="p-col-2">
-									<p:outputLabel value="Discount" for="@next" />
-									<br />
-									<h:inputText type="number" id="discount" style="width:100%"
-										maxlength="2" />
-								</div>
-
-								<div class="p-col-12">
-									<p:separator />
-								</div>
-							</div>
+							</p:panel>
 							<!-- Item Details - End -->
 
 							<!-- Item Table - Start -->
 							<div class="p-grid">
 								<div class="p-col-8">
-									<p:dataTable resizableColumns="true" var="invoTable"
-										id="invoItemTable">
+									<p:dataTable resizableColumns="true" var="inv"
+										id="invoItemTable" value="#{invController.invDets}">
 										<p:column headerText="Item No">
-											<h:outputText value="#{grnDet.grnDetNumber}" />
+											<h:outputText value="#{inv.invDetNumber}" />
 										</p:column>
 
 										<p:column headerText="Item Code">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText value="#{inv.stockItem.product.prdCode}" />
 										</p:column>
 
 										<p:column headerText="Item Name">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText value="#{inv.stockItem.product.prdName}" />
 										</p:column>
 
 										<p:column headerText="Brand">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText
+												value="#{inv.stockItem.product.brand.brandName}" />
 										</p:column>
 
 										<p:column headerText="Qty">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText value="#{inv.qty}" />
 										</p:column>
 
 										<p:column headerText="Unit Price">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText value="#{inv.sellingPrice}" />
 										</p:column>
 
 										<p:column headerText="Discount">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText value="#{inv.discount}" />
 										</p:column>
 
 										<p:column headerText="Total">
-											<h:outputText value="#{grnDet.product.prdCode}" />
+											<h:outputText value="#{inv.amount}" />
 										</p:column>
 
 										<p:column style="width:32px;text-align: center">
 											<p:commandButton icon="pi pi-trash" title="Delete"
+												process="invoItemTable"
+												update=":invoceForm:totAmount,:invoceForm:paybleAmount,:invoceForm:dis,:invoceForm:invoItemTable,:invoceForm:growl"
 												style="width:20px;height:20px" styleClass="red-button">
+												<f:setPropertyActionListener value="#{inv}"
+													target="#{invController.havRemoveDel}" />
+												<p:confirm header="Remove Invoice Item"
+													message="Are You Sure Remove Selected Invoice Item?" />
 											</p:commandButton>
 										</p:column>
 									</p:dataTable>
@@ -212,86 +244,151 @@
 								<!-- Item Table - End -->
 
 								<!-- Item Payment Details - Start -->
-								<div class="p-col-4" align="center"
-									style="display: block; border: solid 1px #1387C4; margin-top: 10px">
-									<table>
-										<tr>
-											<td><h4>Total Amount</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="totAmount"
-													styleClass="read-only-btn" readonly="true" /></td>
-										</tr>
+								<p:panel id="pnlInvPayment" header="Invoice Payments">
+									<div class="p-col-4" align="center"
+										style="display: block; border: solid 1px #1387C4; margin-top: 10px">
+										<table>
+											<tr>
+												<td><h4>Total Amount</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="totAmount"
+														value="#{invController.invHdr.totalAmount}"
+														styleClass="read-only-btn" readonly="true">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:inputText></td>
+											</tr>
 
-										<tr>
-											<td><h4>Discount (%)</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="dis" /></td>
-										</tr>
+											<tr>
+												<td><h4>Labour Charges</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="laborCharges"
+														inputStyle="text-align: right"
+														value="#{invController.invHdr.labourCharge}"
+														styleClass="read-only-btn" readonly="true">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:inputText></td>
+											</tr>
 
-										<tr>
-											<td><h4>Labour Charges</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="laborCharges"
-													styleClass="read-only-btn" readonly="true" /></td>
-										</tr>
+											<tr>
+												<td><h4>Transport Charges</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="transportCharges"
+														inputStyle="text-align: right"
+														value="#{invController.invHdr.transaCharge}"
+														styleClass="read-only-btn" readonly="true">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:inputText></td>
+											</tr>
 
-										<tr>
-											<td><h4>Transport Charges</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="transportCharges"
-													styleClass="read-only-btn" readonly="true" /></td>
-										</tr>
+											<tr>
+												<td><h4>Discount (%)</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="dis" widgetVar="totDisc"
+														disabled="#{invController.txtDiscountLock}" type="number"
+														valueChangeListener="#{invController.handleDiscountKeyEvent}"
+														validatorMessage="The Discount Shuld Betwee 0.0 to 99.99"
+														onkeypress="if (event.keyCode == 13) {PF('cashPay').jq.focus(); return false; }"
+														value="#{invController.invHdr.totalDiscoount}">
+														<f:validateDoubleRange minimum="0.00" maximum="99.99" />
+														<p:ajax event="keyup"
+															update=":invoceForm:growl,:invoceForm:paybleAmount" />
+													</p:inputText></td>
+											</tr>
 
-										<tr>
-											<td><h4>Payble Amount</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="paybleAmount"
-													styleClass="read-only-btn" readonly="true" /></td>
-										</tr>
+											<tr>
+												<td><h4>Payable Amount</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="paybleAmount"
+														styleClass="read-only-btn"
+														value="#{invController.invHdr.payblAmount}"
+														readonly="true">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:inputText></td>
+											</tr>
 
-										<tr>
-											<td><h4>Payment Type</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:selectOneMenu id="pType" style="width:100%">
+											<tr>
+												<td><h4>Payment Type</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:selectOneMenu style="width:100%" id="pType"
+														effect="fold" required="true"
+														requiredMessage="Select Payment Type Is Required"
+														filter="true" editable="true" converter="payConvertor"
+														placeholder="- Select Payment Type -"
+														value="#{invController.selPayType}">
+														<f:selectItems value="#{invController.paymentTypes}"
+															var="paytyp" itemValue="#{paytyp}"
+															itemLabel="#{paytyp.desc}" />
+														<p:ajax listener="#{invController.onPayTypeChange}"
+															update=":invoceForm:cheqPay" />
+													</p:selectOneMenu></td>
+											</tr>
 
-												</p:selectOneMenu></td>
-										</tr>
+											<tr>
+												<td><h4>Cash Payment</h4></td>
+												<td><h4>:</h4></td>
+												<p:remoteCommand name="addCahsRecved"
+													action="#{invController.setCashReceved}"
+													process="pnlInvPayment"
+													onsuccess="PF('paidAmount').jq.focus();"
+													update=":invoceForm:growl,:invoceForm:pnlInvPayment" />
+												<td><p:inputText type="number" id="cPay"
+														widgetVar="cashPay"
+														onkeypress="if (event.keyCode === 13) { addCahsRecved(); return false; }"
+														value="#{invController.invHdr.cashValue}"
+														disabled="#{invController.txtCashPayLock}" /></td>
+											</tr>
 
-										<tr>
-											<td><h4>Cash Payment</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="cPay" /></td>
-										</tr>
+											<tr>
+												<td><h4>Cheque Payment</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="cheqPay" type="number"
+														disabled="#{invController.txtCheqPayLock}" /></td>
+											</tr>
 
-										<tr>
-											<td><h4>Cheque Payment</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="cheqPay" /></td>
-										</tr>
+											<tr>
+												<p:remoteCommand name="confirmInvoice"
+													action="#{invController.confirmInvoice}"
+													onstart="PF('onConfirmlock').block()"
+													oncomplete="PF('onConfirmlock').unblock()"
+													process="pnlInvPayment"
+													update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet" />
+												<td><h4>Total Paid Amount</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="paidAmount" widgetVar="paidAmount" type="number"
+														value="#{invController.invHdr.totalPaid}"
+														valueChangeListener="#{invController.onCashChange}"
+														onkeypress="if (event.keyCode === 13) { confirmInvoice(); return false; }">
+														<p:ajax event="keyup" update=":invoceForm:balanceAmount" />
+													</p:inputText></td>
+											</tr>
 
-										<tr>
-											<td><h4>Total Paid Amount</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="paidAmount"
-													styleClass="read-only-btn" readonly="true" /></td>
-										</tr>
 
+											<tr>
+												<td><h4>Balance Amount</h4></td>
+												<td><h4>:</h4></td>
+												<td><p:inputText id="balanceAmount"
+														value="#{invController.invHdr.balance}"
+														styleClass="read-only-btn" readonly="true">
+														<f:convertNumber type="currency" currencySymbol="LKR " />
+													</p:inputText></td>
+											</tr>
+										</table>
 
-										<tr>
-											<td><h4>Balance Amount</h4></td>
-											<td><h4>:</h4></td>
-											<td><p:inputText id="balanceAmount"
-													styleClass="read-only-btn" readonly="true" /></td>
-										</tr>
-									</table>
+										<p:commandButton value="Create Invoice"
+											icon="pi pi-check-circle"
+											style="margin-right:20px;margin-top:10px;width:100%"
+											action="#{invController.confirmInvoice}"
+											onstart="PF('onConfirmlock').block()"
+											oncomplete="PF('onConfirmlock').unblock()"
+											process="pnlInvPayment"
+											update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet"
+											widgetVar="btnSave">
+											<p:confirm message="Are You Sure Create New Cash Invocie?"
+												icon="pi pi-check-circle" header="Confirm Cash Invoice" />
+										</p:commandButton>
 
-									<p:commandButton value="Create Invoice"
-										icon="pi pi-check-circle"
-										style="margin-right:20px;margin-top:10px;width:100%"
-										widgetVar="btnSave">
-									</p:commandButton>
-
-								</div>
+									</div>
+								</p:panel>
 								<!-- Item Payment Details - End -->
 							</div>
 
@@ -311,7 +408,19 @@
 					<div class="p-col-12" align="center">
 						<p:outputLabel value="Add the Cost" for="@next" />
 						<br />
-						<p:inputText id="labCost" style="width:100%" />
+						<p:remoteCommand name="addLabCost"
+							oncomplete="if(!args.validationFailed){PF('labCost').hide();}"
+							action="#{invController.addLabourCost}" process="@form"
+							update=":labCostForm:labCost,:invoceForm:growl,:invoceForm:laborCharges,:invoceForm:paybleAmount,:invoceForm:pnlInvDet" />
+
+						<p:inputText type="number" id="labCost" style="width:100%"
+							required="true" requiredMessage="The Labour Charge Is Required!"
+							onkeypress="if (event.keyCode === 13) { addLabCost(); return false; }"
+							value="#{invController.invHdr.labourCharge}">
+							<f:validateDoubleRange minimum="0.00" maximum="20000.00" />
+						</p:inputText>
+						<p:message for="labCost" showDetail="true" showSummary="true"
+							skipDetailIfEqualsSummary="true" />
 					</div>
 
 				</h:form>
@@ -324,9 +433,19 @@
 				<h:form id="transCostForm">
 
 					<div class="p-col-12" align="center">
+						<p:remoteCommand name="addTransCost"
+							oncomplete="if(!args.validationFailed){PF('transCost').hide();}"
+							action="#{invController.addTransportCost}" process="@form"
+							update=":transCostForm:transCost,:invoceForm:growl,:invoceForm:transportCharges,:invoceForm:paybleAmount,:invoceForm:pnlInvDet" />
 						<p:outputLabel value="Add the Cost" for="@next" />
 						<br />
-						<p:inputText id="transCost" style="width:100%" />
+						<p:inputText type="number" id="transCost"
+							onkeypress="if (event.keyCode === 13) { addTransCost(); return false; }"
+							value="#{invController.invHdr.transaCharge}" style="width:100%">
+							<f:validateDoubleRange minimum="0.00" maximum="20000.00" />
+						</p:inputText>
+						<p:message for="transCost" showDetail="true" showSummary="true"
+							skipDetailIfEqualsSummary="true" />
 					</div>
 
 				</h:form>
@@ -430,50 +549,61 @@
 
 			<!-- Item Details - Start -->
 			<p:dialog header="Item Details" widgetVar="itemDet" showEffect="clip"
-				hideEffect="clip" height="100%" width="40%">
+				dynamic="true" appendTo="fldInv" hideEffect="clip" height="100%"
+				width="40%">
 				<h:form id="itemDetForm">
 
 					<div class="p-col-12">
 						<p:outputLabel value="Item Code" for="@next" />
 						<br />
-						<p:inputText id="itemCode" style="width:100%" readonly="true" />
+						<p:inputText id="itemCode" style="width:100%" readonly="true"
+							value="#{invController.moreDetStockItem.product.prdCode}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Product Name" for="@next" />
 						<br />
-						<p:inputText id="pName" style="width:100%" readonly="true" />
+						<p:inputText id="pName" style="width:100%" readonly="true"
+							value="#{invController.moreDetStockItem.product.prdName}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Brand" for="@next" />
 						<br />
-						<p:inputText id="brand" style="width:100%" readonly="true" />
+						<p:inputText id="brand" style="width:100%" readonly="true"
+							value="#{invController.moreDetStockItem.product.brand.brandName}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Caegory" for="@next" />
 						<br />
-						<p:inputText id="category" style="width:100%" readonly="true" />
+						<p:inputText id="category" style="width:100%" readonly="true"
+							value="#{invController.moreDetStockItem.product.category.categoryName}" />
 					</div>
 
 
 					<div class="p-col-12">
 						<p:outputLabel value="UOM" for="@next" />
 						<br />
-						<p:inputText id="uom" style="width:100%" readonly="true" />
+						<p:inputText id="uom" style="width:100%" readonly="true"
+							value="#{invController.moreDetStockItem.product.uom.uomName}-#{invController.moreDetStockItem.product.uom.uomChar}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Expire Date" for="@next" />
 						<br />
-						<p:inputText id="expDate" style="width:100%" readonly="true" />
+						<p:inputText id="expDate"
+							value="#{empty invController.moreDetStockItem.expDate ? 'N/A' : invController.moreDetStockItem.expDate}"
+							style="width:100%" readonly="true">
+							<f:convertDateTime type="date" pattern="YYYY-MM-dd" />
+						</p:inputText>
 					</div>
 
 					<div class="p-col-12">
-						<p:outputLabel value="Rack No" for="@next" />
+						<p:outputLabel value="Max Feecable Discount(5)" for="@next" />
 						<br />
-						<p:inputText id="rackNo" style="width:100%" readonly="true" />
+						<p:inputText id="rackNo" style="width:100%" readonly="true"
+							value="#{invController.maxFeeDiscount}" />
 					</div>
 				</h:form>
 			</p:dialog>
@@ -488,11 +618,11 @@
 
 			<!-- Start Block Page Extentions -->
 
-			<pe:blockUI target="fldInv" widgetVar="onLoadBlock" autoShow="true">
+			<pe:blockUI target="fldInv" widgetVar="onConfirmlock" autoShow="true">
 				<h:panelGrid columns="2">
 					<p:graphicImage value="../resources/img/ajax-loader.gif"
 						style="margin-right: 12px; vertical-align: middle;" />
-					<h:outputText value="Sending  GRN Email......"
+					<h:outputText value="Creating New  Invoice......"
 						style="white-space: nowrap;" />
 				</h:panelGrid>
 			</pe:blockUI>

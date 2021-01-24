@@ -420,10 +420,10 @@ public class ProductController implements Serializable {
 			}
 		} catch (SocketTimeoutException ste) {
 			LOGGER.error("Delete Product Couldn't Connect TO Database", ste);
-			addMessage("Delete Product", "Couldn't Connect To Database !\n" + ste.getMessage());
+			addErrorMessage("Delete Product", "Couldn't Connect To Database !\n" + ste.getMessage());
 		} catch (Exception e) {
 			LOGGER.error("Delete Product Error--->", e);
-			addMessage("Delete Product", "Delete Product Error !\n" + e.getLocalizedMessage());
+			addErrorMessage("Delete Product", "Delete Product Error !\n" + e.getLocalizedMessage());
 		}
 	}
 

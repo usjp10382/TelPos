@@ -33,6 +33,7 @@ public class EmailService implements Serializable {
 	public void sendMail(Integer grnNumber) throws JRException, IOException, MessagingException, Exception {
 		LOGGER.info("<-------- Execute Send Mail In Email Serice --------->");
 		String from = "ahangamaharith1@gmail.com";
+		
 		// String to = "teleioslk@gmail.com";
 		String[] recepiants = new String[] { "ahangamaharith1@gmail.com", "teleioslk@gmail.com" };
 

@@ -183,9 +183,9 @@
 															widgetVar="autocomplete" itemLabel="#{prd.prdName}"
 															minQueryLength="2" itemValue="#{prd}"
 															completeMethod="#{grnController.completeProductsContains}"
-															onkeypress="if (event.keyCode == 13) {PF('qtyFil').jq.focus(); return false; }"
 															converter="prdConvertor">
 															<p:ajax event="itemSelect"
+																onsuccess="PF('qtyFil').jq.focus();"
 																listener="#{grnController.onItemSelect}" />
 														</p:autoComplete>
 
@@ -377,7 +377,7 @@
 												<div class="p-col-12">
 													<p:outputLabel for="@next" value="Discount (%)" />
 													<br />
-													<h:inputText id="disFull" type="number" maxlength="2"
+													<h:inputText id="disFull" type="number" maxlength="2" 
 														valueChangeListener="#{grnController.handleDiscountKeyEvent}"
 														value="#{grnController.grnHdr.grnValDiscount}"
 														style="width:77%">

@@ -1,6 +1,7 @@
 package com.teleios.pos.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Customer implements Serializable {
@@ -11,6 +12,7 @@ public class Customer implements Serializable {
 	private String lastName;
 	private String address;
 	private String mobileNumber;
+	private BigDecimal fwBalance;
 	private String createBy;
 	private Date createDate;
 	private Short customerState;
@@ -20,13 +22,14 @@ public class Customer implements Serializable {
 	}
 
 	public Customer(Integer customerId, String firstName, String lastName, String address, String mobileNumber,
-			String createBy, Date createDate, Short customerState) {
+			BigDecimal fwBalance, String createBy, Date createDate, Short customerState) {
 		super();
 		this.customerId = customerId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.address = address;
 		this.mobileNumber = mobileNumber;
+		this.fwBalance = fwBalance;
 		this.createBy = createBy;
 		this.createDate = createDate;
 		this.customerState = customerState;
@@ -77,6 +80,14 @@ public class Customer implements Serializable {
 		 */
 
 		this.mobileNumber = mobileNumber;
+	}
+
+	public BigDecimal getFwBalance() {
+		return fwBalance;
+	}
+
+	public void setFwBalance(BigDecimal fwBalance) {
+		this.fwBalance = fwBalance;
 	}
 
 	public String getCreateBy() {

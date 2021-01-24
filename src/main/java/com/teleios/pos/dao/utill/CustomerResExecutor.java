@@ -19,7 +19,8 @@ public class CustomerResExecutor implements ResultSetExtractor<List<Customer>> {
 		while (rs.next()) {
 			Customer customer = new Customer(rs.getInt("customer_id"), rs.getString("first_name"),
 					rs.getString("last_name"), rs.getString("address"), rs.getString("mobile_number"),
-					rs.getString("create_by"), rs.getDate("create_date"), rs.getShort("cus_state"));
+					rs.getBigDecimal("fw_balance"), rs.getString("create_by"), rs.getDate("create_date"),
+					rs.getShort("cus_state"));
 
 			customers.add(customer);
 
