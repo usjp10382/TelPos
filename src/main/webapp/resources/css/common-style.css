@@ -130,13 +130,10 @@
 	background-color: #e02365 !important;
 	font-weight: bold !important;
 	color: white !important;
-	font-size: medium;
+	font-size: medium !important;
 }
 
 .orange-btn {
 	background: orange !important;
 	border: 1px solid orange !important;
-}
-.ui-datatable thead th .ui-column-title {
-   font-size: 8px !important;
 }

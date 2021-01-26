@@ -70,7 +70,7 @@
 
 									<div>
 										<h4>
-											Invoice ID : <span>001</span>
+											Cashier : <span>Harith</span>
 										</h4>
 									</div>
 
@@ -183,48 +183,49 @@
 											skipDetailIfEqualsSummary="true" />
 									</div>
 
-									<div class="p-col-12">
-										<p:separator />
-									</div>
 								</div>
 							</p:panel>
 							<!-- Item Details - End -->
 
+							<div class="p-col-12">
+								<p:separator />
+							</div>
+
 							<!-- Item Table - Start -->
 							<div class="p-grid">
-								<div class="p-col-8">
+								<div class="p-col-12">
 									<p:dataTable resizableColumns="true" var="inv"
 										id="invoItemTable" value="#{invController.invDets}">
-										<p:column headerText="Item No">
+										<p:column headerText="Item No" style="width:5%">
 											<h:outputText value="#{inv.invDetNumber}" />
 										</p:column>
 
-										<p:column headerText="Item Code">
+										<p:column headerText="Item Code" style="width:10%">
 											<h:outputText value="#{inv.stockItem.product.prdCode}" />
 										</p:column>
 
-										<p:column headerText="Item Name">
+										<p:column headerText="Item Name" style="width:33%">
 											<h:outputText value="#{inv.stockItem.product.prdName}" />
 										</p:column>
 
-										<p:column headerText="Brand">
+										<p:column headerText="Brand" style="width:19%">
 											<h:outputText
 												value="#{inv.stockItem.product.brand.brandName}" />
 										</p:column>
 
-										<p:column headerText="Qty">
+										<p:column headerText="Qty" style="width:5%">
 											<h:outputText value="#{inv.qty}" />
 										</p:column>
 
-										<p:column headerText="Unit Price">
+										<p:column headerText="Unit Price" style="width:10%">
 											<h:outputText value="#{inv.sellingPrice}" />
 										</p:column>
 
-										<p:column headerText="Discount">
+										<p:column headerText="Dis (%)" style="width:8%">
 											<h:outputText value="#{inv.discount}" />
 										</p:column>
 
-										<p:column headerText="Total">
+										<p:column headerText="Total" style="width:10%">
 											<h:outputText value="#{inv.amount}" />
 										</p:column>
 
@@ -244,151 +245,172 @@
 								<!-- Item Table - End -->
 
 								<!-- Item Payment Details - Start -->
-								<p:panel id="pnlInvPayment" header="Invoice Payments">
-									<div class="p-col-4" align="center"
-										style="display: block; border: solid 1px #1387C4; margin-top: 10px">
-										<table>
-											<tr>
-												<td><h4>Total Amount</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="totAmount"
-														value="#{invController.invHdr.totalAmount}"
-														styleClass="read-only-btn" readonly="true">
-														<f:convertNumber type="currency" currencySymbol="LKR " />
-													</p:inputText></td>
-											</tr>
 
-											<tr>
-												<td><h4>Labour Charges</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="laborCharges"
-														inputStyle="text-align: right"
-														value="#{invController.invHdr.labourCharge}"
-														styleClass="read-only-btn" readonly="true">
-														<f:convertNumber type="currency" currencySymbol="LKR " />
-													</p:inputText></td>
-											</tr>
+								<div class="p-col-12" align="center"
+									style="display: block; border: solid 1px #1387C4; margin-top: 10px">
+									<p:panel id="pnlInvPayment" header="Invoice Payments">
 
-											<tr>
-												<td><h4>Transport Charges</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="transportCharges"
-														inputStyle="text-align: right"
-														value="#{invController.invHdr.transaCharge}"
-														styleClass="read-only-btn" readonly="true">
-														<f:convertNumber type="currency" currencySymbol="LKR " />
-													</p:inputText></td>
-											</tr>
+										<div class="p-grid">
 
-											<tr>
-												<td><h4>Discount (%)</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="dis" widgetVar="totDisc"
-														disabled="#{invController.txtDiscountLock}" type="number"
-														valueChangeListener="#{invController.handleDiscountKeyEvent}"
-														validatorMessage="The Discount Shuld Betwee 0.0 to 99.99"
-														onkeypress="if (event.keyCode == 13) {PF('cashPay').jq.focus(); return false; }"
-														value="#{invController.invHdr.totalDiscoount}">
-														<f:validateDoubleRange minimum="0.00" maximum="99.99" />
-														<p:ajax event="keyup"
-															update=":invoceForm:growl,:invoceForm:paybleAmount" />
-													</p:inputText></td>
-											</tr>
+											<div class="p-col-4">
+												<table>
+													<tr>
+														<td><h4>Total Amount</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="totAmount"
+																value="#{invController.invHdr.totalAmount}"
+																styleClass="read-only-btn" readonly="true">
+																<f:convertNumber type="currency" currencySymbol="LKR " />
+															</p:inputText></td>
+													</tr>
 
-											<tr>
-												<td><h4>Payable Amount</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="paybleAmount"
-														styleClass="read-only-btn"
-														value="#{invController.invHdr.payblAmount}"
-														readonly="true">
-														<f:convertNumber type="currency" currencySymbol="LKR " />
-													</p:inputText></td>
-											</tr>
+													<tr>
+														<td><h4>Labour Charges</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="laborCharges"
+																inputStyle="text-align: right"
+																value="#{invController.invHdr.labourCharge}"
+																styleClass="read-only-btn" readonly="true">
+																<f:convertNumber type="currency" currencySymbol="LKR " />
+															</p:inputText></td>
+													</tr>
 
-											<tr>
-												<td><h4>Payment Type</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:selectOneMenu style="width:100%" id="pType"
-														effect="fold" required="true"
-														requiredMessage="Select Payment Type Is Required"
-														filter="true" editable="true" converter="payConvertor"
-														placeholder="- Select Payment Type -"
-														value="#{invController.selPayType}">
-														<f:selectItems value="#{invController.paymentTypes}"
-															var="paytyp" itemValue="#{paytyp}"
-															itemLabel="#{paytyp.desc}" />
-														<p:ajax listener="#{invController.onPayTypeChange}"
-															update=":invoceForm:cheqPay" />
-													</p:selectOneMenu></td>
-											</tr>
+													<tr>
+														<td><h4>Transport Charges</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="transportCharges"
+																inputStyle="text-align: right"
+																value="#{invController.invHdr.transaCharge}"
+																styleClass="read-only-btn" readonly="true">
+																<f:convertNumber type="currency" currencySymbol="LKR " />
+															</p:inputText></td>
+													</tr>
 
-											<tr>
-												<td><h4>Cash Payment</h4></td>
-												<td><h4>:</h4></td>
-												<p:remoteCommand name="addCahsRecved"
-													action="#{invController.setCashReceved}"
-													process="pnlInvPayment"
-													onsuccess="PF('paidAmount').jq.focus();"
-													update=":invoceForm:growl,:invoceForm:pnlInvPayment" />
-												<td><p:inputText type="number" id="cPay"
-														widgetVar="cashPay"
-														onkeypress="if (event.keyCode === 13) { addCahsRecved(); return false; }"
-														value="#{invController.invHdr.cashValue}"
-														disabled="#{invController.txtCashPayLock}" /></td>
-											</tr>
+												</table>
+											</div>
 
-											<tr>
-												<td><h4>Cheque Payment</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="cheqPay" type="number"
-														disabled="#{invController.txtCheqPayLock}" /></td>
-											</tr>
+											<div class="p-col-4">
+												<table>
+													<tr>
+														<td><h4>Discount (%)</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="dis" widgetVar="totDisc"
+																disabled="#{invController.txtDiscountLock}"
+																type="number"
+																valueChangeListener="#{invController.handleDiscountKeyEvent}"
+																validatorMessage="The Discount Shuld Betwee 0.0 to 99.99"
+																onkeypress="if (event.keyCode == 13) {PF('cashPay').jq.focus(); return false; }"
+																value="#{invController.invHdr.totalDiscoount}">
+																<f:validateDoubleRange minimum="0.00" maximum="99.99" />
+																<p:ajax event="keyup"
+																	update=":invoceForm:growl,:invoceForm:paybleAmount" />
+															</p:inputText></td>
+													</tr>
 
-											<tr>
-												<p:remoteCommand name="confirmInvoice"
-													action="#{invController.confirmInvoice}"
-													onstart="PF('onConfirmlock').block()"
-													oncomplete="PF('onConfirmlock').unblock()"
-													process="pnlInvPayment"
-													update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet" />
-												<td><h4>Total Paid Amount</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="paidAmount" widgetVar="paidAmount" type="number"
-														value="#{invController.invHdr.totalPaid}"
-														valueChangeListener="#{invController.onCashChange}"
-														onkeypress="if (event.keyCode === 13) { confirmInvoice(); return false; }">
-														<p:ajax event="keyup" update=":invoceForm:balanceAmount" />
-													</p:inputText></td>
-											</tr>
+													<tr>
+														<td style="width: 100%"><h4>Payable Amount</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="paybleAmount"
+																styleClass="read-only-btn"
+																value="#{invController.invHdr.payblAmount}"
+																readonly="true">
+																<f:convertNumber type="currency" currencySymbol="LKR " />
+															</p:inputText></td>
+													</tr>
+
+													<tr>
+														<td><h4>Payment Type</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:selectOneMenu style="width:100%" id="pType"
+																effect="fold" required="true"
+																requiredMessage="Select Payment Type Is Required"
+																filter="true" editable="true" converter="payConvertor"
+																placeholder="- Select Payment Type -"
+																value="#{invController.selPayType}">
+																<f:selectItems value="#{invController.paymentTypes}"
+																	var="paytyp" itemValue="#{paytyp}"
+																	itemLabel="#{paytyp.desc}" />
+																<p:ajax listener="#{invController.onPayTypeChange}"
+																	update=":invoceForm:cheqPay" />
+															</p:selectOneMenu></td>
+													</tr>
+												</table>
+											</div>
+
+											<div class="p-col-4">
+												<table>
+													<tr>
+														<td><h4>Cash Payment</h4></td>
+														<td><h4>:</h4></td>
+														<p:remoteCommand name="addCahsRecved"
+															action="#{invController.setCashReceved}"
+															process="pnlInvPayment"
+															onsuccess="PF('paidAmount').jq.focus();"
+															update=":invoceForm:growl,:invoceForm:pnlInvPayment" />
+														<td><p:inputText type="number" id="cPay"
+																widgetVar="cashPay"
+																onkeypress="if (event.keyCode === 13) { addCahsRecved(); return false; }"
+																value="#{invController.invHdr.cashValue}"
+																disabled="#{invController.txtCashPayLock}" /></td>
+													</tr>
+
+													<tr>
+														<td><h4>Cheque Payment</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="cheqPay" type="number"
+																disabled="#{invController.txtCheqPayLock}" /></td>
+													</tr>
+
+													<tr>
+														<p:remoteCommand name="confirmInvoice"
+															action="#{invController.confirmInvoice}"
+															onstart="PF('onConfirmlock').block()"
+															oncomplete="PF('onConfirmlock').unblock()"
+															process="pnlInvPayment"
+															update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet" />
+														<td><h4>Total Paid Amount</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="paidAmount"
+																widgetVar="paidAmount" type="number"
+																value="#{invController.invHdr.totalPaid}"
+																valueChangeListener="#{invController.onCashChange}"
+																onkeypress="if (event.keyCode === 13) { confirmInvoice(); return false; }">
+																<p:ajax event="keyup" update=":invoceForm:balanceAmount" />
+															</p:inputText></td>
+													</tr>
+
+													<tr>
+														<td><h4>Balance Amount</h4></td>
+														<td><h4>:</h4></td>
+														<td><p:inputText id="balanceAmount"
+																value="#{invController.invHdr.balance}"
+																styleClass="read-only-btn" readonly="true">
+																<f:convertNumber type="currency" currencySymbol="LKR " />
+															</p:inputText></td>
+													</tr>
+
+													<tr>
+														<td><p:commandButton value="Create Invoice"
+																icon="pi pi-check-circle"
+																style="margin-right:20px;margin-top:10px;width:230%"
+																action="#{invController.confirmInvoice}"
+																onstart="PF('onConfirmlock').block()"
+																oncomplete="PF('onConfirmlock').unblock()"
+																process="pnlInvPayment"
+																update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet"
+																widgetVar="btnSave">
+																<p:confirm
+																	message="Are You Sure Create New Cash Invocie?"
+																	icon="pi pi-check-circle" header="Confirm Cash Invoice" />
+															</p:commandButton></td>
+													</tr>
+												</table>
+											</div>
+										</div>
 
 
-											<tr>
-												<td><h4>Balance Amount</h4></td>
-												<td><h4>:</h4></td>
-												<td><p:inputText id="balanceAmount"
-														value="#{invController.invHdr.balance}"
-														styleClass="read-only-btn" readonly="true">
-														<f:convertNumber type="currency" currencySymbol="LKR " />
-													</p:inputText></td>
-											</tr>
-										</table>
-
-										<p:commandButton value="Create Invoice"
-											icon="pi pi-check-circle"
-											style="margin-right:20px;margin-top:10px;width:100%"
-											action="#{invController.confirmInvoice}"
-											onstart="PF('onConfirmlock').block()"
-											oncomplete="PF('onConfirmlock').unblock()"
-											process="pnlInvPayment"
-											update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet"
-											widgetVar="btnSave">
-											<p:confirm message="Are You Sure Create New Cash Invocie?"
-												icon="pi pi-check-circle" header="Confirm Cash Invoice" />
-										</p:commandButton>
-
-									</div>
-								</p:panel>
+									</p:panel>
+								</div>
 								<!-- Item Payment Details - End -->
 							</div>
 
