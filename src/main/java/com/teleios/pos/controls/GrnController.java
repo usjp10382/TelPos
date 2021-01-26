@@ -265,7 +265,7 @@ public class GrnController implements Serializable {
 				return currentStepId;
 			}
 		}
-		if (currentStepId.equalsIgnoreCase("payDet")) {
+		if (newStepId.equalsIgnoreCase("confirm")) {
 			try {
 				if (selPayType.getPayTypeId() == TeleiosPosConstant.CASH) {
 					if (getCashierValu() == null) {
@@ -308,6 +308,15 @@ public class GrnController implements Serializable {
 									"You Have Selected Cheque Type As DATE_CHEQU\nTheire For Enter Cheque Date Is Required!");
 							return currentStepId;
 						}
+					}
+				} else if (selPayType.getPayTypeId() == TeleiosPosConstant.CASHANDCREDI) {
+					if (getGrnHdr().getPaidAmount() == null) {
+						addErrorMessage("Enter Payment Details", "Paid Cash Value Is Required!");
+						return currentStepId;
+					}
+					if (getGrnHdr().getPaidAmount().compareTo(BigDecimal.ZERO) <= 0) {
+						addErrorMessage("Enter Payment Details", " Paid Cash Value Canot be ZERO Or Minus!");
+						return currentStepId;
 					}
 				}
 			} catch (NullPointerException e) {
@@ -574,6 +583,35 @@ public class GrnController implements Serializable {
 		}
 	}
 
+	public void handlePaidValKeyEvent(ValueChangeEvent evt) {
+		BigDecimal paidValue = (BigDecimal) evt.getNewValue();
+		try {
+			if (paidValue == null) {
+				getGrnHdr().setPaidAmount(BigDecimal.ZERO);
+				getGrnHdr().setBalance(getGrnHdr().getPaybleAmount());
+			} else if (paidValue.compareTo(BigDecimal.ZERO) <= 0) {
+				getGrnHdr().setPaidAmount(BigDecimal.ZERO);
+				getGrnHdr().setBalance(getGrnHdr().getPaybleAmount());
+			} else {
+				getGrnHdr().setPaidAmount(paidValue);
+				getGrnHdr().setBalance(getGrnHdr().getPaybleAmount().subtract(paidValue));
+			}
+
+		} catch (NumberFormatException nfe) {
+			LOGGER.error("Enter Paid Value Input", nfe);
+			addMessage("Enter Paid Value", "Invalied Input\n" + nfe.getLocalizedMessage());
+		} catch (ArithmeticException ame) {
+			LOGGER.error("Enter Paid Value Arithmetic Exception", ame);
+			addMessage("Enter Paid Value", "Arithmetic Exception\n" + ame.getLocalizedMessage());
+		} catch (NullPointerException npe) {
+			getGrnHdr().setPaidAmount(BigDecimal.ZERO);
+			getGrnHdr().setBalance(getGrnHdr().getPaybleAmount());
+		} catch (Exception e) {
+			LOGGER.error("Enter Paid Value System Error Occured", e);
+			addMessage("Enter Paid Value", "System Error Occured\n" + e.getLocalizedMessage());
+		}
+	}
+
 	public void onPayTypeChange() {
 		LOGGER.info("Execute Payment Type Change Ajax------->");
 		try {
@@ -606,7 +644,8 @@ public class GrnController implements Serializable {
 					break;
 
 				case TeleiosPosConstant.CASHANDCREDI:
-					addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+					setCheckDetFiledValidation(false);
+					setTxtCashPayLock(false);
 					break;
 
 				default:
@@ -807,7 +846,14 @@ public class GrnController implements Serializable {
 			break;
 
 		case TeleiosPosConstant.CASHANDCREDI:
-			addErrorMessage("Select Payment Type", "Operation Notyet Added!");
+			if (getGrnHdr().getPaidAmount() == null) {
+				addErrorMessage("Enter Payment Details", "Paid Cash Value Is Required!");
+				return ;
+			}
+			if (getGrnHdr().getPaidAmount().compareTo(BigDecimal.ZERO) <= 0) {
+				addErrorMessage("Enter Payment Details", " Paid Cash Value Canot be ZERO Or Minus!");
+				return ;
+			}
 			break;
 
 		default:

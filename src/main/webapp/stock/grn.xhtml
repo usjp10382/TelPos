@@ -396,9 +396,13 @@
 													<p:outputLabel for="@next" value="Cash Amount" />
 													<br />
 													<p:inputText widgetVar="eidPayVal" id="paidAmountCash"
+														valueChangeListener="#{grnController.handlePaidValKeyEvent}"
 														disabled="#{grnController.txtCashPayLock}"
+														onkeypress="if (event.keyCode === 13) { PF('cashVal').show(); return false; }"
 														value="#{grnController.grnHdr.paidAmount}"
-														style="width:77%" type="number" />
+														style="width:77%" type="number">
+														<p:ajax event="keyup" update="grnBal,payMsg" />
+													</p:inputText>
 												</div>
 
 												<div class="p-col-12">
