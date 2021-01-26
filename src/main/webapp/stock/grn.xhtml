@@ -13,35 +13,16 @@
 	<ui:composition template="/template/common/commonLayout.xhtml">
 		<ui:define name="content">
 			<script type="text/javascript" language="javascript">
-				function updateDiscount(text) {
-					var totalVal = parseFloat(PrimeFaces.widgets.widTot.jq
-							.val());
-					var entDiscount = parseFloat(text.value);
-					var discountVal = totalVal * (entDiscount / 100);
-					var paybVal = (totalVal - discountVal).toFixed(2);
-					if (text !== null) {
-						PF('wgPayAmount').jq.val(paybVal);
-					} else {
-						PF('wgPayAmount').jq.val(totalVal);
-					}
-
+				function showPrdMoredetails() {
+					PF('prdMoreDetBlock').unblock();
+					PF('itemDetpop').show();
 				}
-				function updateDiscountTwo(text) {
-					var totalVal = parseFloat(document.getElementById('totVal').value);
-					var entDiscount = parseFloat(text.value);
-					var discountVal = totalVal * (entDiscount / 100);
-					document.getElementById('totVal').value = discountVal;
-
+				function showSuppMoredetails() {
+					PF('suppMoreDetBlock').unblock();
+					PF('supDet').show();
 				}
 			</script>
 
-			<!-- <p:ajaxStatus onstart="PF('statusDialog').show()"
-				onsuccess="PF('statusDialog').hide()" />
-
-			<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
-				closable="false" resizable="false" showHeader="false">
-				<p:graphicImage value="../resources/img/ajax-loader.gif" />
-			</p:dialog> -->
 			<h:form id="grnFrm" prependId="false"
 				onkeypress="if (event.keyCode == 13) { return false; }">
 				<p:growl id="growl" sticky="false" life="5000" showDetail="true"
@@ -124,9 +105,12 @@
 																	itemValue="#{supp}" itemLabel="#{supp.supplierName}" />
 															</p:selectOneMenu>
 
-															<p:commandButton type="button" icon="fa fa-info-circle"
+															<p:commandButton icon="fa fa-info-circle"
 																title="View Supplier Details" styleClass="info-btn"
-																onclick="PF('supDet').show();">
+																onstart="PF('suppMoreDetBlock').block()"
+																action="#{grnController.getSuppliyerByNumber}"
+																update=":grnFrm:growl,:suppDetForm"
+																onsuccess="showSuppMoredetails();">
 															</p:commandButton>
 														</h:panelGrid>
 													</div>
@@ -185,16 +169,20 @@
 															minQueryLength="2" itemValue="#{prd}"
 															completeMethod="#{grnController.completeProductsContains}"
 															converter="prdConvertor">
-															<p:ajax event="itemSelect"
+															<p:ajax event="itemSelect" update=":itemDetFormPop"
 																onsuccess="PF('qtyFil').jq.focus();"
 																listener="#{grnController.onItemSelect}" />
 														</p:autoComplete>
 
-														<p:commandButton type="button" icon="fa fa-info-circle"
+														<p:commandButton icon="fa fa-info-circle"
 															title="View Item Details" styleClass="info-btn"
-															onclick="PF('itemDetpop').show();">
+															onstart="PF('prdMoreDetBlock').block()"
+															action="#{grnController.getProductByNumber}"
+															update=":grnFrm:growl,:itemDetFormPop"
+															onsuccess="showPrdMoredetails();">
 														</p:commandButton>
 														<br />
+
 													</h:panelGrid>
 												</div>
 												<!-- Item Details Item Select - End -->
@@ -257,7 +245,6 @@
 															style="width:105%" />
 
 													</div>
-
 												</div>
 												<!-- Item Details Text Fields - End -->
 
@@ -403,11 +390,6 @@
 														<p:ajax listener="#{grnController.onPayTypeChange}"
 															update="paidAmountCash,grnBal,paidAmountCheque,payMsg" />
 													</p:selectOneMenu>
-
-													<p:commandButton type="button" icon="fa fa-info-circle"
-														title="View Item Details" styleClass="info-btn"
-														onclick="PF('chequeDetailsPop').show();">
-													</p:commandButton>
 												</div>
 
 												<div class="p-col-12">
@@ -423,13 +405,114 @@
 													<p:outputLabel for="@next" value="Cheque Amount" />
 													<br />
 													<p:inputText id="paidAmountCheque" style="width:77%"
+														value="#{grnController.grnHdr.chequPayment}"
 														disabled="#{grnController.txtCheckLock}" type="number" />
+
+													<p:commandButton type="button" icon="fa fa-info-circle"
+														title="View Item Details" styleClass="info-btn"
+														onclick="PF('chequeDetailsPop').show();">
+													</p:commandButton>
 												</div>
 
 											</div>
 
 										</div>
+
+										<p:dialog header="Enter Cashier Value" widgetVar="cashVal"
+											showEffect="clip" hideEffect="clip" height="100%" width="25%">
+
+											<div class="p-col-12" align="center">
+												<p:outputLabel value="Enter Cashier Value :" for="@next" />
+												<br />
+												<p:inputText type="number" id="transCost"
+													onkeypress="if (event.keyCode === 13) { PF('cashVal').hide(); return false; }"
+													value="#{grnController.cashierValu}" style="width:100%">
+												</p:inputText>
+											</div>
+
+										</p:dialog>
+
+										<p:dialog header="Add Cheque Details"
+											widgetVar="chequeDetailsPop" dynamic="true" showEffect="clip"
+											hideEffect="clip" height="100%" width="50%">
+											<div class="p-grid">
+
+												<div class="p-col-6">
+													<div class="p-col-12">
+														<p:outputLabel value="Cheque No" for="@next" />
+														<br />
+														<p:inputText id="chequeNo" style="width:100%"
+															requiredMessage="The Cheque Number Is Required!"
+															value="#{grnController.cheqDetails.checkNumber}"
+															required="#{grnController.checkDetFiledValidation}" />
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel value="Bank" for="@next" />
+														<br />
+														<p:inputText id="bank" style="width:100%"
+															required="#{grnController.checkDetFiledValidation}"
+															requiredMessage="Bank Name Is Required!"
+															value="#{grnController.cheqDetails.bankName}" />
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel value="Branch" for="@next" />
+														<br />
+														<p:inputText id="branch" style="width:100%"
+															requiredMessage="Branch Name Is Required!"
+															required="#{grnController.checkDetFiledValidation}"
+															value="#{grnController.cheqDetails.brancName}" />
+													</div>
+												</div>
+
+												<div class="p-col-6">
+													<div class="p-col-12">
+														<p:outputLabel value="Amount" for="@next" />
+														<br />
+														<p:inputText id="amount" style="width:100%" type="number"
+															requiredMessage="Chequ Amount Is Required!"
+															required="#{grnController.checkDetFiledValidation}"
+															value="#{grnController.cheqDetails.amount}" />
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel value="Cheque Date" for="@next" />
+														<br />
+														<p:datePicker id="chequeDate" style="width:100%"
+															mindate="#{grnController.minExpDate}"
+															value="#{grnController.cheqDetails.checkDate}" />
+													</div>
+
+													<div class="p-col-12">
+														<p:outputLabel value="Note" for="@next" />
+														<br />
+														<p:inputText id="note" style="width:100%"
+															requiredMessage="Simple Not Is Required!"
+															required="#{grnController.checkDetFiledValidation}"
+															value="#{grnController.cheqDetails.note}" />
+													</div>
+												</div>
+
+												<div class="p-col-6">
+													<div class="p-col-12">
+														<p:outputLabel value="Select Check Type" for="@next" />
+														<br />
+														<p:selectOneMenu id="selCheckType" style="width:100%"
+															required="#{grnController.checkDetFiledValidation}"
+															requiredMessage="Select Chck  Type IS Requ"
+															value="#{grnController.selChequType}">
+															<f:selectItem itemLabel="Select One" itemValue="" />
+															<f:selectItem itemLabel="CASH CHEQUE" itemValue="1" />
+															<f:selectItem itemLabel="DATE CHEQUE" itemValue="2" />
+														</p:selectOneMenu>
+													</div>
+												</div>
+
+											</div>
+										</p:dialog>
 									</p:panel>
+
 								</p:tab>
 
 								<!-- Payment Details (3rd Tab) - Start -->
@@ -630,12 +713,30 @@
 				</div>
 				<!-- GRN Main - End -->
 
+				<pe:blockUI target="grnWizard" widgetVar="prdMoreDetBlock">
+					<h:panelGrid columns="2">
+						<p:graphicImage value="../resources/img/ajax-loader.gif"
+							style="margin-right: 12px; vertical-align: middle;" />
+						<h:outputText value="Searching Product........"
+							style="white-space: nowrap;" />
+					</h:panelGrid>
+				</pe:blockUI>
+
+				<pe:blockUI target="grnWizard" widgetVar="suppMoreDetBlock">
+					<h:panelGrid columns="2">
+						<p:graphicImage value="../resources/img/ajax-loader.gif"
+							style="margin-right: 12px; vertical-align: middle;" />
+						<h:outputText value="Searching Suppliyer........"
+							style="white-space: nowrap;" />
+					</h:panelGrid>
+				</pe:blockUI>
+
 
 				<pe:blockUI target="grnWizard" widgetVar="createNewGrnBlock">
 					<h:panelGrid columns="2">
 						<p:graphicImage value="../resources/img/ajax-loader.gif"
 							style="margin-right: 12px; vertical-align: middle;" />
-						<h:outputText value="Creating New GRN"
+						<h:outputText value="Creating New GRN...."
 							style="white-space: nowrap;" />
 					</h:panelGrid>
 				</pe:blockUI>
@@ -659,90 +760,101 @@
 			</h:form>
 
 			<!-- Supplier Details (popup) - Start -->
-			<p:dialog header="Supplier Details" widgetVar="supDet"
+			<p:dialog header="Supplier Details" widgetVar="supDet" dynamic="true"
 				showEffect="clip" hideEffect="clip" height="100%" width="40%">
-				<h:form id="itemDetForm">
+				<h:form id="suppDetForm">
 
 					<div class="p-col-12">
 						<p:outputLabel value="Supplier Name" for="@next" />
 						<br />
-						<p:inputText id="supNamePop" style="width:100%" readonly="true" />
+						<p:inputText id="supNamePop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetSuppliey.supplierName}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Address" for="@next" />
 						<br />
-						<p:inputText id="addressPop" style="width:100%" readonly="true" />
+						<p:inputText id="addressPop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetSuppliey.address}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Mobile No" for="@next" />
 						<br />
-						<p:inputText id="mobileNoSup" style="width:100%" readonly="true" />
+						<p:inputText id="mobileNoSup" style="width:100%" readonly="true"
+							value="#{grnController.moreDetSuppliey.contactNumber}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Fixed Line" for="@next" />
 						<br />
-						<p:inputText id="fixedPop" style="width:100%" readonly="true" />
+						<p:inputText id="fixedPop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetSuppliey.fixedNumber}" />
 					</div>
 
 
 					<div class="p-col-12">
 						<p:outputLabel value="Email Address" for="@next" />
 						<br />
-						<p:inputText id="emailPop" style="width:100%" readonly="true" />
+						<p:inputText id="emailPop" style="width:100%" readonly="true"
+							value="#{empty grnController.moreDetSuppliey.email?'N/A':grnController.moreDetSuppliey.email}" />
 					</div>
 				</h:form>
 			</p:dialog>
 			<!-- Supplier Details (popup) - End -->
 
 			<!-- Item Details (popup) - Start -->
-			<p:dialog header="Item Details" widgetVar="itemDetpop"
+			<p:dialog header="Item Details" widgetVar="itemDetpop" dynamic="true"
 				showEffect="clip" hideEffect="clip" height="100%" width="40%">
 				<h:form id="itemDetFormPop">
 
 					<div class="p-col-12">
 						<p:outputLabel value="Item Code" for="@next" />
 						<br />
-						<p:inputText id="itemCodePop" style="width:100%" readonly="true" />
+						<p:inputText id="itemCodePop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetProduct.prdCode}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Product Name" for="@next" />
 						<br />
-						<p:inputText id="pNamePop" style="width:100%" readonly="true" />
+						<p:inputText id="pNamePop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetProduct.prdName}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Brand" for="@next" />
 						<br />
-						<p:inputText id="brandPop" style="width:100%" readonly="true" />
+						<p:inputText id="brandPop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetProduct.brand.brandName}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Caegory" for="@next" />
 						<br />
-						<p:inputText id="categoryPop" style="width:100%" readonly="true" />
+						<p:inputText id="categoryPop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetProduct.category.categoryName}" />
 					</div>
 
 
 					<div class="p-col-12">
 						<p:outputLabel value="UOM" for="@next" />
 						<br />
-						<p:inputText id="uomPop" style="width:100%" readonly="true" />
+						<p:inputText id="uomPop" style="width:100%" readonly="true"
+							value="#{grnController.moreDetProduct.uom.uomName}" />
 					</div>
 
 					<div class="p-col-12">
-						<p:outputLabel value="Expire Date" for="@next" />
+						<p:outputLabel value="Minimumm Quantity" for="@next" />
 						<br />
-						<p:inputText id="expDatePop" style="width:100%" readonly="true" />
+						<p:inputText id="minQty" style="width:100%" readonly="true"
+							value="#{empty grnController.moreDetProduct.minQtyLevel?'N/A' : grnController.moreDetProduct.minQtyLevel}" />
 					</div>
-
 					<div class="p-col-12">
 						<p:outputLabel value="Rack No" for="@next" />
 						<br />
-						<p:inputText id="rackNoPop" style="width:100%" readonly="true" />
+						<p:inputText id="rackNoPop" style="width:100%" readonly="true"
+							value="#{empty grnController.moreDetProduct.rackDet ?'N/A' : grnController.moreDetProduct.rackDet}" />
 					</div>
 				</h:form>
 			</p:dialog>
@@ -750,126 +862,100 @@
 
 			<!-- New Product Add (popup) - Start -->
 			<p:dialog header="Add a New Product" widgetVar="newProductPop"
-				showEffect="clip" hideEffect="clip" height="100%" width="40%">
+				dynamic="true" showEffect="clip" hideEffect="clip" height="100%"
+				width="40%">
 				<h:form id="newItemFormPop">
 
 					<div class="p-col-12">
 						<p:outputLabel value="Item Code" for="@next" />
 						<br />
 						<p:inputText id="addItemCodePop" style="width:100%"
-							required="true" />
+							value="#{grnController.newProduct.prdCode}" required="true"
+							requiredMessage="Item Code Is Required!" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Product Name" for="@next" />
 						<br />
-						<p:inputText id="addPNamePop" style="width:100%" required="true" />
+						<p:inputText id="addPNamePop" style="width:100%"
+							value="#{grnController.newProduct.prdName}" required="true"
+							requiredMessage="Item Name Is Required!" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Minimum quanitiy" for="@next" />
 						<br />
-						<p:inputText id="addMinQtyPop" style="width:100%" required="true" />
+						<p:inputText type="number" id="addMinQtyPop" style="width:100%"
+							value="#{grnController.newProduct.minQtyLevel}" />
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Brand" for="@next" />
 						<br />
-						<p:selectOneMenu style="width:100%" id="addBrandPop" effect="fold"
+						<p:selectOneMenu style="width:100%" id="brand" effect="fold"
 							required="true" requiredMessage="Select Brand Is Required"
-							filter="true" editable="true" placeholder="- Select Brand -">
-							<f:selectItems var="brandPop" />
+							filter="true" editable="true" converter="brandConvertor"
+							placeholder="- Select Brand -"
+							value="#{grnController.newProduct.brand}">
+							<f:selectItems value="#{grnController.allActiveBrand}"
+								var="brand" itemValue="#{brand}" itemLabel="#{brand.brandName}" />
 						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Category" for="@next" />
 						<br />
-						<p:selectOneMenu style="width:100%" id="addCategoryPop"
-							effect="fold" required="true"
-							requiredMessage="Select Category Is Required" filter="true"
-							editable="true" placeholder="- Select Category -">
-							<f:selectItems var="CategoryPop" />
+						<p:selectOneMenu style="width:100%"
+							placeholder="-Select Category -" id="category" effect="fold"
+							required="true" requiredMessage="Select Category Is Required"
+							filter="true" editable="true" converter="categoryConvertor"
+							value="#{grnController.newProduct.category}">
+							<f:selectItems value="#{grnController.allActiveCategories}"
+								var="catg" itemValue="#{catg}" itemLabel="#{catg.categoryName}" />
 						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="UOM" for="@next" />
 						<br />
-						<p:selectOneMenu style="width:100%" id="addUomPop" effect="fold"
+						<p:selectOneMenu style="width:100%" id="uom" effect="fold"
 							required="true" requiredMessage="Select UOM Is Required"
-							filter="true" editable="true" placeholder="- Select UOM -">
-							<f:selectItems var="UOMPop" />
+							filter="true" editable="true" placeholder="- Select Uom -"
+							converter="uomConvertor" value="#{grnController.newProduct.uom}">
+							<f:selectItems value="#{grnController.allActiveUoms}" var="uom"
+								itemValue="#{uom}" itemLabel="#{uom.uomChar}-#{uom.uomName}" />
 						</p:selectOneMenu>
 					</div>
 
 					<div class="p-col-12">
 						<p:outputLabel value="Rack Number" for="@next" />
 						<br />
-						<p:inputText id="rackPops" style="width:100%" required="true" />
+						<p:inputText id="rackPops" style="width:100%"
+							value="#{grnController.newProduct.rackDet}" />
 					</div>
 
 					<div class="p-col-12" align="right">
 						<p:commandButton value="Add Item" icon="pi pi-check-circle"
-							styleClass="blue-button" />
+							process="@form" action="#{grnController.createNewProduct}"
+							onstart="PF('createNewPrdBlock').block()"
+							oncomplete="PF('createNewPrdBlock').unblock()"
+							update=":newItemFormPop,:grnFrm:growl,:grnFrm:itemSelect"
+							styleClass="blue-button">
+							<p:confirm message="Are You Sure Create New Product?"
+								header="Create New Product" icon="pi pi-check-circle" />
+						</p:commandButton>
 					</div>
-
+					<pe:blockUI target="grnWizard" widgetVar="createNewPrdBlock">
+						<h:panelGrid columns="2">
+							<p:graphicImage value="../resources/img/ajax-loader.gif"
+								style="margin-right: 12px; vertical-align: middle;" />
+							<h:outputText value="Creating New Product......"
+								style="white-space: nowrap;" />
+						</h:panelGrid>
+					</pe:blockUI>
 				</h:form>
 			</p:dialog>
 			<!-- New Product Add (popup) - End -->
-
-			<!-- Cheque Details Add (popup) - Start -->
-			<p:dialog header="Add Cheque Details" widgetVar="chequeDetailsPop"
-				showEffect="clip" hideEffect="clip" height="100%" width="50%">
-				<h:form id="newchequeFormPop">
-
-					<div class="p-grid">
-
-						<div class="p-col-6">
-							<div class="p-col-12">
-								<p:outputLabel value="Cheque No" for="@next" />
-								<br />
-								<p:inputText id="chequeNo" style="width:100%" required="true" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel value="Bank" for="@next" />
-								<br />
-								<p:inputText id="bank" style="width:100%" required="true" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel value="Branch" for="@next" />
-								<br />
-								<p:inputText id="branch" style="width:100%" required="true" />
-							</div>
-						</div>
-
-						<div class="p-col-6">
-							<div class="p-col-12">
-								<p:outputLabel value="Amount" for="@next" />
-								<br />
-								<p:inputText id="amount" style="width:100%" required="true" />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel value="Cheque Date" for="@next" />
-								<br />
-								<p:datePicker id="chequeDate" style="width:100%" required="true"  />
-							</div>
-
-							<div class="p-col-12">
-								<p:outputLabel value="Note" for="@next" />
-								<br />
-								<p:inputText id="note" style="width:100%" required="true" />
-							</div>
-						</div>
-
-					</div>
-
-				</h:form>
-			</p:dialog>
-			<!-- Cheque Details Add (popup) - End -->
 
 		</ui:define>
 	</ui:composition>

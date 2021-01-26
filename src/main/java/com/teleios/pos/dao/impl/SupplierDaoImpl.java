@@ -2,8 +2,8 @@ package com.teleios.pos.dao.impl;
 
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
-import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -42,6 +43,8 @@ public class SupplierDaoImpl implements Serializable, SupplierDao {
 	private static final String DEL_SUPP_SQL = "UPDATE supplier_schema.supplier SET spu_state=:spu_state WHERE supp_id=:supp_id";
 
 	// Define Supplier Select SQL
+	private static final String SEL_SUPP_BYNUMBER_SQL = "SELECT supp_id,supp_name,address,contact_number,create_by,create_date,spu_state,fix_contact,email "
+			+ "FROM supplier_schema.supplier WHERE supp_id=?";
 	private static final String SEL_ALL_ACTIVE_SUPP = "SELECT supp_id,supp_name,address,contact_number,create_by,create_date,spu_state,fix_contact,email "
 			+ "FROM supplier_schema.supplier WHERE spu_state=? ORDER BY supp_id ASC";
 
@@ -137,8 +140,18 @@ public class SupplierDaoImpl implements Serializable, SupplierDao {
 	@Override
 	public Supplier getSuppliyerById(Integer suppId)
 			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("<---- Execute Get Suppliyer By Number : {} In Supplier Repositiry --------->");
+		return this.jdbcTemplate.queryForObject(SEL_SUPP_BYNUMBER_SQL, new Object[] { suppId },
+				new RowMapper<Supplier>() {
+					@Override
+					public Supplier mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Supplier supplier = new Supplier(rs.getInt("supp_id"), rs.getString("supp_name"),
+								rs.getString("address"), rs.getString("contact_number"), rs.getString("fix_contact"),
+								rs.getString("email"), rs.getDate("create_date"), rs.getString("create_by"),
+								rs.getShort("spu_state"));
+						return supplier;
+					}
+				});
 	}
 
 	@Override

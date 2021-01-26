@@ -2,12 +2,15 @@ package com.teleios.pos.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 public class CheqDetails implements Serializable {
 	private static final long serialVersionUID = -5646571216029966169L;
 
+	private Integer chequeId;
 	private GrnHdr grnHdr;
+	private Payeble payeble;
+	private ExpenditureList expenditureList;
 	private CheqType cheqType;
 	private String bankName;
 	private String brancName;
@@ -15,15 +18,22 @@ public class CheqDetails implements Serializable {
 	private String note;
 	private BigDecimal amount;
 	private Date checkDate;
+	private short checkState;
+	private Date createDate;
+	private String createBy;
 
 	public CheqDetails() {
 		super();
 	}
 
-	public CheqDetails(GrnHdr grnHdr, CheqType cheqType, String bankName, String brancName, String checkNumber,
-			String note, BigDecimal amount, Date checkDate) {
+	public CheqDetails(Integer chequeId, GrnHdr grnHdr, Payeble payeble, ExpenditureList expenditureList,
+			CheqType cheqType, String bankName, String brancName, String checkNumber, String note, BigDecimal amount,
+			Date checkDate, short checkState, Date createDate, String createBy) {
 		super();
+		this.chequeId = chequeId;
 		this.grnHdr = grnHdr;
+		this.payeble = payeble;
+		this.expenditureList = expenditureList;
 		this.cheqType = cheqType;
 		this.bankName = bankName;
 		this.brancName = brancName;
@@ -31,6 +41,17 @@ public class CheqDetails implements Serializable {
 		this.note = note;
 		this.amount = amount;
 		this.checkDate = checkDate;
+		this.checkState = checkState;
+		this.createDate = createDate;
+		this.createBy = createBy;
+	}
+
+	public Integer getChequeId() {
+		return chequeId;
+	}
+
+	public void setChequeId(Integer chequeId) {
+		this.chequeId = chequeId;
 	}
 
 	public GrnHdr getGrnHdr() {
@@ -39,6 +60,22 @@ public class CheqDetails implements Serializable {
 
 	public void setGrnHdr(GrnHdr grnHdr) {
 		this.grnHdr = grnHdr;
+	}
+
+	public Payeble getPayeble() {
+		return payeble;
+	}
+
+	public void setPayeble(Payeble payeble) {
+		this.payeble = payeble;
+	}
+
+	public ExpenditureList getExpenditureList() {
+		return expenditureList;
+	}
+
+	public void setExpenditureList(ExpenditureList expenditureList) {
+		this.expenditureList = expenditureList;
 	}
 
 	public CheqType getCheqType() {
@@ -95,6 +132,30 @@ public class CheqDetails implements Serializable {
 
 	public void setCheckDate(Date checkDate) {
 		this.checkDate = checkDate;
+	}
+
+	public short getCheckState() {
+		return checkState;
+	}
+
+	public void setCheckState(short checkState) {
+		this.checkState = checkState;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getCreateBy() {
+		return createBy;
+	}
+
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
 	}
 
 }

@@ -18,8 +18,12 @@ import com.teleios.pos.model.Product;
 public class ProductService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
 
-	@Autowired
 	private ProductDaoImpl productDaoImpl;
+
+	@Autowired
+	public ProductService(ProductDaoImpl productDaoImpl) {
+		this.productDaoImpl = productDaoImpl;
+	}
 
 	public int createNewProduct(Product product) throws DuplicateKeyException, SocketTimeoutException, Exception {
 		LOGGER.info("<------- Execute Create New Product In Service ---------->");
@@ -36,11 +40,17 @@ public class ProductService {
 		LOGGER.info("<----- Execute Update Product Name:{} Execute In Service --->", product.getPrdName());
 		return this.productDaoImpl.updateProduct(product);
 	}
-	
+
 	public int deleteProduct(Product product) throws SocketTimeoutException, Exception {
 		LOGGER.info("<---- Execute Delete Product: {} in Service ---->",
 				product.getPrdCode() + " " + product.getPrdName());
 		return this.productDaoImpl.deleteProduct(product);
+	}
+
+	public Product getProductByNumber(Integer prdNumber)
+			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
+		LOGGER.info("<----- Execute Get Product By Number Product Number: {} In Product Service -------->", prdNumber);
+		return this.productDaoImpl.getProductByNumber(prdNumber);
 	}
 
 	public List<Product> getAllActiveProducts()

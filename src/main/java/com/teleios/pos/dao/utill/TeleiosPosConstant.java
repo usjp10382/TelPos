@@ -23,7 +23,7 @@ public class TeleiosPosConstant implements Serializable {
 	public static final short CHEQUE_PENDING = 8;
 
 	// Define Cheque Type
-	public static final short DATE_CHEQUE = 1;
-	public static final short CASH_CHEQUE = 2;
+	public static final short CASH_CHEQUE = 1;
+	public static final short DATE_CHEQUE = 2;
 
 }

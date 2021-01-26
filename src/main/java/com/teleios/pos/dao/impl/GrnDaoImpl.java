@@ -27,7 +27,7 @@ public class GrnDaoImpl implements GrnDao {
 
 	// Define Grn Insert SQL
 	private static final String CREATE_GRN_HDR_SQL = "INSERT INTO inv_schema.grn_hdr (grn_hdr_num,batch_number,grn_date,total,fk_supp_id,create_by,fk_pur_type,create_date,grn_state,"
-			+ "remark,cheq_det_id,is_tot_val_disc,grn_val_discount,disc_precentage,payble_amount,paid_amount,balance,item_count) VALUES "
+			+ "remark,is_tot_val_disc,grn_val_discount,disc_precentage,payble_amount,paid_amount,balance,item_count,chequ_pay) VALUES "
 			+ "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 	private static final String CREATE_GRN_DETS_SQL = "INSERT INTO inv_schema.grn_det (unit_price,discount,purchase_price,selling_price,fk_prd_no,fk_grn_hdr_num,is_discount,qty,"
@@ -55,9 +55,10 @@ public class GrnDaoImpl implements GrnDao {
 		saveState = this.jdbcTemplate.update(CREATE_GRN_HDR_SQL, grnHdr.getGrnNumber(), grnHdr.getBatchNumber(),
 				grnHdr.getGrnDate(), grnHdr.getTotalValue(), grnHdr.getSupplier().getSupplierId(), grnHdr.getCreateBy(),
 				grnHdr.getPaymentType().getPayTypeId(), grnHdr.getCreateDate(), grnHdr.getGrnState(),
-				grnHdr.getRemark(), Integer.valueOf(0), grnHdr.isTotValDiscount(),
+				grnHdr.getRemark(), grnHdr.isTotValDiscount(),
 				grnHdr.getTotalValue().subtract(grnHdr.getPaybleAmount()), grnHdr.getGrnValDiscount(),
-				grnHdr.getPaybleAmount(), grnHdr.getPaidAmount(), grnHdr.getBalance(), grnHdr.getItemCount());
+				grnHdr.getPaybleAmount(), grnHdr.getPaidAmount(), grnHdr.getBalance(), grnHdr.getItemCount(),
+				grnHdr.getChequPayment());
 
 		LOGGER.info("New Grn Header Successfuly Created.. ");
 		return saveState;

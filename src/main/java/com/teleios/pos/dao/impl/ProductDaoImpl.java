@@ -2,6 +2,7 @@ package com.teleios.pos.dao.impl;
 
 import java.net.SocketTimeoutException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +16,16 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.teleios.pos.dao.ProductDao;
 import com.teleios.pos.dao.utill.ProductResExecutor;
+import com.teleios.pos.model.Brand;
+import com.teleios.pos.model.Category;
 import com.teleios.pos.model.Product;
+import com.teleios.pos.model.Uom;
 
 @Repository
 public class ProductDaoImpl implements ProductDao {
@@ -40,6 +45,12 @@ public class ProductDaoImpl implements ProductDao {
 	private static final String DEL_PRD_SQL = "DELETE FROM inv_schema.product WHERE prd_id=?";
 
 	// Define Product Search SQL
+	private static final String SELECT_PRD_BYNUM_SQL = "SELECT p.prd_id,p.code,p.prd_name,p.create_by,p.create_date,p.prd_state,p.min_qty_lev,p.rack_no,"
+			+ "b.brand_id,b.brand_name,c.categ_id,c.categ_name,u.uom_id,u.uom_name,u.char_prifix "
+			+ "FROM inv_schema.product p INNER JOIN inv_schema.brand b ON P.brand=b.brand_id "
+			+ "INNER JOIN inv_schema.category c ON p.category=c.categ_id "
+			+ "INNER JOIN inv_schema.uom u ON p.uom=u.uom_id " + "WHERE p.prd_id=?";
+
 	private static final String ALL_ACTIVE_PRD_SQL = "SELECT p.prd_id,p.code,p.prd_name,p.create_by,p.create_date,p.prd_state,p.min_qty_lev,p.rack_no,"
 			+ "b.brand_id,b.brand_name,c.categ_id,c.categ_name,u.uom_id,u.uom_name,u.char_prifix "
 			+ "FROM inv_schema.product p INNER JOIN inv_schema.brand b ON P.brand=b.brand_id "
@@ -51,7 +62,6 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Autowired
 	public ProductDaoImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-		super();
 		this.jdbcTemplate = jdbcTemplate;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 	}
@@ -137,6 +147,48 @@ public class ProductDaoImpl implements ProductDao {
 				product.getPrdCode() + " " + product.getPrdName());
 
 		return this.jdbcTemplate.update(DEL_PRD_SQL, product.getPrdId());
+	}
+
+	@Override
+	public Product getProductByNumber(Integer prdNumber)
+			throws SocketTimeoutException, EmptyResultDataAccessException, DataAccessException, Exception {
+		LOGGER.info("<----- Execute Get Product By Number Product Number:{} In Product Repository---->", prdNumber);
+		return this.jdbcTemplate.queryForObject(SELECT_PRD_BYNUM_SQL, new Object[] { prdNumber },
+				new RowMapper<Product>() {
+
+					@Override
+					public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Product product = new Product();
+						product.setPrdId(rs.getInt("prd_id"));
+						product.setPrdCode(rs.getString("code"));
+						product.setPrdName(rs.getString("prd_name"));
+						product.setCreateBy(rs.getString("create_by"));
+						product.setCreateDate(rs.getDate("create_date"));
+						product.setState(rs.getShort("prd_state"));
+						product.setRackDet(rs.getString("rack_no"));
+						product.setMinQtyLevel(rs.getDouble("min_qty_lev"));
+
+						Brand brand = new Brand();
+						brand.setBrandId(rs.getInt("brand_id"));
+						brand.setBrandName(rs.getString("brand_name"));
+
+						product.setBrand(brand);
+
+						Category category = new Category();
+						category.setCategoryId(rs.getInt("categ_id"));
+						category.setCategoryName(rs.getString("categ_name"));
+
+						product.setCategory(category);
+
+						Uom uom = new Uom();
+						uom.setUomId(rs.getInt("uom_id"));
+						uom.setUomName(rs.getString("uom_name"));
+						uom.setUomChar(rs.getString("char_prifix"));
+
+						product.setUom(uom);
+						return product;
+					}
+				});
 	}
 
 	@Override

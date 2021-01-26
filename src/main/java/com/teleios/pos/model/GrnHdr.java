@@ -14,7 +14,6 @@ public class GrnHdr implements Serializable {
 	private Integer batchNumber;
 	private Supplier supplier;
 	private Date grnDate;
-	private CheqDetails cheqDetails;
 	private PaymentType paymentType;
 	private boolean isTotValDiscount;
 	private BigDecimal grnValDiscount;
@@ -22,6 +21,7 @@ public class GrnHdr implements Serializable {
 	private BigDecimal totalValue;
 	private BigDecimal paybleAmount;
 	private BigDecimal paidAmount;
+	private BigDecimal chequPayment;
 	private BigDecimal balance;
 	private Integer itemCount;
 	private String createBy;
@@ -35,8 +35,8 @@ public class GrnHdr implements Serializable {
 	}
 
 	public GrnHdr(Integer grnNumber, String remark, Integer batchNumber, Supplier supplier, Date grnDate,
-			CheqDetails cheqDetails, PaymentType paymentType, boolean isTotValDiscount, BigDecimal grnValDiscount,
-			Float discPrecentage, BigDecimal totalValue, BigDecimal paybleAmount, BigDecimal paidAmount,
+			PaymentType paymentType, boolean isTotValDiscount, BigDecimal grnValDiscount, Float discPrecentage,
+			BigDecimal totalValue, BigDecimal paybleAmount, BigDecimal paidAmount, BigDecimal chequPayment,
 			BigDecimal balance, Integer itemCount, Date createDate, String createBy, short grnState) {
 		super();
 		this.grnNumber = grnNumber;
@@ -44,7 +44,6 @@ public class GrnHdr implements Serializable {
 		this.batchNumber = batchNumber;
 		this.supplier = supplier;
 		this.grnDate = grnDate;
-		this.cheqDetails = cheqDetails;
 		this.paymentType = paymentType;
 		this.isTotValDiscount = isTotValDiscount;
 		this.grnValDiscount = grnValDiscount;
@@ -52,6 +51,7 @@ public class GrnHdr implements Serializable {
 		this.totalValue = totalValue;
 		this.paybleAmount = paybleAmount;
 		this.paidAmount = paidAmount;
+		this.chequPayment = chequPayment;
 		this.balance = balance;
 		this.itemCount = itemCount;
 		this.createDate = createDate;
@@ -97,14 +97,6 @@ public class GrnHdr implements Serializable {
 
 	public void setGrnDate(Date grnDate) {
 		this.grnDate = grnDate;
-	}
-
-	public CheqDetails getCheqDetails() {
-		return cheqDetails;
-	}
-
-	public void setCheqDetails(CheqDetails cheqDetails) {
-		this.cheqDetails = cheqDetails;
 	}
 
 	public PaymentType getPaymentType() {
@@ -161,6 +153,14 @@ public class GrnHdr implements Serializable {
 
 	public void setPaidAmount(BigDecimal paidAmount) {
 		this.paidAmount = paidAmount;
+	}
+
+	public BigDecimal getChequPayment() {
+		return chequPayment;
+	}
+
+	public void setChequPayment(BigDecimal chequPayment) {
+		this.chequPayment = chequPayment;
 	}
 
 	public BigDecimal getBalance() {
