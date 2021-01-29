@@ -43,13 +43,14 @@ public class InvoiceDaoImpl implements Serializable, InvoiceDao {
 	@Override
 	public Integer createNewInvoiceHeader(InvHdr invHdr) throws SocketTimeoutException, DataAccessException, Exception {
 		LOGGER.info("<-------- Execute Create New Invoice Header In Invoice Repository -------->");
-		
+
 		Integer invoiceNumber = getNextInvoiceNumber();
 		if (invoiceNumber == null)
 			invoiceNumber = Integer.valueOf(1);
 		else
 			invoiceNumber = invoiceNumber + 1;
-		
+		invHdr.setBarcode(invoiceNumber + "12541");
+
 		this.jdbcTemplate.update(CREATE_NEW_INVHDR_SQL, invoiceNumber, invHdr.getCreateDate(),
 				invHdr.getTotalDiscoount(), invHdr.getTotalAmount(), invHdr.getCashValue(), invHdr.getBalance(),
 				invHdr.getPayType().getPayTypeId(), invHdr.getCustomer().getCustomerId(), invHdr.getCreateBy(),

@@ -13,7 +13,9 @@
 	<ui:composition template="/template/common/commonLayout.xhtml">
 		<ui:define name="content">
 			<script type="text/javascript" language="javascript">
-				
+				function addCashValue() {
+					PF('addCshValBlock').unblock();
+				}
 			</script>
 
 			<!-- Top Icon Button - Start -->
@@ -24,7 +26,7 @@
 						<p:commandButton icon="fa fa-user-plus" style="margin-right:5px;"
 							type="button" id="cusAdd" title="Add Customer"
 							widgetVar="btnAddCus" onclick="PF('cusAdd').show();" />
-						<p:hotkey bind="shift+c" handler="PF('cusAdd').show();"
+						<p:hotkey bind="ctrl+shift+c" handler="PF('cusAdd').show();"
 							id="hotAddCus" />
 					</div>
 
@@ -32,7 +34,7 @@
 						<p:commandButton icon="fa fa-male" style="margin-right:5px;"
 							type="button" id="lab" title="Labour Charges"
 							onclick="PF('labCost').show();" />
-						<p:hotkey bind="shift+l" handler="PF('labCost').show();"
+						<p:hotkey bind="ctrl+shift+l" handler="PF('labCost').show();"
 							id="hotAddLab" />
 					</div>
 
@@ -40,7 +42,7 @@
 						<p:commandButton icon="fa fa-truck" style="margin-right:5px;"
 							type="button" id="transport" title="Transport Charges"
 							onclick="PF('transCost').show();" />
-						<p:hotkey bind="shift+t" handler="PF('transCost').show();"
+						<p:hotkey bind="ctrl+shift+t" handler="PF('transCost').show();"
 							id="hotAddTra" />
 					</div>
 
@@ -55,7 +57,7 @@
 
 			<!-- Invoice - Start -->
 			<p:fieldset legend="Invoice" id="fldInv">
-				<h:form id="invoceForm"
+				<h:form id="invoceForm" prependId="false"
 					onkeypress="if (event.keyCode == 13) { return false; }">
 
 					<p:growl id="growl" sticky="false" life="3000" showDetail="true"
@@ -70,7 +72,7 @@
 
 									<div>
 										<h4>
-											Cashier : <span>Harith</span>
+											Cashier : <span>#{invController.cashierName}</span>
 										</h4>
 									</div>
 
@@ -78,8 +80,8 @@
 										<p:outputLabel value="Customer Name" for="@next" />
 										<br />
 										<p:autoComplete id="cusName" dropdown="true" size="40"
-											value="#{invController.selectedCustomer}" var="cus"
-											forceSelection="true" queryDelay="700"
+											maxResults="10" value="#{invController.selectedCustomer}"
+											var="cus" forceSelection="true" queryDelay="700"
 											widgetVar="autocomplete" itemLabel="#{cus}"
 											minQueryLength="3" itemValue="#{cus}"
 											completeMethod="#{invController.completeCustomerContains}"
@@ -115,7 +117,7 @@
 										<p:outputLabel value="Item" for="@next" />
 										<br />
 										<p:autoComplete id="itemDetails" dropdown="true"
-											widgetVar="wgitemDetails" style="width: 80%"
+											maxResults="5" widgetVar="wgitemDetails" style="width: 80%"
 											completeMethod="#{invController.completeItemsContains}"
 											var="item" value="#{invController.selectedItem}"
 											required="true"
@@ -169,6 +171,8 @@
 									<div class="p-col-2">
 										<p:outputLabel value="Discount (%)" for="@next" />
 										<p:remoteCommand name="addCrt"
+											onstart="PF('addCartBlock').block()"
+											oncomplete="PF('addCartBlock').unblock()"
 											action="#{invController.addTocart}" process="@this pnlInvDet"
 											update="growl,pnlInvDet,invoItemTable,totAmount,paybleAmount,dis,cPay" />
 										<br />
@@ -184,6 +188,16 @@
 									</div>
 
 								</div>
+
+								<pe:blockUI target="fldInv" widgetVar="addCartBlock">
+									<h:panelGrid columns="2">
+										<p:graphicImage value="../resources/img/ajax-loader.gif"
+											style="margin-right: 12px; vertical-align: middle;" />
+										<h:outputText value="Adding Item To Cart........"
+											style="white-space: nowrap;" />
+									</h:panelGrid>
+								</pe:blockUI>
+
 							</p:panel>
 							<!-- Item Details - End -->
 
@@ -232,7 +246,7 @@
 										<p:column style="width:32px;text-align: center">
 											<p:commandButton icon="pi pi-trash" title="Delete"
 												process="invoItemTable"
-												update=":invoceForm:totAmount,:invoceForm:paybleAmount,:invoceForm:dis,:invoceForm:invoItemTable,:invoceForm:growl"
+												update=":invoceForm:totAmount,:invoceForm:paybleAmount,:invoceForm:transportCharges,:invoceForm:laborCharges,:invoceForm:dis,:invoceForm:invoItemTable,:invoceForm:growl"
 												style="width:20px;height:20px" styleClass="red-button">
 												<f:setPropertyActionListener value="#{inv}"
 													target="#{invController.havRemoveDel}" />
@@ -331,7 +345,7 @@
 																	var="paytyp" itemValue="#{paytyp}"
 																	itemLabel="#{paytyp.desc}" />
 																<p:ajax listener="#{invController.onPayTypeChange}"
-																	update=":invoceForm:cheqPay" />
+																	update=":invoceForm:cheqPay,:invoceForm:growl" />
 															</p:selectOneMenu></td>
 													</tr>
 												</table>
@@ -345,7 +359,8 @@
 														<p:remoteCommand name="addCahsRecved"
 															action="#{invController.setCashReceved}"
 															process="pnlInvPayment"
-															onsuccess="PF('paidAmount').jq.focus();"
+															onstart="PF('addCshValBlock').block();"
+															oncomplete="addCashValue();if(!args.validationFailed){PF('paidAmount').jq.focus();}"
 															update=":invoceForm:growl,:invoceForm:pnlInvPayment" />
 														<td><p:inputText type="number" id="cPay"
 																widgetVar="cashPay"
@@ -362,19 +377,13 @@
 													</tr>
 
 													<tr>
-														<p:remoteCommand name="confirmInvoice"
-															action="#{invController.confirmInvoice}"
-															onstart="PF('onConfirmlock').block()"
-															oncomplete="PF('onConfirmlock').unblock()"
-															process="pnlInvPayment"
-															update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet" />
 														<td><h4>Total Paid Amount</h4></td>
 														<td><h4>:</h4></td>
 														<td><p:inputText id="paidAmount"
+																readonly="#{invController.txtCashPayReadOnly}"
 																widgetVar="paidAmount" type="number"
 																value="#{invController.invHdr.totalPaid}"
-																valueChangeListener="#{invController.onCashChange}"
-																onkeypress="if (event.keyCode === 13) { confirmInvoice(); return false; }">
+																valueChangeListener="#{invController.onCashChange}">
 																<p:ajax event="keyup" update=":invoceForm:balanceAmount" />
 															</p:inputText></td>
 													</tr>
@@ -390,15 +399,14 @@
 													</tr>
 
 													<tr>
+														<p:defaultCommand target="btnConfirm" scope="paidAmount" />
 														<td><p:commandButton value="Create Invoice"
-																icon="pi pi-check-circle"
+																id="btnConfirm" icon="pi pi-check-circle"
 																style="margin-right:20px;margin-top:10px;width:230%"
 																action="#{invController.confirmInvoice}"
 																onstart="PF('onConfirmlock').block()"
 																oncomplete="PF('onConfirmlock').unblock()"
-																process="pnlInvPayment"
-																update=":invoceForm:pnlInvPayment,:invoceForm:cusName,:invoceForm:invoItemTable,:invoceForm:growl,:invoceForm:pnlInvDet"
-																widgetVar="btnSave">
+																process="pnlInvPayment" widgetVar="btnSave">
 																<p:confirm
 																	message="Are You Sure Create New Cash Invocie?"
 																	icon="pi pi-check-circle" header="Confirm Cash Invoice" />
@@ -407,7 +415,14 @@
 												</table>
 											</div>
 										</div>
-
+										<pe:blockUI target="fldInv" widgetVar="addCshValBlock">
+											<h:panelGrid columns="2">
+												<p:graphicImage value="../resources/img/ajax-loader.gif"
+													style="margin-right: 12px; vertical-align: middle;" />
+												<h:outputText value="Adding Cashier Value........"
+													style="white-space: nowrap;" />
+											</h:panelGrid>
+										</pe:blockUI>
 
 									</p:panel>
 								</div>
@@ -615,14 +630,14 @@
 						<p:outputLabel value="Expire Date" for="@next" />
 						<br />
 						<p:inputText id="expDate"
-							value="#{empty invController.moreDetStockItem.expDate ? 'N/A' : invController.moreDetStockItem.expDate}"
+							value="#{ empty invController.moreDetStockItem.expDate  ? 'N/A' : invController.moreDetStockItem.expDate}"
 							style="width:100%" readonly="true">
 							<f:convertDateTime type="date" pattern="YYYY-MM-dd" />
 						</p:inputText>
 					</div>
 
 					<div class="p-col-12">
-						<p:outputLabel value="Max Feecable Discount(5)" for="@next" />
+						<p:outputLabel value="Max Feecable Discount(%)" for="@next" />
 						<br />
 						<p:inputText id="rackNo" style="width:100%" readonly="true"
 							value="#{invController.maxFeeDiscount}" />

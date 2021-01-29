@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
+import javax.faces.push.Push;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import com.teleios.pos.model.Customer;
 import com.teleios.pos.model.InvDet;
 import com.teleios.pos.model.InvHdr;
 import com.teleios.pos.model.PaymentType;
+import com.teleios.pos.model.Receivable;
 import com.teleios.pos.model.Stock;
 import com.teleios.pos.service.CustomerService;
 import com.teleios.pos.service.GrnService;
@@ -46,6 +50,8 @@ public class InvoiceController implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceController.class);
 
 	// Injected OBJ
+	@Autowired
+	private FacesContext facesContext;
 	@Autowired
 	private CustomerService customerService;
 	@Autowired
@@ -64,6 +70,8 @@ public class InvoiceController implements Serializable {
 	private boolean txtDiscountLock;
 	private boolean txtCheqPayLock;
 	private boolean txtCashPayLock;
+	private boolean txtCashPayReadOnly;
+	private String cashierName;
 
 	// New Customer Details
 	private String newCusFirstName;
@@ -89,11 +97,12 @@ public class InvoiceController implements Serializable {
 	private BigDecimal discount;
 
 	@PostConstruct
-	public void init() {
+	public void init() throws AccessDeniedException {
 		LOGGER.info("Execute Invoice Controller Init --------->");
 		this.txtDiscountLock = true;
 		this.txtCashPayLock = true;
 		this.txtCheqPayLock = true;
+		this.txtCashPayReadOnly = true;
 		loadAllActiveCustomers();
 		loadAllStockForPOS();
 		this.invHdr = new InvHdr();
@@ -105,6 +114,12 @@ public class InvoiceController implements Serializable {
 		this.invHdr.setTotalDiscoount(BigDecimal.ZERO);
 		this.invHdr.setPayblAmount(BigDecimal.ZERO);
 		loadPaymentTypes();
+		Authentication authTwo = SecurityContextHolder.getContext().getAuthentication();
+		if (authTwo != null) {
+			setCashierName(authTwo.getName());
+		} else {
+			throw new AccessDeniedException("Un Authorized Access !");
+		}
 	}
 
 	private void loadPaymentTypes() {
@@ -278,6 +293,7 @@ public class InvoiceController implements Serializable {
 	}
 
 	private void calcMaxFessDiscount(final Stock stock) {
+
 		BigDecimal maxProfitMargin = BigDecimal.ZERO;
 		BigDecimal maxDiscount = BigDecimal.ZERO;
 		try {
@@ -405,6 +421,8 @@ public class InvoiceController implements Serializable {
 				if (getInvDets().size() <= 0) {
 					setTxtDiscountLock(true);
 					setTxtCashPayLock(true);
+					getInvHdr().setTransaCharge(BigDecimal.ZERO);
+					getInvHdr().setLabourCharge(BigDecimal.ZERO);
 				}
 				setFooterValue(getHavRemoveDel(), 0);
 				addMessage("Remove Invoice Item", "Successfuly Remove Invoice Item!");
@@ -421,12 +439,14 @@ public class InvoiceController implements Serializable {
 		LOGGER.info("<------- Execute Invoice Header Set Footer Value ------>");
 		switch (state) {
 		case 1:
-			getInvHdr().setTotalAmount(getInvHdr().getTotalAmount().add(invDet.getAmount()));
+			getInvHdr().setTotalAmount(getInvHdr().getTotalAmount().add(invDet.getAmount())
+					.add(getInvHdr().getLabourCharge()).add(getInvHdr().getTransaCharge()));
 			getInvHdr().setPayblAmount(invHdr.getTotalAmount());
 			break;
 		case 0:
 			getInvHdr().setTotalAmount(getInvHdr().getTotalAmount().subtract(invDet.getAmount()));
 			getInvHdr().setPayblAmount(invHdr.getTotalAmount());
+			this.subNumber = subNumber - 1;
 			break;
 		}
 
@@ -495,8 +515,10 @@ public class InvoiceController implements Serializable {
 				getInvHdr().setTotalDiscoount(BigDecimal.ZERO);
 			} else {
 				getInvHdr().setTotalDiscoount(discounValue);
-				getInvHdr().setPayblAmount(getInvHdr().getPayblAmount().subtract(getInvHdr().getTotalAmount()
-						.multiply(discounValue.divide(BigDecimal.valueOf(100.00), 2, RoundingMode.HALF_EVEN))));
+				getInvHdr().setPayblAmount(getInvHdr().getPayblAmount()
+						.subtract(
+								getInvHdr().getTotalAmount().multiply(discounValue.divide(BigDecimal.valueOf(100.00))))
+						.setScale(2, RoundingMode.HALF_EVEN));
 			}
 		} catch (NumberFormatException nfe) {
 			LOGGER.error("Enter Discount Invalied Input", nfe);
@@ -523,7 +545,13 @@ public class InvoiceController implements Serializable {
 					break;
 
 				case TeleiosPosConstant.CREDICT:
-					// TODO Invoice Credit Payment Goes Hear
+					if (getSelectedCustomer() != null)
+						if (getSelectedCustomer().getCustomerId().equals(Integer.valueOf(1))) {
+							addErrorMessage("Select Invocie Payment Type",
+									"You Are Going To Place Credit Invoice\nTheire For Customer Shuld be Selected Customer!");
+							return;
+						}
+
 					break;
 
 				case TeleiosPosConstant.CASH:
@@ -556,24 +584,60 @@ public class InvoiceController implements Serializable {
 		LOGGER.info("<----- Execute Set Cash Receved ----->");
 		try {
 			if (getSelPayType() != null) {
-				if (invHdr.getCashValue() == null) {
-					addErrorMessage("Enter Cash Receved", "The Cash Value Is Required!");
-					return;
-				}
-				if (invHdr.getCashValue().compareTo(BigDecimal.ZERO) <= 0) {
-					addErrorMessage("Enter Cash Receved", "The Cash Payment Shuld Gretter thaan Zero!");
-					return;
-				}
-				if (invHdr.getCashValue().compareTo(invHdr.getPayblAmount()) == -1) {
-					addErrorMessage("Couldnd Complite Cash Invoice",
-							"The Cash Payment Shuld Gretter thaan Or Equal to Invoice Payble Amount!");
-					return;
+				switch (getSelPayType().getPayTypeId()) {
+				case TeleiosPosConstant.CASH:
+					if (invHdr.getCashValue() == null) {
+						UIInput input = (UIInput) facesContext.getViewRoot().findComponent("invoceForm:cPay");
+						input.setValid(false);
+						facesContext.addMessage(input.getClientId(facesContext),
+								new FacesMessage(FacesMessage.SEVERITY_ERROR, "Enter Cashier Receved",
+										"Cashier Receved Value Is Required!"));
+						facesContext.validationFailed();
+						return;
+					}
+					if (invHdr.getCashValue().compareTo(BigDecimal.ZERO) <= 0) {
+						UIInput input = (UIInput) facesContext.getViewRoot().findComponent("invoceForm:cPay");
+						input.setValid(false);
+						facesContext.addMessage(input.getClientId(facesContext),
+								new FacesMessage(FacesMessage.SEVERITY_ERROR, "Enter Cashier Receved",
+										"Cashier Receved Value Canot be Zero Or Minus!"));
+						facesContext.validationFailed();
+						return;
+					}
+					if (invHdr.getCashValue().compareTo(invHdr.getPayblAmount()) == -1) {
+						UIInput input = (UIInput) facesContext.getViewRoot().findComponent("invoceForm:cPay");
+						input.setValid(false);
+						facesContext.addMessage(input.getClientId(facesContext),
+								new FacesMessage(FacesMessage.SEVERITY_ERROR, "Enter Cashier Receved",
+										"Cashier Receved Value Shuld Be Greter Than Payble Amount!"));
+						facesContext.validationFailed();
+						return;
+					}
+
+					getInvHdr().setTotalPaid(getInvHdr().getPayblAmount().setScale(2, RoundingMode.HALF_EVEN));
+					getInvHdr().setBalance(getInvHdr().getPayblAmount().subtract(invHdr.getCashValue()));
+					setTxtDiscountLock(true);
+					break;
+
+				case TeleiosPosConstant.CREDICT:
+					if (getSelectedCustomer().getCustomerId().equals(Integer.valueOf(1))) {
+						addErrorMessage("Select Invocie Payment Type",
+								"You Are Going To Place Credit Invoice\nTheire For Customer Shuld be Selected Customer!");
+						return;
+					}
+					getInvHdr().setCashValue(BigDecimal.ZERO);
+					getInvHdr().setTotalPaid(BigDecimal.ZERO);
+					getInvHdr().setBalance(getInvHdr().getPayblAmount());
+					break;
+
+				default:
+					addErrorMessage("Enter Cash Receved", "Undefine Payment Type!");
+					break;
 				}
 
-				if (getSelPayType().getPayTypeId() == TeleiosPosConstant.CASH) {
-					invHdr.setTotalPaid(getInvHdr().getPayblAmount());
-					invHdr.setBalance(getInvHdr().getPayblAmount().subtract(invHdr.getCashValue()));
-				}
+			} else {
+				addErrorMessage("Enter Cash Receved", "Select Payment Type Is Required!");
+				return;
 			}
 		} catch (Exception e) {
 			LOGGER.error("Handle Cashier Cashe Recevd Error", e);
@@ -596,17 +660,17 @@ public class InvoiceController implements Serializable {
 			}
 		} catch (NumberFormatException nfe) {
 			LOGGER.error("Enter Cash Recived Invalied Input", nfe);
-			addMessage("Enter Cash Recived", "Invalied Input\n" + nfe.getLocalizedMessage());
+			addErrorMessage("Enter Cash Recived", "Invalied Input\n" + nfe.getLocalizedMessage());
 		} catch (ArithmeticException ame) {
 			LOGGER.error("Enter Cash Recived Arithmetic Exception", ame);
-			addMessage("Enter Cash Recived", "Arithmetic Exception\n" + ame.getLocalizedMessage());
+			addErrorMessage("Enter Cash Recived", "Arithmetic Exception\n" + ame.getLocalizedMessage());
 		} catch (NullPointerException npe) {
 			getInvHdr().setCashValue(BigDecimal.ZERO);
 			getInvHdr().setBalance(getInvHdr().getPayblAmount());
 			getInvHdr().setTotalPaid(BigDecimal.ZERO);
 		} catch (Exception e) {
 			LOGGER.error("Cash Recived System Error Occured", e);
-			addMessage("Enter Cash Recived", "System Error Occured\n" + e.getLocalizedMessage());
+			addErrorMessage("Enter Cash Recived", "System Error Occured\n" + e.getLocalizedMessage());
 		}
 	}
 
@@ -632,7 +696,62 @@ public class InvoiceController implements Serializable {
 				break;
 
 			case TeleiosPosConstant.CREDICT:
-				// TODO Invoice Credit Payment Goes Hear
+				if (getSelectedCustomer().getCustomerId().equals(Integer.valueOf(1))) {
+					addErrorMessage("Select Invocie Payment Type",
+							"You Are Going To Place Credit Invoice\nTheire For Customer Shuld be Selected Customer!");
+					return;
+				}
+				try {
+					getInvHdr().setCreateDate(new Date());
+					Authentication authTwo = SecurityContextHolder.getContext().getAuthentication();
+					if (authTwo != null) {
+						getInvHdr().setCreateBy(authTwo.getName());
+					} else {
+						throw new AccessDeniedException("Un Authorized Access !");
+					}
+					getInvHdr().setState(TeleiosPosConstant.CREDICT);
+					getInvHdr().setCustomer(getSelectedCustomer());
+					getInvHdr().setPayType(getSelPayType());
+					getInvHdr().setChequAmount(BigDecimal.ZERO);
+					getInvHdr().setCashValue(BigDecimal.ZERO);
+					getInvHdr().setTotalPaid(BigDecimal.ZERO);
+					getInvHdr().setBalance(getInvHdr().getPayblAmount());
+
+					Receivable receivable = new Receivable(Integer.valueOf(1), getInvHdr().getBalance(), getInvHdr(),
+							getSelPayType(), (short) 1, getSelectedCustomer(), getInvHdr().getCreateDate(),
+							getInvHdr().getCreateBy());
+
+					Integer createdInvoiceNumber = this.invoiceService.createNewCreditInvoice(getInvHdr(), getInvDets(),
+							receivable);
+
+					if (createdInvoiceNumber != null) {
+						setInvoiceNumber(createdInvoiceNumber);
+						addMessage("Confirm Cash Invoice",
+								"Successfuly Created Inovoice!\nInvoice Number: " + getInvoiceNumber());
+						clearAll();
+						PrimeFaces.current().ajax().update(":invoceForm:pnlInvPayment", ":invoceForm:cusName",
+								":invoceForm:pType", ":invoceForm:invoItemTable", ":invoceForm:growl",
+								":invoceForm:pnlInvDet");
+						PrimeFaces.current().scrollTo("fldInv");
+						// TODO PRINT INVOICE GOES HEAR
+					} else {
+						addErrorMessage("Confirm Cash Invoice", "Invoice Create Failed !");
+					}
+				} catch (SocketTimeoutException ste) {
+					LOGGER.error("Confirm New Cash Invoice Coluldnt Connect To Database Error", ste);
+					addErrorMessage("Confirm New Cash Invoice",
+							"Coluldnt Connecto To Data Base Please Inform To System Admin\n"
+									+ ste.getLocalizedMessage());
+				} catch (DataAccessException dae) {
+					LOGGER.error("Confirm New Cash Invoice Data Access Error", dae);
+					addErrorMessage("Confirm New Cash Invoice",
+							"Data Access Errro Please Inform To System Admin\n" + dae.getLocalizedMessage());
+				} catch (Exception e) {
+					LOGGER.error("Confirm New Cash Invoice System  Error Occured", e);
+					addErrorMessage("Confirm New Cash Invoice",
+							"System  Error Occured Please Inform To System Admin\n" + e.getLocalizedMessage());
+				}
+
 				break;
 
 			case TeleiosPosConstant.CASH:
@@ -645,7 +764,7 @@ public class InvoiceController implements Serializable {
 						addErrorMessage("Confirm Invoice", "The Paid Amount Is Required!");
 						return;
 					}
-					
+
 					if (invHdr.getTotalPaid().compareTo(invHdr.getPayblAmount()) == -1) {
 						addErrorMessage("Couldnd Complite Cash Invoice",
 								"The Cash Payment Shuld Gretter thaan Or Equal to Invoice Payble Amount!");
@@ -662,11 +781,12 @@ public class InvoiceController implements Serializable {
 					getInvHdr().setCustomer(getSelectedCustomer());
 					getInvHdr().setPayType(getSelPayType());
 					getInvHdr().setChequAmount(BigDecimal.ZERO);
-					getInvHdr().setBarcode("123456");
 
 					CashRecived cashRecived = new CashRecived(new Integer(1), getInvHdr().getPayblAmount(),
-							getInvHdr().getCashValue(), getInvHdr().getBalance(), getInvHdr().getCreateDate(), null,
-							auth.getName(), (short) 1, getSelectedCustomer(), getInvHdr());
+							getInvHdr().getCashValue(), getInvHdr().getBalance().setScale(2, RoundingMode.HALF_EVEN),
+							getInvHdr().getCreateDate(), null, auth.getName(), (short) 1, getSelectedCustomer(),
+							getInvHdr());
+
 					getInvHdr().setBalance(BigDecimal.ZERO);
 
 					Integer createdInvoiceNumber = this.invoiceService.createNewCashInvoice(getInvHdr(), getInvDets(),
@@ -677,6 +797,10 @@ public class InvoiceController implements Serializable {
 						addMessage("Confirm Cash Invoice",
 								"Successfuly Created Inovoice!\nInvoice Number: " + getInvoiceNumber());
 						clearAll();
+						PrimeFaces.current().ajax().update(":invoceForm:pnlInvPayment", ":invoceForm:cusName",
+								":invoceForm:pType", ":invoceForm:invoItemTable", ":invoceForm:growl",
+								":invoceForm:pnlInvDet");
+						PrimeFaces.current().scrollTo("fldInv");
 						// TODO PRINT INVOICE GOES HEAR
 					} else {
 						addErrorMessage("Confirm Cash Invoice", "Invoice Create Failed !");
@@ -715,6 +839,7 @@ public class InvoiceController implements Serializable {
 			// TODO: handle exception
 		}
 	}
+
 
 	private void clearInvDet(final int flag) {
 		LOGGER.info("<-------- Clear Invoice Details Execute -------->");
@@ -759,17 +884,17 @@ public class InvoiceController implements Serializable {
 	// Faces Messages
 	private void addMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, summery, details);
-		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
+		facesContext.addMessage(null, facesMessage);
 	}
 
 	private void addWarMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_WARN, summery, details);
-		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
+		facesContext.addMessage(null, facesMessage);
 	}
 
 	private void addErrorMessage(String summery, String details) {
 		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summery, details);
-		FacesContext.getCurrentInstance().addMessage(null, facesMessage);
+		facesContext.addMessage(null, facesMessage);
 	}
 
 	public List<Customer> getAllActiveCustomers() {
@@ -948,6 +1073,22 @@ public class InvoiceController implements Serializable {
 
 	public void setInvoiceNumber(Integer invoiceNumber) {
 		this.invoiceNumber = invoiceNumber;
+	}
+
+	public boolean isTxtCashPayReadOnly() {
+		return txtCashPayReadOnly;
+	}
+
+	public void setTxtCashPayReadOnly(boolean txtCashPayReadOnly) {
+		this.txtCashPayReadOnly = txtCashPayReadOnly;
+	}
+
+	public String getCashierName() {
+		return cashierName;
+	}
+
+	public void setCashierName(String cashierName) {
+		this.cashierName = cashierName;
 	}
 
 }

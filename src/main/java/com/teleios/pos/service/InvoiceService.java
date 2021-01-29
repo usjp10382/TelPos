@@ -67,6 +67,7 @@ public class InvoiceService implements Serializable {
 		invoiceNumber = this.invoiceDaoImpl.createNewInvoiceHeader(invHdr);
 		this.invoiceDaoImpl.createNewInvoiceDetails(invDets, invoiceNumber);
 		this.stockDaoImpl.updateStockForNewInvoice(invDets);
+		invHdr.setInvNumber(invoiceNumber);
 		this.recevableDaoImpl.createNewRecevable(receivable);
 		this.customerDaoImpl.updateCustomerBalance(invHdr.getCustomer(), invHdr.getBalance());
 
